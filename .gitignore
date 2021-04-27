@@ -1,0 +1,38 @@
+# Gradle build files
+build/
+.gradle
+
+# Local gradle properties
+local.properties
+
+# IntelliJ .idea folder
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+.idea/tasks.xml
+.idea/compiler.xml
+/.idea/assetWizardSettings.xml
+/.idea/jarRepositories.xml
+gradle.xml
+markdown-*.xml
+*.iml
+
+# General
+.DS_Store
+.externalNativeBuild
+.cxx
+
+# Log Files
+*.log
+
+# Android Studio Navigation editor temp files
+.navigation/
+
+# Android Studio captures folder
+captures/
+
+# Built application files
+*.apk
+*.aar
