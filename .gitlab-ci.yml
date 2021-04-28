@@ -1,0 +1,95 @@
+image: "registry.gitlab.e.foundation:5000/e/apps/docker-android-apps-cicd:latest"
+
+stages:
+  - update
+  - qa
+  - build
+  - test
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_PIPELINE_SOURCE == "push"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+
+before_script:
+  - export GRADLE_USER_HOME=$(pwd)/.gradle
+  - chmod +x ./gradlew
+
+cache:
+  key: ${CI_PROJECT_ID}
+  paths:
+    - .gradle/
+
+nightly-tasks:
+  stage: update
+  script:
+    - ./gradlew dependencyUpdates
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+  artifacts:
+    paths:
+      - build/dependencyUpdates
+
+quality-analysis:
+  stage: qa
+  script:
+    - ./gradlew spotlessCheck
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
+    - when: always
+
+build-debug:
+  stage: build
+  script:
+    - ./gradlew assembleDebug
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
+    - when: on_success
+  artifacts:
+    paths:
+      - app/build/outputs/apk
+
+test-debug:
+  stage: test
+  script:
+    - ./gradlew testDebug --stacktrace
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
+    - when: on_success
+  artifacts:
+    paths:
+      - ./**/build/reports/tests/testDebugUnitTest
+
+build-full:
+  stage: build
+  script:
+    - ./gradlew build
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: always
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+      when: always
+    - when: never
+  artifacts:
+    paths:
+      - app/build/outputs/apk
+      - app/build/reports
