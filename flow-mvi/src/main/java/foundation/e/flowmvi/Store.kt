@@ -17,4 +17,8 @@
 
 package foundation.e.flowmvi
 
-class MyClass
+import kotlinx.coroutines.flow.StateFlow
+
+interface Store<State : Any, in Action : Any> {
+    val state: StateFlow<State>
+}
