@@ -15,10 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package foundation.e.privacycentralapp
+package foundation.e.privacycentralapp.features
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import foundation.e.privacycentralapp.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

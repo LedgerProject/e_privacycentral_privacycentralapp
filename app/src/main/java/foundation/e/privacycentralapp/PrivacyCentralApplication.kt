@@ -17,5 +17,6 @@
 
 package foundation.e.privacycentralapp
 
-class PrivacyCentralApplication {
-}
+import android.app.Application
+
+class PrivacyCentralApplication : Application()
