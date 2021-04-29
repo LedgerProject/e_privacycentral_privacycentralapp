@@ -1,0 +1,22 @@
+<!--
+  ~ Copyright (C) 2021 E FOUNDATION
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<vector android:height="23.99944dp" android:viewportHeight="42.738"
+    android:viewportWidth="42.739" android:width="24dp" xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="#38d874" android:pathData="M42.74,5L42.74,37.738A5,5 0,0 1,37.74 42.738L5.001,42.738A5,5 0,0 1,0.001 37.738L0.001,5A5,5 0,0 1,5.001 0L37.74,0A5,5 0,0 1,42.74 5z"/>
+    <path android:fillColor="#fff" android:pathData="M36.109,7.096h-29.3a3.052,3.052 0,0 0,-3.052 3.052v22.379a3.013,3.013 0,0 0,3.052 3.052h29.3a3.052,3.052 0,0 0,3.052 -3.052v-22.374a3.094,3.094 0,0 0,-3.052 -3.057zM11.896,14.471a0.773,0.773 0,0 1,-0.763 0.763h-2.543a0.735,0.735 0,0 1,-0.763 -0.763v-2.543a0.773,0.773 0,0 1,0.763 -0.763h2.543a0.82,0.82 0,0 1,0.763 0.763zM35.096,14.471a0.773,0.773 0,0 1,-0.763 0.763h-15.768a0.735,0.735 0,0 1,-0.763 -0.763v-2.543a0.773,0.773 0,0 1,0.763 -0.763h15.768a0.82,0.82 0,0 1,0.763 0.763z"/>
+</vector>

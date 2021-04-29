@@ -15,15 +15,35 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package foundation.e.privacycentralapp.features
+package foundation.e.privacycentralapp.features.dashboard
 
+import android.graphics.Color
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import foundation.e.privacycentralapp.R
 
-class MainActivity : AppCompatActivity() {
+class DashboardActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        title = "My Privacy Dashboard"
+        setSupportActionBar(findViewById(R.id.toolbar))
+
+        addClickToMore(findViewById<TextView>(R.id.personal_leakag_info))
+    }
+
+    private fun addClickToMore(textView: TextView) {
+        val clickToMore = SpannableString("Click to learn more")
+        clickToMore.setSpan(
+            ForegroundColorSpan(Color.parseColor("#007fff")),
+            0,
+            clickToMore.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        textView.append(clickToMore)
     }
 }

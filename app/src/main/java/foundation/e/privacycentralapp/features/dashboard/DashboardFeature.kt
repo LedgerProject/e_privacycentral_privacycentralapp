@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package foundation.e.privacycentralapp.features
+package foundation.e.privacycentralapp.features.dashboard
 
 import foundation.e.flowmvi.Actor
 import foundation.e.flowmvi.Reducer

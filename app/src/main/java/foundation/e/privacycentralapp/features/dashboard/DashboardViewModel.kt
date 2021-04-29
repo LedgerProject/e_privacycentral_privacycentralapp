@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package foundation.e.privacycentralapp.features
+package foundation.e.privacycentralapp.features.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import foundation.e.flowmvi.feature.BaseFeature
 
-class HomeViewModel : ViewModel() {
+class DashboardViewModel : ViewModel() {
 
     val homeFeature: BaseFeature<HomeFeature.State, HomeFeature.Action,
         HomeFeature.Effect, HomeFeature.SingleEvent> by lazy {
