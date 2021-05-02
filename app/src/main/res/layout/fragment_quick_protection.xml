@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    >
+
+    <Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:layout_gravity="top|center"
+        android:background="@color/white"
+        tools:layout_height="56dp"
+        />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="?android:attr/actionBarSize"
+        android:layout_marginBottom="56dp"
+        tools:context=".main.MainActivity"
+        >
+
+        <TextView
+            android:id="@+id/quick_protection_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:paddingLeft="32dp"
+            android:paddingRight="32dp"
+            android:paddingTop="16dp"
+            android:text="@string/quick_protection_info"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            />
+
+        <TextView
+            android:id="@+id/quick_protection_settings_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:paddingLeft="32dp"
+            android:paddingRight="32dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/quick_protection_settings_list"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            />
+    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="56dp"
+        android:paddingRight="32dp"
+        android:paddingLeft="32dp"
+        android:gravity="center_vertical|right"
+        android:id="@+id/learn_more"
+        android:text="@string/learn_more"
+        android:textColor="#007fff"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif-medium"
+        android:layout_gravity="bottom|right"/>
+</FrameLayout>

@@ -11,4 +11,23 @@
     <string name="my_location_subtitle">"7 apps are using location permission\n Current location mode: "</string>
     <string name="internet_activity_privacy_title">My Internet Activity Privacy</string>
     <string name="internet_activity_privacy_subtitle">"Current internet activity mode: "</string>
+    <string name="quick_protection_info">Quick protection enables these settings when turned on</string>
+    <string name="quick_protection_settings_list"> - All trackers are turned off.\n- Your geolocation will be faked.\n- Your real IP address will be hidden.</string>
+    <string name="learn_more">Learn more</string>
+    <string name="fake_location_info">Choose if you want to fake your real location when app asks for your geolocation tracking.</string>
+    <string name="use_real_location">Use real location</string>
+    <string name="use_random_location">Use random plausible location</string>
+    <string name="use_specific_location">Use specific location</string>
+    <string name="longitude">Longitude</string>
+    <string name="latitude">Latitude</string>
+    <string name="add_location">Add location</string>
+    <string name="internet_activity_privacy_info">Choose if you want to expose your real IP address or hide when connected to the internet (uses the tor network).</string>
+    <string name="use_real_ip">Use real IP address</string>
+    <string name="i_can_be_tracked">I can be tracked by my IP address.</string>
+    <string name="hide_ip">Hide IP address</string>
+    <string name="i_am_anonymous">I am anonymous on the internet.</string>
+    <string name="permission_control_info">Manage and control apps requesting various permissions.</string>
+
+    <string name="apps_allowed">%1$d of %2$d apps allowed</string>
+    <string name="apps_access_to_permission">Apps which has access to %1$s permission</string>
 </resources>

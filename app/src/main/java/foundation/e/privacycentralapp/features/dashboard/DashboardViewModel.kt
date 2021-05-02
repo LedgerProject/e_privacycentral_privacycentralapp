@@ -20,11 +20,23 @@ package foundation.e.privacycentralapp.features.dashboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import foundation.e.flowmvi.feature.BaseFeature
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 
 class DashboardViewModel : ViewModel() {
 
-    val homeFeature: BaseFeature<HomeFeature.State, HomeFeature.Action,
-        HomeFeature.Effect, HomeFeature.SingleEvent> by lazy {
+    private val _actions = MutableSharedFlow<DashboardFeature.Action>()
+    val actions = _actions.asSharedFlow()
+
+    val homeFeature: BaseFeature<DashboardFeature.State, DashboardFeature.Action,
+        DashboardFeature.Effect, DashboardFeature.SingleEvent> by lazy {
         homeFeature(coroutineScope = viewModelScope)
+    }
+
+    fun submitAction(action: DashboardFeature.Action) {
+        viewModelScope.launch {
+            _actions.emit(action)
+        }
     }
 }

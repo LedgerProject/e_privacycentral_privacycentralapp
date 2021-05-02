@@ -1,8 +1,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.PrivacyCentralApp" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <style name="Theme.PrivacyCentralApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimary">#007fff</item>
+        <item name="colorAccent">#007fff</item>
+        <item name="colorSecondary">#007fff</item>
+        <item name="colorControlNormal">#007fff</item>
         <!-- Status bar color. -->
         <!-- Customize your theme here. -->
     </style>

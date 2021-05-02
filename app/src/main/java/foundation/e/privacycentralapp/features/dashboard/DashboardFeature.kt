@@ -23,47 +23,51 @@ import foundation.e.flowmvi.feature.BaseFeature
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flowOf
 
-// Define a state machine for HomeFeature
-object HomeFeature {
+// Define a state machine for Dashboard Feature
+object DashboardFeature {
     sealed class State {
-        object Loading : State()
-        object Loaded : State()
+        object DashboardState : State()
+        object QuickProtectionState : State()
     }
 
     sealed class SingleEvent {
-        object NavigateToQuickProtection : SingleEvent()
-        object NavigateToTrackers : SingleEvent()
-        object NavigateToInternetActivityPolicy : SingleEvent()
-        object NavigateToLocation : SingleEvent()
-        object NavigateToPermissionManagement : SingleEvent()
+        object NavigateToQuickProtectionSingleEvent : SingleEvent()
+        object NavigateToTrackersSingleEvent : SingleEvent()
+        object NavigateToInternetActivityPolicySingleEvent : SingleEvent()
+        object NavigateToLocationSingleEvent : SingleEvent()
+        object NavigateToPermissionManagementSingleEvent : SingleEvent()
     }
 
     sealed class Action {
-        object load : Action()
+        object ShowQuickPrivacyProtectionInfoAction : Action()
+        object ShowDashboardAction : Action()
     }
 
     sealed class Effect {
-        object LoadingFinished : Effect()
+        object OpenQuickPrivacyProtectionEffect : Effect()
+        object OpenDashboardEffect : Effect()
     }
 }
 
-private val reducer: Reducer<HomeFeature.State, HomeFeature.Effect> = { _, effect ->
+private val reducer: Reducer<DashboardFeature.State, DashboardFeature.Effect> = { _, effect ->
     when (effect) {
-        HomeFeature.Effect.LoadingFinished -> HomeFeature.State.Loaded
+        DashboardFeature.Effect.OpenQuickPrivacyProtectionEffect -> DashboardFeature.State.QuickProtectionState
+        DashboardFeature.Effect.OpenDashboardEffect -> DashboardFeature.State.DashboardState
     }
 }
 
-private val actor: Actor<HomeFeature.State, HomeFeature.Action, HomeFeature.Effect> =
+private val actor: Actor<DashboardFeature.State, DashboardFeature.Action, DashboardFeature.Effect> =
     { _, action ->
         when (action) {
-            HomeFeature.Action.load -> flowOf(HomeFeature.Effect.LoadingFinished)
+            DashboardFeature.Action.ShowQuickPrivacyProtectionInfoAction -> flowOf(DashboardFeature.Effect.OpenQuickPrivacyProtectionEffect)
+            DashboardFeature.Action.ShowDashboardAction -> flowOf(DashboardFeature.Effect.OpenDashboardEffect)
         }
     }
 
 fun homeFeature(
-    initialState: HomeFeature.State = HomeFeature.State.Loading,
+    initialState: DashboardFeature.State = DashboardFeature.State.DashboardState,
     coroutineScope: CoroutineScope
-) = BaseFeature<HomeFeature.State, HomeFeature.Action, HomeFeature.Effect, HomeFeature.SingleEvent>(
+) = BaseFeature<DashboardFeature.State, DashboardFeature.Action, DashboardFeature.Effect, DashboardFeature.SingleEvent>(
     initialState,
     actor,
     reducer,
