@@ -28,7 +28,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 
-// Define a state machine for Fake location feature
+// Define a state machine for Internet privacy feature
 class InternetPrivacyFeature(
     initialState: State,
     coroutineScope: CoroutineScope,
