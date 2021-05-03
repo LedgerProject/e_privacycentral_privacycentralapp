@@ -18,17 +18,21 @@
 package foundation.e.privacycentralapp.dummy
 
 import foundation.e.privacycentralapp.R
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlin.random.Random
 
 // ======================================================//
 //
-// ============    ====        ====   ============
-// ============    =====      =====   ====     ====
-//    ====        ======    ======   ====     ====
-//    ====        =======  =======   ============
-//    ====        ================   ====
-//    ====        ==== ====== ====   ====
-// ============    ====  ====  ====   ====
-// ============    ====   ==   ====   ====
+// ================    ====            ====   ===============
+// ================    ======        ======   ================
+//       ====          ========    ========   ====         ====
+//       ====          =========  =========   ====         ====
+//       ====          ====================   ================
+//       ====          ====  ========  ====   ===============
+//       ====          ====    ====    ====   ====
+// ================    ====     ==     ====   ====
+// ================    ====            ====   ====
 //
 // ======================================================//
 
@@ -47,7 +51,30 @@ data class Permission(
     val packagesAllowed: List<String> = emptyList()
 )
 
+enum class LocationMode {
+    REAL_LOCATION, RANDOM_LOCATION, CUSTOM_LOCATION
+}
+
+enum class InternetPrivacyMode {
+    REAL_IP, HIDE_IP
+}
+
+data class Location(val mode: LocationMode, val latitude: Double, val longitude: Double)
+
 object DummyDataSource {
+    private val _appsUsingLocationPerm = MutableStateFlow<List<String>>(emptyList())
+    val appsUsingLocationPerm = _appsUsingLocationPerm.asStateFlow()
+
+    const val trackersCount = 77
+    private val _activeTrackersCount = MutableStateFlow(10)
+    val activeTrackersCount = _activeTrackersCount.asStateFlow()
+
+    private val _location = MutableStateFlow(Location(LocationMode.REAL_LOCATION, 0.0, 0.0))
+    val location = _location.asStateFlow()
+
+    private val _internetActivityMode = MutableStateFlow(InternetPrivacyMode.REAL_IP)
+    val internetActivityMode = _internetActivityMode.asStateFlow()
+
     val permissions = arrayOf("Body Sensor", "Calendar", "Call Logs", "Location")
     val icons = arrayOf(
         R.drawable.ic_body_monitor,
@@ -137,5 +164,30 @@ object DummyDataSource {
 
     fun getPermission(permissionId: Int): Permission {
         return populatedPermission.get(permissionId)
+    }
+
+    fun setLocationMode(locationMode: LocationMode, location: Location? = null): Boolean {
+        when (locationMode) {
+            LocationMode.REAL_LOCATION ->
+                _location.value =
+                    Location(LocationMode.REAL_LOCATION, 24.39, 71.80)
+            LocationMode.RANDOM_LOCATION -> _location.value = randomLocation()
+            LocationMode.CUSTOM_LOCATION -> {
+                requireNotNull(location) { "Custom location should be null" }
+                _location.value = location.copy(mode = LocationMode.CUSTOM_LOCATION)
+            }
+        }
+        return true
+    }
+
+    private fun randomLocation(): Location = Location(
+        LocationMode.RANDOM_LOCATION,
+        Random.nextDouble(-90.0, 90.0),
+        Random.nextDouble(-180.0, 180.0)
+    )
+
+    fun setInternetPrivacyMode(mode: InternetPrivacyMode): Boolean {
+        _internetActivityMode.value = mode
+        return true
     }
 }

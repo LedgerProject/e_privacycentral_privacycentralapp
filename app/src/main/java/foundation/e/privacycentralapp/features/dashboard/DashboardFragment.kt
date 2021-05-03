@@ -23,8 +23,11 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.View
+import android.widget.ProgressBar
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toolbar
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.add
@@ -32,7 +35,12 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import foundation.e.flowmvi.MVIView
 import foundation.e.privacycentralapp.R
+import foundation.e.privacycentralapp.dummy.mapToString
+import foundation.e.privacycentralapp.features.internetprivacy.InternetPrivacyFragment
+import foundation.e.privacycentralapp.features.location.FakeLocationFragment
+import foundation.e.privacycentralapp.features.permissions.PermissionsFragment
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 
 class DashboardFragment :
     Fragment(R.layout.fragment_dashboard),
@@ -43,7 +51,40 @@ class DashboardFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launchWhenStarted {
-            viewModel.homeFeature.takeView(this, this@DashboardFragment)
+            viewModel.dashboardFeature.takeView(this, this@DashboardFragment)
+        }
+        lifecycleScope.launchWhenStarted {
+            viewModel.dashboardFeature.singleEvents.collect { event ->
+                if (event is DashboardFeature.SingleEvent.NavigateToLocationSingleEvent) {
+                    requireActivity().supportFragmentManager.commit {
+                        add<FakeLocationFragment>(R.id.container)
+                        setReorderingAllowed(true)
+                        addToBackStack("dashboard")
+                    }
+                } else if (event is DashboardFeature.SingleEvent.NavigateToQuickProtectionSingleEvent) {
+                    requireActivity().supportFragmentManager.commit {
+                        add<QuickProtectionFragment>(R.id.container)
+                        setReorderingAllowed(true)
+                        addToBackStack("dashboard")
+                    }
+                } else if (event is DashboardFeature.SingleEvent.NavigateToInternetActivityPrivacySingleEvent) {
+                    requireActivity().supportFragmentManager.commit {
+                        add<InternetPrivacyFragment>(R.id.container)
+                        setReorderingAllowed(true)
+                        addToBackStack("dashboard")
+                    }
+                } else if (event is DashboardFeature.SingleEvent.NavigateToPermissionsSingleEvent) {
+                    requireActivity().supportFragmentManager.commit {
+                        add<PermissionsFragment>(R.id.container)
+                        setReorderingAllowed(true)
+                        addToBackStack("dashboard")
+                    }
+                }
+            }
+        }
+        lifecycleScope.launchWhenStarted {
+            viewModel.submitAction(DashboardFeature.Action.ShowDashboardAction)
+            viewModel.submitAction(DashboardFeature.Action.ObserveDashboardAction)
         }
     }
 
@@ -55,6 +96,15 @@ class DashboardFragment :
         view.let {
             it.findViewById<TextView>(R.id.tap_to_enable_quick_protection).setOnClickListener {
                 viewModel.submitAction(DashboardFeature.Action.ShowQuickPrivacyProtectionInfoAction)
+            }
+            it.findViewById<RelativeLayout>(R.id.my_location).setOnClickListener {
+                viewModel.submitAction(DashboardFeature.Action.ShowFakeMyLocationAction)
+            }
+            it.findViewById<RelativeLayout>(R.id.internet_activity_privacy).setOnClickListener {
+                viewModel.submitAction(DashboardFeature.Action.ShowInternetActivityPrivacyAction)
+            }
+            it.findViewById<RelativeLayout>(R.id.apps_permissions).setOnClickListener {
+                viewModel.submitAction(DashboardFeature.Action.ShowAppsPermissions)
             }
         }
     }
@@ -78,15 +128,59 @@ class DashboardFragment :
 
     override fun render(state: DashboardFeature.State) {
         when (state) {
-            is DashboardFeature.State.QuickProtectionState -> {
-                requireActivity().supportFragmentManager.commit {
-                    add<QuickProtectionFragment>(R.id.container)
-                    setReorderingAllowed(true)
-                    addToBackStack("dashboard")
+            is DashboardFeature.State.InitialState, is DashboardFeature.State.LoadingDashboardState -> {
+                view?.let {
+                    it.findViewById<ProgressBar>(R.id.loadingSpinner).visibility = View.VISIBLE
+                    it.findViewById<NestedScrollView>(R.id.scrollContainer).visibility = View.GONE
                 }
             }
-            else -> {
-                // TODO: any remaining state must either be handled or needs to be passed down to the UI.
+            is DashboardFeature.State.DashboardState -> {
+                view?.let { view ->
+                    view.findViewById<ProgressBar>(R.id.loadingSpinner).visibility = View.GONE
+                    view.findViewById<NestedScrollView>(R.id.scrollContainer).visibility =
+                        View.VISIBLE
+                    view.findViewById<TextView>(R.id.am_i_tracked_subtitle).text = getString(
+                        R.string.am_i_tracked_subtitle,
+                        state.trackersCount,
+                        state.activeTrackersCount
+                    )
+                    view.findViewById<TextView>(R.id.apps_permissions_subtitle).text = getString(
+                        R.string.apps_permissions_subtitle,
+                        state.totalApps,
+                        state.permissionCount
+                    )
+                    view.findViewById<TextView>(R.id.my_location_subtitle).let {
+                        it.text = getString(
+                            R.string.my_location_subtitle,
+                            state.appsUsingLocationPerm,
+                        )
+                        it.append(
+                            SpannableString(state.locationMode.mapToString())
+                                .also {
+                                    it.setSpan(
+                                        ForegroundColorSpan(Color.parseColor("#007fff")),
+                                        0,
+                                        it.length,
+                                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                                    )
+                                }
+                        )
+                    }
+                    view.findViewById<TextView>(R.id.internet_activity_privacy_subtitle).let {
+                        it.text = getString(R.string.internet_activity_privacy_subtitle)
+                        it.append(
+                            SpannableString(state.internetPrivacyMode.mapToString())
+                                .also {
+                                    it.setSpan(
+                                        ForegroundColorSpan(Color.parseColor("#007fff")),
+                                        0,
+                                        it.length,
+                                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                                    )
+                                }
+                        )
+                    }
+                }
             }
         }
     }

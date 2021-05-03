@@ -15,24 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package foundation.e.privacycentralapp.features.location
+package foundation.e.privacycentralapp.dummy
 
-import android.os.Bundle
-import android.view.View
-import android.widget.Toolbar
-import androidx.fragment.app.Fragment
-import foundation.e.privacycentralapp.R
+fun LocationMode.mapToString(): String = when (this) {
+    LocationMode.REAL_LOCATION -> "Real location mode"
+    LocationMode.RANDOM_LOCATION -> "Random location mode"
+    LocationMode.CUSTOM_LOCATION -> "Fake location mode"
+}
 
-class FakeMyLocationFragment : Fragment(R.layout.fragment_fake_location) {
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
-        setupToolbar(toolbar)
-    }
-
-    private fun setupToolbar(toolbar: Toolbar) {
-        val activity = requireActivity()
-        activity.setActionBar(toolbar)
-        activity.title = "Fake My Location"
-    }
+fun InternetPrivacyMode.mapToString(): String = when (this) {
+    InternetPrivacyMode.REAL_IP -> "I'm exposing my real IP address"
+    InternetPrivacyMode.HIDE_IP -> "I'm anonymous on the internet"
 }

@@ -25,7 +25,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import foundation.e.privacycentralapp.R
-import foundation.e.privacycentralapp.features.permissions.PermissionsFragment
+import foundation.e.privacycentralapp.features.dashboard.DashboardFragment
 
 open class MainActivity : FragmentActivity(R.layout.activity_main) {
 
@@ -36,7 +36,7 @@ open class MainActivity : FragmentActivity(R.layout.activity_main) {
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
-                add<PermissionsFragment>(R.id.container)
+                add<DashboardFragment>(R.id.container)
             }
         }
     }

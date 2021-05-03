@@ -17,59 +17,189 @@
 
 package foundation.e.privacycentralapp.features.dashboard
 
+import android.util.Log
 import foundation.e.flowmvi.Actor
 import foundation.e.flowmvi.Reducer
+import foundation.e.flowmvi.SingleEventProducer
 import foundation.e.flowmvi.feature.BaseFeature
+import foundation.e.privacycentralapp.dummy.DummyDataSource
+import foundation.e.privacycentralapp.dummy.InternetPrivacyMode
+import foundation.e.privacycentralapp.dummy.LocationMode
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 
 // Define a state machine for Dashboard Feature
-object DashboardFeature {
+class DashboardFeature(
+    initialState: State,
+    coroutineScope: CoroutineScope,
+    reducer: Reducer<State, Effect>,
+    actor: Actor<State, Action, Effect>,
+    singleEventProducer: SingleEventProducer<State, Action, Effect, SingleEvent>
+) : BaseFeature<DashboardFeature.State,
+    DashboardFeature.Action,
+    DashboardFeature.Effect,
+    DashboardFeature.SingleEvent>(
+    initialState, actor, reducer, coroutineScope, { message -> Log.d("DashboardFeature", message) },
+    singleEventProducer
+) {
     sealed class State {
-        object DashboardState : State()
+        object InitialState : State()
+        object LoadingDashboardState : State()
+        data class DashboardState(
+            val trackersCount: Int,
+            val activeTrackersCount: Int,
+            val totalApps: Int,
+            val permissionCount: Int,
+            val appsUsingLocationPerm: Int,
+            val locationMode: LocationMode,
+            val internetPrivacyMode: InternetPrivacyMode
+        ) : State()
+
         object QuickProtectionState : State()
     }
 
     sealed class SingleEvent {
         object NavigateToQuickProtectionSingleEvent : SingleEvent()
         object NavigateToTrackersSingleEvent : SingleEvent()
-        object NavigateToInternetActivityPolicySingleEvent : SingleEvent()
+        object NavigateToInternetActivityPrivacySingleEvent : SingleEvent()
         object NavigateToLocationSingleEvent : SingleEvent()
-        object NavigateToPermissionManagementSingleEvent : SingleEvent()
+        object NavigateToPermissionsSingleEvent : SingleEvent()
     }
 
     sealed class Action {
         object ShowQuickPrivacyProtectionInfoAction : Action()
+        object ObserveDashboardAction : Action()
         object ShowDashboardAction : Action()
+        object ShowFakeMyLocationAction : Action()
+        object ShowInternetActivityPrivacyAction : Action()
+        object ShowAppsPermissions : Action()
     }
 
     sealed class Effect {
         object OpenQuickPrivacyProtectionEffect : Effect()
-        object OpenDashboardEffect : Effect()
+        data class OpenDashboardEffect(
+            val trackersCount: Int,
+            val activeTrackersCount: Int,
+            val totalApps: Int,
+            val permissionCount: Int,
+            val appsUsingLocationPerm: Int,
+            val locationMode: LocationMode,
+            val internetPrivacyMode: InternetPrivacyMode
+        ) : Effect()
+
+        object LoadingDashboardEffect : Effect()
+        data class UpdateActiveTrackersCountEffect(val count: Int) : Effect()
+        data class UpdateLocationModeEffect(val mode: LocationMode) : Effect()
+        data class UpdateInternetActivityModeEffect(val mode: InternetPrivacyMode) : Effect()
+        data class UpdateAppsUsingLocationPermEffect(val apps: Int) : Effect()
+        object OpenFakeMyLocationEffect : Effect()
+        object OpenInternetActivityPrivacyEffect : Effect()
+        object OpenAppsPermissionsEffect : Effect()
+    }
+
+    companion object {
+        fun create(initialState: State, coroutineScope: CoroutineScope): DashboardFeature =
+            DashboardFeature(
+                initialState,
+                coroutineScope,
+                reducer = { state, effect ->
+                    when (effect) {
+                        Effect.OpenQuickPrivacyProtectionEffect -> State.QuickProtectionState
+                        is Effect.OpenDashboardEffect -> State.DashboardState(
+                            effect.trackersCount,
+                            effect.activeTrackersCount,
+                            effect.totalApps,
+                            effect.permissionCount,
+                            effect.appsUsingLocationPerm,
+                            effect.locationMode,
+                            effect.internetPrivacyMode
+                        )
+                        Effect.LoadingDashboardEffect -> {
+                            if (state is State.InitialState) {
+                                State.LoadingDashboardState
+                            } else state
+                        }
+                        is Effect.UpdateActiveTrackersCountEffect -> {
+                            if (state is State.DashboardState) {
+                                state.copy(activeTrackersCount = effect.count)
+                            } else state
+                        }
+                        is Effect.UpdateInternetActivityModeEffect -> {
+                            if (state is State.DashboardState) {
+                                state.copy(internetPrivacyMode = effect.mode)
+                            } else state
+                        }
+                        is Effect.UpdateLocationModeEffect -> {
+                            if (state is State.DashboardState) {
+                                state.copy(locationMode = effect.mode)
+                            } else state
+                        }
+                        is Effect.UpdateAppsUsingLocationPermEffect -> if (state is State.DashboardState) {
+                            state.copy(appsUsingLocationPerm = effect.apps)
+                        } else state
+
+                        Effect.OpenFakeMyLocationEffect -> state
+                        Effect.OpenAppsPermissionsEffect -> state
+                        Effect.OpenInternetActivityPrivacyEffect -> state
+                    }
+                },
+                actor = { _: State, action: Action ->
+                    Log.d("Feature", "action: $action")
+                    when (action) {
+                        Action.ObserveDashboardAction -> merge(
+                            DummyDataSource.activeTrackersCount.map {
+                                Effect.UpdateActiveTrackersCountEffect(it)
+                            },
+                            DummyDataSource.appsUsingLocationPerm.map {
+                                Effect.UpdateAppsUsingLocationPermEffect(it.size)
+                            },
+                            DummyDataSource.location.map {
+                                Effect.UpdateLocationModeEffect(it.mode)
+                            },
+                            DummyDataSource.internetActivityMode.map {
+                                Effect.UpdateInternetActivityModeEffect(it)
+                            }
+                        )
+                        Action.ShowQuickPrivacyProtectionInfoAction -> flowOf(
+                            Effect.OpenQuickPrivacyProtectionEffect
+                        )
+                        Action.ShowDashboardAction -> flow {
+                            emit(Effect.LoadingDashboardEffect)
+                            kotlinx.coroutines.delay(2000)
+                            emit(
+                                Effect.OpenDashboardEffect(
+                                    DummyDataSource.trackersCount,
+                                    DummyDataSource.activeTrackersCount.value,
+                                    DummyDataSource.packages.size,
+                                    DummyDataSource.permissions.size,
+                                    DummyDataSource.appsUsingLocationPerm.value.size,
+                                    DummyDataSource.location.value.mode,
+                                    DummyDataSource.internetActivityMode.value
+                                )
+                            )
+                        }
+                        Action.ShowFakeMyLocationAction -> flowOf(Effect.OpenFakeMyLocationEffect)
+                        Action.ShowAppsPermissions -> flowOf(Effect.OpenAppsPermissionsEffect)
+                        Action.ShowInternetActivityPrivacyAction -> flowOf(
+                            Effect.OpenInternetActivityPrivacyEffect
+                        )
+                    }
+                },
+                singleEventProducer = { state, _, effect ->
+                    Log.d("DashboardFeature", "$state, $effect")
+                    if (state is State.DashboardState && effect is Effect.OpenFakeMyLocationEffect)
+                        SingleEvent.NavigateToLocationSingleEvent
+                    else if (state is State.QuickProtectionState && effect is Effect.OpenQuickPrivacyProtectionEffect)
+                        SingleEvent.NavigateToQuickProtectionSingleEvent
+                    else if (state is State.DashboardState && effect is Effect.OpenInternetActivityPrivacyEffect)
+                        SingleEvent.NavigateToInternetActivityPrivacySingleEvent
+                    else if (state is State.DashboardState && effect is Effect.OpenAppsPermissionsEffect)
+                        SingleEvent.NavigateToPermissionsSingleEvent
+                    else null
+                }
+            )
     }
 }
-
-private val reducer: Reducer<DashboardFeature.State, DashboardFeature.Effect> = { _, effect ->
-    when (effect) {
-        DashboardFeature.Effect.OpenQuickPrivacyProtectionEffect -> DashboardFeature.State.QuickProtectionState
-        DashboardFeature.Effect.OpenDashboardEffect -> DashboardFeature.State.DashboardState
-    }
-}
-
-private val actor: Actor<DashboardFeature.State, DashboardFeature.Action, DashboardFeature.Effect> =
-    { _, action ->
-        when (action) {
-            DashboardFeature.Action.ShowQuickPrivacyProtectionInfoAction -> flowOf(DashboardFeature.Effect.OpenQuickPrivacyProtectionEffect)
-            DashboardFeature.Action.ShowDashboardAction -> flowOf(DashboardFeature.Effect.OpenDashboardEffect)
-        }
-    }
-
-fun homeFeature(
-    initialState: DashboardFeature.State = DashboardFeature.State.DashboardState,
-    coroutineScope: CoroutineScope
-) = BaseFeature<DashboardFeature.State, DashboardFeature.Action, DashboardFeature.Effect, DashboardFeature.SingleEvent>(
-    initialState,
-    actor,
-    reducer,
-    coroutineScope
-)

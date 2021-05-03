@@ -15,26 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package foundation.e.privacycentralapp.features.dashboard
+package foundation.e.privacycentralapp.features.location
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-class DashboardViewModel : ViewModel() {
+class FakeLocationViewModel : ViewModel() {
 
-    private val _actions = MutableSharedFlow<DashboardFeature.Action>()
+    private val _actions = MutableSharedFlow<FakeLocationFeature.Action>()
     val actions = _actions.asSharedFlow()
 
-    val dashboardFeature: DashboardFeature by lazy {
-        DashboardFeature.create(DashboardFeature.State.InitialState, coroutineScope = viewModelScope)
+    val fakeLocationFeature: FakeLocationFeature by lazy {
+        FakeLocationFeature.create(coroutineScope = viewModelScope)
     }
 
-    fun submitAction(action: DashboardFeature.Action) {
-        Log.d("DashboardViewModel", "submitAction() called with: action = $action")
+    fun submitAction(action: FakeLocationFeature.Action) {
         viewModelScope.launch {
             _actions.emit(action)
         }

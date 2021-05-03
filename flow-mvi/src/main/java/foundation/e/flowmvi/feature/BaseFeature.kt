@@ -101,8 +101,8 @@ open class BaseFeature<State : Any, in Action : Any, in Effect : Any, SingleEven
                     logger.invoke("View actions flow started")
                     emitAll(initialActions.asFlow())
                 }
-                .onCompletion {
-                    logger.invoke("View actions flow completed")
+                .onCompletion { cause ->
+                    logger.invoke("View actions flow completed: $cause")
                 }
                 .collectIntoHandler(this, logger)
         }
@@ -142,19 +142,3 @@ open class BaseFeature<State : Any, in Action : Any, in Effect : Any, SingleEven
             .launchIn(callerCoroutineScope)
     }
 }
-
-fun <State : Any, Action : Any, Effect : Any, SingleEvent : Any> feature(
-    initialState: State,
-    actor: Actor<State, Action, Effect>,
-    reducer: Reducer<State, Effect>,
-    coroutineScope: CoroutineScope,
-    defaultLogger: Logger = {},
-    singleEventProducer: SingleEventProducer<State, Action, Effect, SingleEvent>? = null
-) = BaseFeature(
-    initialState,
-    actor,
-    reducer,
-    coroutineScope,
-    defaultLogger,
-    singleEventProducer
-)

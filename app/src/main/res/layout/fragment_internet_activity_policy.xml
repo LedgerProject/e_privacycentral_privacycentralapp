@@ -87,10 +87,10 @@
                     android:textSize="14sp"/>
 
                 <foundation.e.privacycentralapp.common.RightRadioButton
-                    android:id="@+id/radio_hide_ip"
+                    android:id="@+id/radio_use_hidden_ip"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/hide_ip"
+                    android:text="@string/hidden_ip"
                     android:textSize="16sp"
                     android:layout_marginTop="8dp"
                     />

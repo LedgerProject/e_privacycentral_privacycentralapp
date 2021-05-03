@@ -15,10 +15,20 @@
         tools:layout_height="56dp"
         />
 
+    <ProgressBar
+        android:id="@+id/loadingSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        />
+
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?android:attr/actionBarSize"
+        android:visibility="gone"
         >
 
         <LinearLayout
@@ -71,8 +81,8 @@
                 />
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="160dp"
                 android:src="@drawable/dummy_leakage_analytics"
                 />
 
@@ -84,250 +94,256 @@
                 android:gravity="center"
                 android:paddingLeft="32dp"
                 android:paddingRight="32dp"
+                android:paddingBottom="16dp"
                 android:text="@string/personal_leakage_info"
                 android:textColor="@color/black"
                 android:textSize="12sp"
                 />
 
-            <RelativeLayout
-                android:id="@+id/am_i_tracked"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:background="#f9f9f9"
-                android:paddingLeft="32dp"
-                android:paddingTop="16dp"
-                android:paddingRight="32dp"
-                android:paddingBottom="16dp"
+                android:orientation="vertical"
                 >
 
-                <ImageView
-                    android:id="@+id/am_i_tracked_icon"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_tracked"
-                    />
-
-                <LinearLayout
+                <RelativeLayout
+                    android:id="@+id/am_i_tracked"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_toStartOf="@+id/am_i_tracked_chevron"
-                    android:layout_toEndOf="@+id/am_i_tracked_icon"
-                    android:orientation="vertical"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="32dp"
+                    android:paddingLeft="32dp"
+                    android:paddingTop="16dp"
+                    android:paddingRight="32dp"
+                    android:paddingBottom="16dp"
                     >
 
-                    <TextView
-                        android:id="@+id/am_i_tracked_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="@string/am_i_tracked_title"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
+                    <ImageView
+                        android:id="@+id/am_i_tracked_icon"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_tracked"
                         />
 
-                    <TextView
-                        android:id="@+id/am_i_tracked_subtitle"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/am_i_tracked_subtitle"
-                        android:textColor="@color/black"
-                        android:textSize="14sp"
+                        android:layout_toStartOf="@+id/am_i_tracked_chevron"
+                        android:layout_toEndOf="@+id/am_i_tracked_icon"
+                        android:orientation="vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="32dp"
+                        >
+
+                        <TextView
+                            android:id="@+id/am_i_tracked_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="@string/am_i_tracked_title"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            />
+
+                        <TextView
+                            android:id="@+id/am_i_tracked_subtitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/am_i_tracked_subtitle"
+                            android:textColor="@color/black"
+                            android:textSize="14sp"
+                            />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/am_i_tracked_chevron"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_chevron_right_24dp"
                         />
-                </LinearLayout>
+                </RelativeLayout>
 
-                <ImageView
-                    android:id="@+id/am_i_tracked_chevron"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_chevron_right_24dp"
-                    />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/apps_permissions"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#f9f9f9"
-                android:paddingLeft="32dp"
-                android:paddingTop="16dp"
-                android:paddingRight="32dp"
-                android:paddingBottom="16dp"
-                >
-
-                <ImageView
-                    android:id="@+id/apps_permissions_icon"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_apps_permissions"
-                    />
-
-                <LinearLayout
+                <RelativeLayout
+                    android:id="@+id/apps_permissions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_toStartOf="@+id/apps_permissions_chevron"
-                    android:layout_toEndOf="@+id/apps_permissions_icon"
-                    android:orientation="vertical"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="32dp"
+                    android:paddingLeft="32dp"
+                    android:paddingTop="16dp"
+                    android:paddingRight="32dp"
+                    android:paddingBottom="16dp"
                     >
 
-                    <TextView
-                        android:id="@+id/apps_permissions_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="@string/apps_permissions_title"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
+                    <ImageView
+                        android:id="@+id/apps_permissions_icon"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_apps_permissions"
                         />
 
-                    <TextView
-                        android:id="@+id/apps_permissions_subtitle"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/apps_permissions_subtitle"
-                        android:textColor="@color/black"
-                        android:textSize="14sp"
+                        android:layout_toStartOf="@+id/apps_permissions_chevron"
+                        android:layout_toEndOf="@+id/apps_permissions_icon"
+                        android:orientation="vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="32dp"
+                        >
+
+                        <TextView
+                            android:id="@+id/apps_permissions_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="@string/apps_permissions_title"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            />
+
+                        <TextView
+                            android:id="@+id/apps_permissions_subtitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/apps_permissions_subtitle"
+                            android:textColor="@color/black"
+                            android:textSize="14sp"
+                            />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/apps_permissions_chevron"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_chevron_right_24dp"
                         />
-                </LinearLayout>
+                </RelativeLayout>
 
-                <ImageView
-                    android:id="@+id/apps_permissions_chevron"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_chevron_right_24dp"
-                    />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/my_location"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#f9f9f9"
-                android:paddingLeft="32dp"
-                android:paddingTop="16dp"
-                android:paddingRight="32dp"
-                android:paddingBottom="16dp"
-                >
-
-                <ImageView
-                    android:id="@+id/my_location_icon"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_location"
-                    />
-
-                <LinearLayout
+                <RelativeLayout
+                    android:id="@+id/my_location"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_toStartOf="@+id/my_location_chevron"
-                    android:layout_toEndOf="@+id/my_location_icon"
-                    android:orientation="vertical"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="32dp"
+                    android:paddingLeft="32dp"
+                    android:paddingTop="16dp"
+                    android:paddingRight="32dp"
+                    android:paddingBottom="16dp"
                     >
 
-                    <TextView
-                        android:id="@+id/my_location_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="@string/my_location_title"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
+                    <ImageView
+                        android:id="@+id/my_location_icon"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_my_location"
                         />
 
-                    <TextView
-                        android:id="@+id/my_location_subtitle"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/my_location_subtitle"
-                        android:textColor="@color/black"
-                        android:textSize="14sp"
+                        android:layout_toStartOf="@+id/my_location_chevron"
+                        android:layout_toEndOf="@+id/my_location_icon"
+                        android:orientation="vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="32dp"
+                        >
+
+                        <TextView
+                            android:id="@+id/my_location_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="@string/my_location_title"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            />
+
+                        <TextView
+                            android:id="@+id/my_location_subtitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/my_location_subtitle"
+                            android:textColor="@color/black"
+                            android:textSize="14sp"
+                            />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/my_location_chevron"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_chevron_right_24dp"
                         />
-                </LinearLayout>
+                </RelativeLayout>
 
-                <ImageView
-                    android:id="@+id/my_location_chevron"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_chevron_right_24dp"
-                    />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/internet_activity_privacy"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#f9f9f9"
-                android:paddingLeft="32dp"
-                android:paddingTop="16dp"
-                android:paddingRight="32dp"
-                android:paddingBottom="16dp"
-                >
-
-                <ImageView
-                    android:id="@+id/internet_activity_privacy_icon"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_internet_activity"
-                    />
-
-                <LinearLayout
+                <RelativeLayout
+                    android:id="@+id/internet_activity_privacy"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_toStartOf="@+id/internet_activity_privacy_chevron"
-                    android:layout_toEndOf="@+id/internet_activity_privacy_icon"
-                    android:orientation="vertical"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="32dp"
+                    android:paddingLeft="32dp"
+                    android:paddingTop="16dp"
+                    android:paddingRight="32dp"
+                    android:paddingBottom="16dp"
                     >
 
-                    <TextView
-                        android:id="@+id/internet_activity_privacy_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="@string/internet_activity_privacy_title"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
+                    <ImageView
+                        android:id="@+id/internet_activity_privacy_icon"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_internet_activity"
                         />
 
-                    <TextView
-                        android:id="@+id/internet_activity_privacy_subtitle"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/internet_activity_privacy_subtitle"
-                        android:textColor="@color/black"
-                        android:textSize="14sp"
-                        />
-                </LinearLayout>
+                        android:layout_toStartOf="@+id/internet_activity_privacy_chevron"
+                        android:layout_toEndOf="@+id/internet_activity_privacy_icon"
+                        android:orientation="vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="32dp"
+                        >
 
-                <ImageView
-                    android:id="@+id/internet_activity_privacy_chevron"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_chevron_right_24dp"
-                    />
-            </RelativeLayout>
+                        <TextView
+                            android:id="@+id/internet_activity_privacy_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="@string/internet_activity_privacy_title"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            />
+
+                        <TextView
+                            android:id="@+id/internet_activity_privacy_subtitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/internet_activity_privacy_subtitle"
+                            android:textColor="@color/black"
+                            android:textSize="14sp"
+                            />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/internet_activity_privacy_chevron"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_chevron_right_24dp"
+                        />
+                </RelativeLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

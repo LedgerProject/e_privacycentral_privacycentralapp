@@ -99,6 +99,7 @@
             </RadioGroup>
 
             <ImageView
+                android:id="@+id/dummy_img_map"
                 android:layout_width="match_parent"
                 android:layout_height="254dp"
                 android:layout_marginTop="32dp"

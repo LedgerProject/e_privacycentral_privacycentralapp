@@ -4,11 +4,11 @@
     <string name="tap_to_enable_quick_protection">Tap to enable quick privacy protection</string>
     <string name="personal_leakage_info">Personal data leakage over past 24 hours. </string>
     <string name="am_i_tracked_title">Am I tracked?</string>
-    <string name="am_i_tracked_subtitle">Currently there are 77 trackers in your apps, 12 trackers are active</string>
+    <string name="am_i_tracked_subtitle">Currently there are %1$d trackers in your apps, %2$d trackers are active</string>
     <string name="apps_permissions_title">Apps Permissions</string>
-    <string name="apps_permissions_subtitle">120 apps are requesting 72 permissions</string>
+    <string name="apps_permissions_subtitle">%1$d apps are requesting %2$d permissions</string>
     <string name="my_location_title">My Location</string>
-    <string name="my_location_subtitle">"7 apps are using location permission\n Current location mode: "</string>
+    <string name="my_location_subtitle">"%1$d apps are using location permission\nCurrent location mode: "</string>
     <string name="internet_activity_privacy_title">My Internet Activity Privacy</string>
     <string name="internet_activity_privacy_subtitle">"Current internet activity mode: "</string>
     <string name="quick_protection_info">Quick protection enables these settings when turned on</string>
@@ -24,7 +24,7 @@
     <string name="internet_activity_privacy_info">Choose if you want to expose your real IP address or hide when connected to the internet (uses the tor network).</string>
     <string name="use_real_ip">Use real IP address</string>
     <string name="i_can_be_tracked">I can be tracked by my IP address.</string>
-    <string name="hide_ip">Hide IP address</string>
+    <string name="hidden_ip">Hide IP address</string>
     <string name="i_am_anonymous">I am anonymous on the internet.</string>
     <string name="permission_control_info">Manage and control apps requesting various permissions.</string>
 
