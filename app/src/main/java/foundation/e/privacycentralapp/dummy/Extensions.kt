@@ -17,13 +17,16 @@
 
 package foundation.e.privacycentralapp.dummy
 
-fun LocationMode.mapToString(): String = when (this) {
-    LocationMode.REAL_LOCATION -> "Real location mode"
-    LocationMode.RANDOM_LOCATION -> "Random location mode"
-    LocationMode.CUSTOM_LOCATION -> "Fake location mode"
+import android.content.Context
+import foundation.e.privacycentralapp.R
+
+fun LocationMode.mapToString(context: Context): String = when (this) {
+    LocationMode.REAL_LOCATION -> context.getString(R.string.real_location_mode)
+    LocationMode.RANDOM_LOCATION -> context.getString(R.string.random_location_mode)
+    LocationMode.CUSTOM_LOCATION -> context.getString(R.string.fake_location_mode)
 }
 
-fun InternetPrivacyMode.mapToString(): String = when (this) {
-    InternetPrivacyMode.REAL_IP -> "I'm exposing my real IP address"
-    InternetPrivacyMode.HIDE_IP -> "I'm anonymous on the internet"
+fun InternetPrivacyMode.mapToString(context: Context): String = when (this) {
+    InternetPrivacyMode.REAL_IP -> context.getString(R.string.i_am_exposing)
+    InternetPrivacyMode.HIDE_IP -> context.getString(R.string.i_am_anonymous)
 }

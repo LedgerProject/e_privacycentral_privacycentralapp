@@ -40,7 +40,7 @@ class InternetPrivacyFeature(
     actor,
     reducer,
     coroutineScope,
-    { message -> Log.d("FakeLocationFeature", message) },
+    { message -> Log.d("InternetPrivacyFeature", message) },
     singleEventProducer
 ) {
     data class State(val mode: InternetPrivacyMode)

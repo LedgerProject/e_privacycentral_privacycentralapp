@@ -55,29 +55,36 @@ class DashboardFragment :
         }
         lifecycleScope.launchWhenStarted {
             viewModel.dashboardFeature.singleEvents.collect { event ->
-                if (event is DashboardFeature.SingleEvent.NavigateToLocationSingleEvent) {
-                    requireActivity().supportFragmentManager.commit {
-                        add<FakeLocationFragment>(R.id.container)
-                        setReorderingAllowed(true)
-                        addToBackStack("dashboard")
+                when (event) {
+                    is DashboardFeature.SingleEvent.NavigateToLocationSingleEvent -> {
+                        requireActivity().supportFragmentManager.commit {
+                            add<FakeLocationFragment>(R.id.container)
+                            setReorderingAllowed(true)
+                            addToBackStack("dashboard")
+                        }
                     }
-                } else if (event is DashboardFeature.SingleEvent.NavigateToQuickProtectionSingleEvent) {
-                    requireActivity().supportFragmentManager.commit {
-                        add<QuickProtectionFragment>(R.id.container)
-                        setReorderingAllowed(true)
-                        addToBackStack("dashboard")
+                    is DashboardFeature.SingleEvent.NavigateToQuickProtectionSingleEvent -> {
+                        requireActivity().supportFragmentManager.commit {
+                            add<QuickProtectionFragment>(R.id.container)
+                            setReorderingAllowed(true)
+                            addToBackStack("dashboard")
+                        }
                     }
-                } else if (event is DashboardFeature.SingleEvent.NavigateToInternetActivityPrivacySingleEvent) {
-                    requireActivity().supportFragmentManager.commit {
-                        add<InternetPrivacyFragment>(R.id.container)
-                        setReorderingAllowed(true)
-                        addToBackStack("dashboard")
+                    is DashboardFeature.SingleEvent.NavigateToInternetActivityPrivacySingleEvent -> {
+                        requireActivity().supportFragmentManager.commit {
+                            add<InternetPrivacyFragment>(R.id.container)
+                            setReorderingAllowed(true)
+                            addToBackStack("dashboard")
+                        }
                     }
-                } else if (event is DashboardFeature.SingleEvent.NavigateToPermissionsSingleEvent) {
-                    requireActivity().supportFragmentManager.commit {
-                        add<PermissionsFragment>(R.id.container)
-                        setReorderingAllowed(true)
-                        addToBackStack("dashboard")
+                    is DashboardFeature.SingleEvent.NavigateToPermissionsSingleEvent -> {
+                        requireActivity().supportFragmentManager.commit {
+                            add<PermissionsFragment>(R.id.container)
+                            setReorderingAllowed(true)
+                            addToBackStack("dashboard")
+                        }
+                    }
+                    DashboardFeature.SingleEvent.NavigateToTrackersSingleEvent -> {
                     }
                 }
             }
@@ -149,13 +156,13 @@ class DashboardFragment :
                         state.totalApps,
                         state.permissionCount
                     )
-                    view.findViewById<TextView>(R.id.my_location_subtitle).let {
-                        it.text = getString(
+                    view.findViewById<TextView>(R.id.my_location_subtitle).let { textView ->
+                        textView.text = getString(
                             R.string.my_location_subtitle,
                             state.appsUsingLocationPerm,
                         )
-                        it.append(
-                            SpannableString(state.locationMode.mapToString())
+                        textView.append(
+                            SpannableString(state.locationMode.mapToString(requireContext()))
                                 .also {
                                     it.setSpan(
                                         ForegroundColorSpan(Color.parseColor("#007fff")),
@@ -166,21 +173,24 @@ class DashboardFragment :
                                 }
                         )
                     }
-                    view.findViewById<TextView>(R.id.internet_activity_privacy_subtitle).let {
-                        it.text = getString(R.string.internet_activity_privacy_subtitle)
-                        it.append(
-                            SpannableString(state.internetPrivacyMode.mapToString())
-                                .also {
-                                    it.setSpan(
-                                        ForegroundColorSpan(Color.parseColor("#007fff")),
-                                        0,
-                                        it.length,
-                                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                                    )
-                                }
-                        )
-                    }
+                    view.findViewById<TextView>(R.id.internet_activity_privacy_subtitle)
+                        .let { textView ->
+                            textView.text = getString(R.string.internet_activity_privacy_subtitle)
+                            textView.append(
+                                SpannableString(state.internetPrivacyMode.mapToString(requireContext()))
+                                    .also {
+                                        it.setSpan(
+                                            ForegroundColorSpan(Color.parseColor("#007fff")),
+                                            0,
+                                            it.length,
+                                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                                        )
+                                    }
+                            )
+                        }
                 }
+            }
+            DashboardFeature.State.QuickProtectionState -> {
             }
         }
     }

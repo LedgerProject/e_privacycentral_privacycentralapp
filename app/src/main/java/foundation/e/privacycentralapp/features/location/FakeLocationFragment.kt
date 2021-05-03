@@ -169,6 +169,8 @@ class FakeLocationFragment :
                     }
                 }
             }
+            FakeLocationFeature.State.InitialState -> {
+            }
         }
     }
 

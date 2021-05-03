@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package foundation.e.privacycentralapp.features.dashboard
+package foundation.e.privacycentralapp.features.permissions
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,16 +23,16 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-class DashboardViewModel : ViewModel() {
+class PermissionsViewModel : ViewModel() {
 
-    private val _actions = MutableSharedFlow<DashboardFeature.Action>()
+    private val _actions = MutableSharedFlow<PermissionsFeature.Action>()
     val actions = _actions.asSharedFlow()
 
-    val dashboardFeature: DashboardFeature by lazy {
-        DashboardFeature.create(DashboardFeature.State.InitialState, coroutineScope = viewModelScope)
+    val permissionsFeature: PermissionsFeature by lazy {
+        PermissionsFeature.create(coroutineScope = viewModelScope)
     }
 
-    fun submitAction(action: DashboardFeature.Action) {
+    fun submitAction(action: PermissionsFeature.Action) {
         viewModelScope.launch {
             _actions.emit(action)
         }

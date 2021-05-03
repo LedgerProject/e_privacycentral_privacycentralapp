@@ -20,7 +20,6 @@ package foundation.e.privacycentralapp.main
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
@@ -28,8 +27,6 @@ import foundation.e.privacycentralapp.R
 import foundation.e.privacycentralapp.features.dashboard.DashboardFragment
 
 open class MainActivity : FragmentActivity(R.layout.activity_main) {
-
-    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

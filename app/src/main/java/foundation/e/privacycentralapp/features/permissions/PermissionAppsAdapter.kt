@@ -21,25 +21,33 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.Switch
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import foundation.e.privacycentralapp.R
 
-class PermissionAppsAdapter(private val dataSet: List<Pair<String, Boolean>>) :
+class PermissionAppsAdapter(
+    private val dataSet: List<Pair<String, Boolean>>,
+    private val listener: (String, Boolean) -> Unit
+) :
     RecyclerView.Adapter<PermissionAppsAdapter.PermissionViewHolder>() {
 
     class PermissionViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val appName: TextView = view.findViewById(R.id.app_title)
-        @SuppressLint("UseSwitchCompatOrMaterialCode") val togglePermission: Switch = view.findViewById(R.id.togglePermission)
-        val appIcon: ImageView = view.findViewById(R.id.app_icon)
+
+        @SuppressLint("UseSwitchCompatOrMaterialCode")
+        val togglePermission: Switch = view.findViewById(R.id.togglePermission)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PermissionViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_permission_apps, parent, false)
-        return PermissionViewHolder(view)
+        val holder = PermissionViewHolder(view)
+        holder.togglePermission.setOnCheckedChangeListener { _, isChecked ->
+            listener(dataSet[holder.adapterPosition].first, isChecked)
+        }
+        view.findViewById<Switch>(R.id.togglePermission)
+        return holder
     }
 
     override fun onBindViewHolder(holder: PermissionViewHolder, position: Int) {

@@ -23,11 +23,16 @@
     <string name="add_location">Add location</string>
     <string name="internet_activity_privacy_info">Choose if you want to expose your real IP address or hide when connected to the internet (uses the tor network).</string>
     <string name="use_real_ip">Use real IP address</string>
-    <string name="i_can_be_tracked">I can be tracked by my IP address.</string>
+    <string name="i_can_be_tracked">I can be tracked by my IP address</string>
     <string name="hidden_ip">Hide IP address</string>
-    <string name="i_am_anonymous">I am anonymous on the internet.</string>
+    <string name="i_am_anonymous">I am anonymous on the internet</string>
+    <string name="i_am_exposing">I am exposing my real IP address</string>
     <string name="permission_control_info">Manage and control apps requesting various permissions.</string>
 
     <string name="apps_allowed">%1$d of %2$d apps allowed</string>
     <string name="apps_access_to_permission">Apps which has access to %1$s permission</string>
+
+    <string name="real_location_mode">Real location mode</string>
+    <string name="random_location_mode">Random location mode</string>
+    <string name="fake_location_mode">Fake location mode</string>
 </resources>

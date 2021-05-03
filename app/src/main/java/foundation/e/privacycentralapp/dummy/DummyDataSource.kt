@@ -45,10 +45,11 @@ import kotlin.random.Random
  * Dummmy permission data class.
  */
 data class Permission(
+    val id: Int,
     val name: String,
     val iconId: Int,
-    val packagesRequested: List<String> = emptyList(),
-    val packagesAllowed: List<String> = emptyList()
+    val packagesRequested: Set<String> = emptySet(),
+    val packagesAllowed: Set<String> = emptySet()
 )
 
 enum class LocationMode {
@@ -62,8 +63,6 @@ enum class InternetPrivacyMode {
 data class Location(val mode: LocationMode, val latitude: Double, val longitude: Double)
 
 object DummyDataSource {
-    private val _appsUsingLocationPerm = MutableStateFlow<List<String>>(emptyList())
-    val appsUsingLocationPerm = _appsUsingLocationPerm.asStateFlow()
 
     const val trackersCount = 77
     private val _activeTrackersCount = MutableStateFlow(10)
@@ -75,8 +74,17 @@ object DummyDataSource {
     private val _internetActivityMode = MutableStateFlow(InternetPrivacyMode.REAL_IP)
     val internetActivityMode = _internetActivityMode.asStateFlow()
 
+    /**
+     * Declare dummy permissions with following ids
+     *
+     * [0] -> Body sensor
+     * [1] -> Calendar
+     * [2] -> Call Logs
+     * [3] -> Location
+     */
     val permissions = arrayOf("Body Sensor", "Calendar", "Call Logs", "Location")
-    val icons = arrayOf(
+
+    private val permissionIcons = arrayOf(
         R.drawable.ic_body_monitor,
         R.drawable.ic_calendar,
         R.drawable.ic_call,
@@ -98,22 +106,26 @@ object DummyDataSource {
         "privacycentral"
     )
 
-    val populatedPermission: List<Permission> by lazy {
-        fetchPermissions()
-    }
+    val _populatedPermissions = MutableStateFlow(fetchPermissions())
+    val populatedPermission = _populatedPermissions.asStateFlow()
+
+    private val _appsUsingLocationPerm =
+        MutableStateFlow(_populatedPermissions.value[3].packagesAllowed)
+    val appsUsingLocationPerm = _appsUsingLocationPerm.asStateFlow()
 
     private fun fetchPermissions(): List<Permission> {
         val result = mutableListOf<Permission>()
         permissions.forEachIndexed { index, permission ->
             when (index) {
-                0 -> result.add(Permission(permission, icons[index]))
+                0 -> result.add(Permission(index, permission, permissionIcons[index]))
                 1 -> {
                     val randomPackages = getRandomItems(packages, 8)
                     val grantedPackages = getRandomItems(randomPackages, 3)
                     result.add(
                         Permission(
+                            index,
                             permission,
-                            icons[index],
+                            permissionIcons[index],
                             randomPackages,
                             grantedPackages
                         )
@@ -124,8 +136,9 @@ object DummyDataSource {
                     val grantedPackages = getRandomItems(randomPackages, 9)
                     result.add(
                         Permission(
+                            index,
                             permission,
-                            icons[index],
+                            permissionIcons[index],
                             randomPackages,
                             grantedPackages
                         )
@@ -136,8 +149,9 @@ object DummyDataSource {
                     val grantedPackages = getRandomItems(randomPackages, 3)
                     result.add(
                         Permission(
+                            index,
                             permission,
-                            icons[index],
+                            permissionIcons[index],
                             randomPackages,
                             grantedPackages
                         )
@@ -148,10 +162,10 @@ object DummyDataSource {
         return result
     }
 
-    private fun <T> getRandomItems(data: Array<T>, limit: Int): List<T> =
-        getRandomItems(data.asList(), limit)
+    private fun <T> getRandomItems(data: Array<T>, limit: Int): Set<T> =
+        getRandomItems(data.toSet(), limit)
 
-    private fun <T> getRandomItems(data: List<T>, limit: Int): List<T> {
+    private fun <T> getRandomItems(data: Set<T>, limit: Int): Set<T> {
         val randomItems = mutableSetOf<T>()
         val localData = data.toMutableList()
         repeat(limit) {
@@ -159,12 +173,12 @@ object DummyDataSource {
             randomItems.add(generated)
             localData.remove(generated)
         }
-        return randomItems.toList()
+        return randomItems
     }
 
-    fun getPermission(permissionId: Int): Permission {
-        return populatedPermission.get(permissionId)
-    }
+    fun getPermission(permissionId: Int): Permission = populatedPermission.value[permissionId]
+
+    fun getLocationPermissionApps(): Permission = getPermission(3)
 
     fun setLocationMode(locationMode: LocationMode, location: Location? = null): Boolean {
         when (locationMode) {
@@ -189,5 +203,25 @@ object DummyDataSource {
     fun setInternetPrivacyMode(mode: InternetPrivacyMode): Boolean {
         _internetActivityMode.value = mode
         return true
+    }
+
+    fun togglePermission(permissionId: Int, packageName: String, grant: Boolean) {
+        val allPermissions = _populatedPermissions.value.toMutableList()
+        val permission: Permission = allPermissions[permissionId].let { permission ->
+
+            val packagesAllowed = permission.packagesAllowed.toMutableSet()
+
+            if (grant) packagesAllowed.add(packageName)
+            else packagesAllowed.remove(packageName)
+
+            permission.copy(packagesAllowed = packagesAllowed)
+        }
+        allPermissions[permissionId] = permission
+        _populatedPermissions.value = allPermissions
+
+        // Update when permission is toggled for Location
+        if (permissionId == 3) {
+            _appsUsingLocationPerm.value = _populatedPermissions.value[permissionId].packagesAllowed
+        }
     }
 }
