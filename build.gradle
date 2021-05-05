@@ -1,3 +1,6 @@
+import foundation.e.privacycentral.buildsrc.DependencyUpdates
+import foundation.e.privacycentral.buildsrc.ReleaseType
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext.buildConfig = [
