@@ -14,6 +14,8 @@ android {
 		versionName buildConfig.version.fullName
 
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+		resValue("string", "mapbox_key", MAPBOX_KEY)
 	}
 
 	buildTypes {
@@ -37,6 +39,7 @@ dependencies {
 	implementation Libs.AndroidX.Lifecycle.runtime
 	implementation Libs.AndroidX.Lifecycle.viewmodel
 
+	implementation Libs.MapBox.sdk
 	implementation 'com.google.android.material:material:1.3.0'
 
 	testImplementation 'junit:junit:4.+'

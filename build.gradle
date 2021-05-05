@@ -27,15 +27,19 @@ buildscript {
     }
     ext.buildConfig.version['code'] = buildConfig.version.major * 1000000 + buildConfig.version.minor * 10000 + buildConfig.version.patch * 100 + buildNumber
 
+    // Load properties either from local.properties or system environment (on CI).
+    apply from: rootProject.file('load-properties.gradle')
+
+    // Load dependencies as extra properties.
     apply from: rootProject.file('dependencies.gradle')
+
     repositories {
         google()
         mavenCentral()
-        jcenter()
     }
 
     dependencies {
-        classpath Libs.androidGradlePlugin
+        classpath 'com.android.tools.build:gradle:4.2.0'
         classpath Libs.Kotlin.gradlePlugin
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -52,7 +56,21 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        jcenter()
+
+        maven {
+            url 'https://api.mapbox.com/downloads/v2/releases/maven'
+            authentication {
+                basic(BasicAuthentication)
+            }
+            credentials {
+                // Do not change the username below.
+                // This should always be `mapbox` (not your username).
+                username = 'mapbox'
+                // Use the secret token you stored in gradle.properties as the password
+                password = MAPBOX_SECRET_KEY ?: ""
+            }
+        }
+
     }
 }
 
