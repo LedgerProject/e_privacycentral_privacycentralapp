@@ -15,6 +15,7 @@ local.properties
 .idea/compiler.xml
 /.idea/assetWizardSettings.xml
 /.idea/jarRepositories.xml
+/.idea/google-java-format.xml
 gradle.xml
 markdown-*.xml
 *.iml
