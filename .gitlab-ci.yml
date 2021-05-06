@@ -6,6 +6,11 @@ stages:
   - build
   - test
 
+# By default load dev keys.
+variables:
+  MAPBOX_KEY: $MAPBOX_KEY_DEV
+  MAPBOX_SECRET_KEY: $MAPBOX_SECRET_KEY_DEV
+
 workflow:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
@@ -85,6 +90,9 @@ build-full:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
     - if: '$CI_COMMIT_BRANCH == "master"'
+      variables:
+          MAPBOX_KEY: $MAPBOX_KEY_PROD
+          MAPBOX_SECRET_KEY: $MAPBOX_SECRET_KEY_PROD
       when: always
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
       when: always
