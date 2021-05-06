@@ -19,8 +19,10 @@ package foundation.e.privacycentralapp.features.location
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.app.AppOpsManager
 import android.os.Bundle
 import android.os.Looper
+import android.os.Process
 import android.text.Editable
 import android.util.Log
 import android.view.Gravity
@@ -60,9 +62,15 @@ import foundation.e.privacycentralapp.dummy.LocationMode
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import foundation.e.privacymodules.location.FakeLocation
+import foundation.e.privacymodules.location.IFakeLocation
+import foundation.e.privacymodules.permissions.PermissionsPrivacyModule
+import foundation.e.privacymodules.permissions.data.AppOpModes
+import foundation.e.privacymodules.permissions.data.ApplicationDescription
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
 class FakeLocationFragment :
     Fragment(R.layout.fragment_fake_location),
@@ -129,6 +137,19 @@ class FakeLocationFragment :
         private const val TAG = "FakeLocationFragment"
         private const val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L
         private const val DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5
+        private const val DROPPED_MARKER_LAYER_ID = "DROPPED_MARKER_LAYER_ID"
+    }
+
+    private val fakeLocationModule: IFakeLocation by lazy { FakeLocation(this.requireContext()) }
+    private val permissionsModule by lazy { PermissionsPrivacyModule(this.requireContext()) }
+
+    private val appDesc by lazy {
+        ApplicationDescription(
+            packageName = this.requireContext().packageName,
+            uid = Process.myUid(),
+            label = getString(R.string.app_name),
+            icon = null
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -143,9 +164,11 @@ class FakeLocationFragment :
                         displayToast("Random location selected")
                         hoveringMarker?.visibility = View.GONE
                         isCameraMoved = false
+                        setLondonLocation()
                     }
                     is FakeLocationFeature.SingleEvent.SpecificLocationSavedEvent -> {
                         // Hide camera hover marker when custom location is picked from map.
+                        displayToast("Specific location selected")
                         hoveringMarker?.visibility = View.GONE
                         isCameraMoved = false
                     }
@@ -157,6 +180,7 @@ class FakeLocationFragment :
                         displayToast("Real location selected")
                         hoveringMarker?.visibility = View.GONE
                         isCameraMoved = false
+                        setRealLocation()
                     }
                 }
             }
@@ -171,6 +195,35 @@ class FakeLocationFragment :
     private fun displayToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT)
             .show()
+    }
+
+    private fun setFakeLocation(latitude: Double, longitude: Double) {
+        if (permissionsModule.getAppOpMode(appDesc, AppOpsManager.OPSTR_MOCK_LOCATION) != AppOpModes.ALLOWED) {
+            permissionsModule.setAppOpMode(appDesc, AppOpsManager.OPSTR_MOCK_LOCATION,
+                AppOpModes.ALLOWED)
+        }
+        try {
+            fakeLocationModule.startFakeLocation()
+        } catch(e: Exception) {
+            Log.e("FakeLoc", "Can't startFakeLocation", e)
+        }
+        fakeLocationModule.setFakeLocation(latitude, longitude)
+    }
+
+    private fun setRealLocation() {
+        try {
+            permissionsModule.setAppOpMode(appDesc, AppOpsManager.OPSTR_MOCK_LOCATION,
+                AppOpModes.IGNORED)
+            fakeLocationModule.stopFakeLocation()
+            displayToast("Real location selected")
+        } catch(e: Exception) {
+            Log.e("FakeLoc", "Can't stop FakeLocation", e)
+        }
+    }
+
+    private fun setLondonLocation() {
+        displayToast("Random location selected")
+        setFakeLocation(51.5287718, -0.2416803)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -257,6 +310,7 @@ class FakeLocationFragment :
     }
 
     private fun saveSpecificLocation(latitude: Double, longitude: Double) {
+        setFakeLocation(latitude, longitude)
         viewModel.submitAction(
             FakeLocationFeature.Action.SetFakeLocationAction(latitude, longitude)
         )
