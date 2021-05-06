@@ -18,6 +18,21 @@ android {
 		resValue("string", "mapbox_key", MAPBOX_KEY)
 	}
 
+	// We define here  the OS flavor e, specific for the /e/ OS version, and google, for any
+	// Andriod device. The e or google prefix is then used in resources, dependencies, ... as
+	// expected by the android gradle plugin.
+	flavorDimensions 'os'
+	productFlavors {
+		e {
+			applicationId 'foundation.e.privacymodulesdemo.e'
+			dimension 'os'
+		}
+		google {
+			applicationId 'foundation.e.privacymodeulesdemo.google'
+			dimension 'os'
+		}
+	}
+
 	buildTypes {
 		release {
 			minifyEnabled false
