@@ -35,4 +35,6 @@
     <string name="real_location_mode">Real location mode</string>
     <string name="random_location_mode">Random location mode</string>
     <string name="fake_location_mode">Fake location mode</string>
+    <string name="user_location_permission_explanation">This app needs location permissions in order to show its functionality.</string>
+    <string name="user_location_permission_not_granted">You didn\'t grant location permission</string>
 </resources>

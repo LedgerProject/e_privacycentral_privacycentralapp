@@ -28,6 +28,6 @@ if (localPropertiesFile.exists()) {
     new FileInputStream(localPropertiesFile).withCloseable { is -> p.load(is) }
     p.each { name, value -> ext[name] = value }
 } else {
-    ext["MAPBOX_KEY"] = System.getenv('MAPBOX_KEY')
-    ext["MAPBOX_SECRET_KEY"] = System.getenv('MAPBOX_SECRET_KEY')
+    ext["MAPBOX_KEY"] = System.getenv('MAPBOX_KEY_DEV')
+    ext["MAPBOX_SECRET_KEY"] = System.getenv('MAPBOX_SECRET_KEY_DEV')
 }
