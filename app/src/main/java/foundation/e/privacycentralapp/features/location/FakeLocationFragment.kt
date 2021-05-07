@@ -18,8 +18,8 @@
 package foundation.e.privacycentralapp.features.location
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.app.AppOpsManager
+import android.content.Context
 import android.os.Bundle
 import android.os.Looper
 import android.os.Process
@@ -199,12 +199,14 @@ class FakeLocationFragment :
 
     private fun setFakeLocation(latitude: Double, longitude: Double) {
         if (permissionsModule.getAppOpMode(appDesc, AppOpsManager.OPSTR_MOCK_LOCATION) != AppOpModes.ALLOWED) {
-            permissionsModule.setAppOpMode(appDesc, AppOpsManager.OPSTR_MOCK_LOCATION,
-                AppOpModes.ALLOWED)
+            permissionsModule.setAppOpMode(
+                appDesc, AppOpsManager.OPSTR_MOCK_LOCATION,
+                AppOpModes.ALLOWED
+            )
         }
         try {
             fakeLocationModule.startFakeLocation()
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             Log.e("FakeLoc", "Can't startFakeLocation", e)
         }
         fakeLocationModule.setFakeLocation(latitude, longitude)
@@ -212,11 +214,13 @@ class FakeLocationFragment :
 
     private fun setRealLocation() {
         try {
-            permissionsModule.setAppOpMode(appDesc, AppOpsManager.OPSTR_MOCK_LOCATION,
-                AppOpModes.IGNORED)
+            permissionsModule.setAppOpMode(
+                appDesc, AppOpsManager.OPSTR_MOCK_LOCATION,
+                AppOpModes.IGNORED
+            )
             fakeLocationModule.stopFakeLocation()
             displayToast("Real location selected")
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             Log.e("FakeLoc", "Can't stop FakeLocation", e)
         }
     }
