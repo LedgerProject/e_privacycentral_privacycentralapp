@@ -29,7 +29,10 @@ class DashboardViewModel : ViewModel() {
     val actions = _actions.asSharedFlow()
 
     val dashboardFeature: DashboardFeature by lazy {
-        DashboardFeature.create(DashboardFeature.State.InitialState, coroutineScope = viewModelScope)
+        DashboardFeature.create(
+            DashboardFeature.State.InitialState,
+            coroutineScope = viewModelScope
+        )
     }
 
     fun submitAction(action: DashboardFeature.Action) {

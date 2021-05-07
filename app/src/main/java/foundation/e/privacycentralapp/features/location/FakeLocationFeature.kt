@@ -37,7 +37,11 @@ class FakeLocationFeature(
     actor: Actor<State, Action, Effect>,
     singleEventProducer: SingleEventProducer<State, Action, Effect, SingleEvent>
 ) : BaseFeature<FakeLocationFeature.State, FakeLocationFeature.Action, FakeLocationFeature.Effect, FakeLocationFeature.SingleEvent>(
-    initialState, actor, reducer, coroutineScope, { message -> Log.d("FakeLocationFeature", message) },
+    initialState,
+    actor,
+    reducer,
+    coroutineScope,
+    { message -> Log.d("FakeLocationFeature", message) },
     singleEventProducer
 ) {
     sealed class State {
