@@ -185,7 +185,10 @@ object DummyDataSource {
             LocationMode.REAL_LOCATION ->
                 _location.value =
                     Location(LocationMode.REAL_LOCATION, 24.39, 71.80)
-            LocationMode.RANDOM_LOCATION -> _location.value = randomLocation()
+            LocationMode.RANDOM_LOCATION -> {
+                requireNotNull(location) { "Custom location should be null" }
+                _location.value = location
+            }
             LocationMode.CUSTOM_LOCATION -> {
                 requireNotNull(location) { "Custom location should be null" }
                 _location.value = location.copy(mode = LocationMode.CUSTOM_LOCATION)

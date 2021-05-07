@@ -18,16 +18,17 @@
 package foundation.e.privacycentralapp.features.location
 
 import android.util.Log
+import com.mapbox.mapboxsdk.geometry.LatLng
 import foundation.e.flowmvi.Actor
 import foundation.e.flowmvi.Reducer
 import foundation.e.flowmvi.SingleEventProducer
 import foundation.e.flowmvi.feature.BaseFeature
+import foundation.e.privacycentralapp.dummy.CityDataSource
 import foundation.e.privacycentralapp.dummy.DummyDataSource
 import foundation.e.privacycentralapp.dummy.Location
 import foundation.e.privacycentralapp.dummy.LocationMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 
 // Define a state machine for Fake location feature
 class FakeLocationFeature(
@@ -44,10 +45,7 @@ class FakeLocationFeature(
     { message -> Log.d("FakeLocationFeature", message) },
     singleEventProducer
 ) {
-    sealed class State {
-        object InitialState : State()
-        data class LocationState(val location: Location) : State()
-    }
+    data class State(val location: Location)
 
     sealed class SingleEvent {
         object RandomLocationSelectedEvent : SingleEvent()
@@ -57,47 +55,91 @@ class FakeLocationFeature(
     }
 
     sealed class Action {
-        object ObserveLocationAction : Action()
+        data class UpdateLocationAction(val latLng: LatLng) : Action()
         object UseRealLocationAction : Action()
-        object UseRandomLocationAction : Action()
+        data class UseRandomLocationAction(val cities: Array<String>) : Action() {
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as UseRandomLocationAction
+
+                if (!cities.contentEquals(other.cities)) return false
+
+                return true
+            }
+
+            override fun hashCode(): Int {
+                return cities.contentHashCode()
+            }
+        }
+
         object UseSpecificLocationAction : Action()
-        data class AddSpecificLocationAction(val latitude: Double, val longitude: Double) : Action()
+        data class SetFakeLocationAction(val latitude: Double, val longitude: Double) : Action()
     }
 
     sealed class Effect {
-        data class LocationUpdatedEffect(val location: Location) : Effect()
+        data class LocationUpdatedEffect(val latitude: Double, val longitude: Double) : Effect()
         object RealLocationSelectedEffect : Effect()
         object RandomLocationSelectedEffect : Effect()
-        data class SpecificLocationSelectedEffect(val location: Location) : Effect()
+        object SpecificLocationSelectedEffect : Effect()
         object SpecificLocationSavedEffect : Effect()
         data class ErrorEffect(val message: String) : Effect()
     }
 
     companion object {
         fun create(
-            initialState: State = State.InitialState,
+            initialState: State = State(
+                Location(
+                    LocationMode.REAL_LOCATION,
+                    0.0,
+                    0.0
+                )
+            ),
             coroutineScope: CoroutineScope
         ) = FakeLocationFeature(
             initialState, coroutineScope,
             reducer = { state, effect ->
                 when (effect) {
-                    Effect.RandomLocationSelectedEffect,
-                    Effect.RealLocationSelectedEffect, is Effect.ErrorEffect, Effect.SpecificLocationSavedEffect -> state
-                    is Effect.LocationUpdatedEffect -> State.LocationState(effect.location)
-                    is Effect.SpecificLocationSelectedEffect -> State.LocationState(effect.location)
+                    Effect.RandomLocationSelectedEffect -> state.copy(
+                        location = state.location.copy(
+                            mode = LocationMode.RANDOM_LOCATION
+                        )
+                    )
+                    Effect.RealLocationSelectedEffect -> state.copy(
+                        location = state.location.copy(
+                            mode = LocationMode.REAL_LOCATION
+                        )
+                    )
+                    is Effect.ErrorEffect, Effect.SpecificLocationSavedEffect -> state
+                    is Effect.LocationUpdatedEffect -> state.copy(
+                        location = state.location.copy(
+                            latitude = effect.latitude,
+                            longitude = effect.longitude
+                        )
+                    )
+                    is Effect.SpecificLocationSelectedEffect -> state.copy(
+                        location = state.location.copy(
+                            mode = LocationMode.CUSTOM_LOCATION
+                        )
+                    )
                 }
             },
             actor = { _, action ->
                 when (action) {
-                    is Action.ObserveLocationAction -> DummyDataSource.location.map {
-                        Effect.LocationUpdatedEffect(it)
-                    }
-                    is Action.AddSpecificLocationAction -> {
+                    is Action.UpdateLocationAction -> flowOf(
+                        Effect.LocationUpdatedEffect(
+                            action.latLng.latitude,
+                            action.latLng.longitude
+                        )
+                    )
+                    is Action.SetFakeLocationAction -> {
                         val location = Location(
                             LocationMode.CUSTOM_LOCATION,
                             action.latitude,
                             action.longitude
                         )
+                        // TODO: Call fake location api with specific coordinates here.
                         val success = DummyDataSource.setLocationMode(
                             LocationMode.CUSTOM_LOCATION,
                             location
@@ -112,8 +154,13 @@ class FakeLocationFeature(
                             )
                         }
                     }
-                    Action.UseRandomLocationAction -> {
-                        val success = DummyDataSource.setLocationMode(LocationMode.RANDOM_LOCATION)
+                    is Action.UseRandomLocationAction -> {
+                        val randomCity = CityDataSource.getRandomCity(action.cities)
+                        // TODO: Call fake location api with random location here.
+                        val success = DummyDataSource.setLocationMode(
+                            LocationMode.RANDOM_LOCATION,
+                            randomCity.toRandomLocation()
+                        )
                         if (success) {
                             flowOf(
                                 Effect.RandomLocationSelectedEffect
@@ -125,6 +172,7 @@ class FakeLocationFeature(
                         }
                     }
                     Action.UseRealLocationAction -> {
+                        // TODO: Call turn off fake location api here.
                         val success = DummyDataSource.setLocationMode(LocationMode.REAL_LOCATION)
                         if (success) {
                             flowOf(
@@ -137,8 +185,7 @@ class FakeLocationFeature(
                         }
                     }
                     Action.UseSpecificLocationAction -> {
-                        val location = DummyDataSource.location.value
-                        flowOf(Effect.SpecificLocationSelectedEffect(location.copy(mode = LocationMode.CUSTOM_LOCATION)))
+                        flowOf(Effect.SpecificLocationSelectedEffect)
                     }
                 }
             },

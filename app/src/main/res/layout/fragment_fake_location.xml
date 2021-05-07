@@ -3,30 +3,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:background="@color/white"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
     >
 
     <Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?android:attr/actionBarSize"
-        android:layout_gravity="top|center"
         android:background="@color/white"
+        android:id="@+id/toolbar"
+        android:layout_gravity="top|center"
+        android:layout_height="?android:attr/actionBarSize"
+        android:layout_width="match_parent"
         tools:layout_height="56dp"
         />
 
     <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?android:attr/actionBarSize"
         android:layout_marginBottom="32dp"
+        android:layout_marginTop="?android:attr/actionBarSize"
+        android:layout_width="match_parent"
         >
 
         <LinearLayout
-            android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_width="match_parent"
             android:orientation="vertical"
             android:paddingLeft="32dp"
             android:paddingRight="32dp"
@@ -35,9 +35,9 @@
 
             <TextView
                 android:id="@+id/fake_location_info"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
                 android:paddingTop="16dp"
                 android:text="@string/fake_location_info"
                 android:textColor="@color/black"
@@ -45,23 +45,23 @@
                 />
 
             <TextView
-                android:id="@+id/learn_more_fake_location"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center_vertical"
+                android:id="@+id/learn_more_fake_location"
+                android:layout_height="48dp"
+                android:layout_width="wrap_content"
                 android:text="@string/learn_more"
                 android:textColor="#007fff"
                 android:textSize="14sp"
                 />
 
             <TextView
-                android:id="@+id/my_location_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:paddingTop="16dp"
+                android:id="@+id/my_location_header"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
                 android:paddingBottom="8dp"
+                android:paddingTop="16dp"
                 android:text="@string/my_location_title"
                 android:textColor="@color/black"
                 android:textSize="14sp"
@@ -69,31 +69,31 @@
 
             <RadioGroup
                 android:id="@+id/location_choices"
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_width="match_parent"
                 android:orientation="vertical"
                 >
 
                 <foundation.e.privacycentralapp.common.RightRadioButton
                     android:id="@+id/radio_use_real_location"
-                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
                     android:text="@string/use_real_location"
                     android:textSize="16sp"
                     />
 
                 <foundation.e.privacycentralapp.common.RightRadioButton
                     android:id="@+id/radio_use_random_location"
-                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
                     android:text="@string/use_random_location"
                     android:textSize="16sp"
                     />
 
                 <foundation.e.privacycentralapp.common.RightRadioButton
                     android:id="@+id/radio_use_specific_location"
-                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
                     android:text="@string/use_specific_location"
                     android:textSize="16sp"
                     />
@@ -102,53 +102,44 @@
 
             <foundation.e.privacycentralapp.features.location.FakeLocationMapView
                 android:id="@+id/mapView"
-                android:layout_width="match_parent"
                 android:layout_height="240dp"
-                mapbox:mapbox_cameraZoom="15"
-                android:layout_marginTop="32dp"
                 android:layout_marginBottom="32dp"
+                android:layout_marginTop="32dp"
+                android:layout_width="match_parent"
+                mapbox:mapbox_cameraZoom="8"
                 />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/edittext_longitude"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:hint="@string/longitude"
+                android:id="@+id/edittext_longitude"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
                 >
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
                     />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/edittext_latitude"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
+                android:hint="@string/latitude"
+                android:id="@+id/edittext_latitude"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="@string/latitude"
+                android:layout_width="match_parent"
                 >
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
                     />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <Button
-                android:id="@+id/button_add_location"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="32dp"
-                android:text="@string/add_location"
-                app:backgroundTint="#007fff"
-                />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </FrameLayout>
