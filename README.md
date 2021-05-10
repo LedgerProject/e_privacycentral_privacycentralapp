@@ -48,7 +48,7 @@ You can set them in local.properties
 MAPBOX_KEY=<insert mapbox public key>
 MAPBOX_SECRET_KEY=<insert mapbox secret key>
 ```
-*IMP: Never add this file to version control.*
+**IMP: Never add this file to version control.**
 
 ### For CI build
 When building in CI environment, we don't have local.properties file. So the following environment variables must be set:
@@ -100,7 +100,7 @@ adb reboot
 ### To run apk on stock android devices
 You can simply install the apk. Keep in that mind all features won't be available on stock android devices.
 
-Volla!!!, PrivacyCentral is installed successfully in your device.
+> Volla!!!, PrivacyCentral is installed successfully in your device.
 
 # Distribution
 This project can be distributed as prebuilt apk with /e/OS or it can be published on other app stores for non /e/OS devices.
@@ -110,7 +110,7 @@ Please refer to [Development Guide](DEVELOPMENT.md) for detailed instructions ab
 
 # License
 ```
-Copyright (C) $YEAR E FOUNDATION
+Copyright (C) 2021 E FOUNDATION
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
