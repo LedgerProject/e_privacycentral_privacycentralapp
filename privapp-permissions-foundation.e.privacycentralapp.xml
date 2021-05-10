@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<permissions>
+    <privapp-permissions package="foundation.e.privacymodulesdemo.e">
+        <permission name="android.permission.UPDATE_APP_OPS_STATS"/>
+        <permission name="android.permission.WATCH_APPOPS"/>
+        <permission name="android.permission.GET_APP_OPS_STATS"/>
+    </privapp-permissions>
+</permissions>
