@@ -185,6 +185,7 @@ class FakeLocationFragment :
                 }
             }
         }
+        locationApiDelegate.startRealLocation()
     }
 
     override fun onAttach(context: Context) {

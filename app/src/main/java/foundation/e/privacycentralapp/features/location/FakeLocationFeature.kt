@@ -179,7 +179,7 @@ class FakeLocationFeature(
                         }
                     }
                     is Action.UseRealLocationAction -> {
-                        action.locationApiDelegate.stopFakeLocation()
+                        action.locationApiDelegate.startRealLocation()
                         val success = DummyDataSource.setLocationMode(LocationMode.REAL_LOCATION)
                         if (success) {
                             flowOf(

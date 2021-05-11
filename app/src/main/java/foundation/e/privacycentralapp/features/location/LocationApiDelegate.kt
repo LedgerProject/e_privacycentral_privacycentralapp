@@ -54,9 +54,28 @@ class LocationApiDelegate(
                 appDesc, AppOpsManager.OPSTR_MOCK_LOCATION,
                 AppOpModes.IGNORED
             )
+            permissionsModule.setAppOpMode(
+                appDesc, AppOpsManager.OPSTR_MOCK_LOCATION,
+                AppOpModes.IGNORED
+            )
             fakeLocationModule.stopFakeLocation()
         } catch (e: Exception) {
             Log.e(TAG, "Can't stop FakeLocation", e)
+        }
+    }
+    fun startRealLocation() {
+        stopFakeLocation()
+        try {
+            permissionsModule.setAppOpMode(
+                appDesc, AppOpsManager.OPSTR_COARSE_LOCATION,
+                AppOpModes.ALLOWED
+            )
+            permissionsModule.setAppOpMode(
+                appDesc, AppOpsManager.OPSTR_FINE_LOCATION,
+                AppOpModes.ALLOWED
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Can't start RealLocation", e)
         }
     }
 }
