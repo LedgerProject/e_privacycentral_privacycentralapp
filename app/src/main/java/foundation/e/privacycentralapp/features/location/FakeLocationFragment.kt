@@ -18,7 +18,6 @@
 package foundation.e.privacycentralapp.features.location
 
 import android.annotation.SuppressLint
-import android.app.AppOpsManager
 import android.content.Context
 import android.os.Bundle
 import android.os.Looper
@@ -59,14 +58,13 @@ import com.mapbox.mapboxsdk.maps.Style
 import foundation.e.flowmvi.MVIView
 import foundation.e.privacycentralapp.R
 import foundation.e.privacycentralapp.dummy.LocationMode
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.ensureActive
 import foundation.e.privacymodules.location.FakeLocation
 import foundation.e.privacymodules.location.IFakeLocation
 import foundation.e.privacymodules.permissions.PermissionsPrivacyModule
-import foundation.e.privacymodules.permissions.data.AppOpModes
 import foundation.e.privacymodules.permissions.data.ApplicationDescription
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -152,6 +150,10 @@ class FakeLocationFragment :
         )
     }
 
+    private val locationApiDelegate by lazy {
+        LocationApiDelegate(fakeLocationModule, permissionsModule, appDesc)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launchWhenStarted {
@@ -164,7 +166,6 @@ class FakeLocationFragment :
                         displayToast("Random location selected")
                         hoveringMarker?.visibility = View.GONE
                         isCameraMoved = false
-                        setLondonLocation()
                     }
                     is FakeLocationFeature.SingleEvent.SpecificLocationSavedEvent -> {
                         // Hide camera hover marker when custom location is picked from map.
@@ -180,7 +181,6 @@ class FakeLocationFragment :
                         displayToast("Real location selected")
                         hoveringMarker?.visibility = View.GONE
                         isCameraMoved = false
-                        setRealLocation()
                     }
                 }
             }
@@ -195,39 +195,6 @@ class FakeLocationFragment :
     private fun displayToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT)
             .show()
-    }
-
-    private fun setFakeLocation(latitude: Double, longitude: Double) {
-        if (permissionsModule.getAppOpMode(appDesc, AppOpsManager.OPSTR_MOCK_LOCATION) != AppOpModes.ALLOWED) {
-            permissionsModule.setAppOpMode(
-                appDesc, AppOpsManager.OPSTR_MOCK_LOCATION,
-                AppOpModes.ALLOWED
-            )
-        }
-        try {
-            fakeLocationModule.startFakeLocation()
-        } catch (e: Exception) {
-            Log.e("FakeLoc", "Can't startFakeLocation", e)
-        }
-        fakeLocationModule.setFakeLocation(latitude, longitude)
-    }
-
-    private fun setRealLocation() {
-        try {
-            permissionsModule.setAppOpMode(
-                appDesc, AppOpsManager.OPSTR_MOCK_LOCATION,
-                AppOpModes.IGNORED
-            )
-            fakeLocationModule.stopFakeLocation()
-            displayToast("Real location selected")
-        } catch (e: Exception) {
-            Log.e("FakeLoc", "Can't stop FakeLocation", e)
-        }
-    }
-
-    private fun setLondonLocation() {
-        displayToast("Random location selected")
-        setFakeLocation(51.5287718, -0.2416803)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -313,32 +280,33 @@ class FakeLocationFragment :
         }
     }
 
-    private fun saveSpecificLocation(latitude: Double, longitude: Double) {
-        setFakeLocation(latitude, longitude)
-        viewModel.submitAction(
-            FakeLocationFeature.Action.SetFakeLocationAction(latitude, longitude)
-        )
-    }
-
     private fun toggleLocationType(radioButton: View?) {
         if (radioButton is RadioButton) {
             val checked = radioButton.isChecked
             when (radioButton.id) {
                 R.id.radio_use_real_location ->
                     if (checked) {
-                        viewModel.submitAction(FakeLocationFeature.Action.UseRealLocationAction)
+                        viewModel.submitAction(
+                            FakeLocationFeature.Action.UseRealLocationAction(
+                                locationApiDelegate
+                            )
+                        )
                     }
                 R.id.radio_use_random_location ->
                     if (checked) {
                         viewModel.submitAction(
                             FakeLocationFeature.Action.UseRandomLocationAction(
-                                resources.getStringArray(R.array.cities)
+                                locationApiDelegate, resources.getStringArray(R.array.cities)
                             )
                         )
                     }
                 R.id.radio_use_specific_location ->
                     if (checked) {
-                        viewModel.submitAction(FakeLocationFeature.Action.UseSpecificLocationAction)
+                        viewModel.submitAction(
+                            FakeLocationFeature.Action.UseSpecificLocationAction(
+                                locationApiDelegate
+                            )
+                        )
                     }
             }
         }

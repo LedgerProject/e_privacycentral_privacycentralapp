@@ -54,10 +54,13 @@ class FakeLocationFeature(
         data class ErrorEvent(val error: String) : SingleEvent()
     }
 
-    sealed class Action {
+    sealed class Action() {
         data class UpdateLocationAction(val latLng: LatLng) : Action()
-        object UseRealLocationAction : Action()
-        data class UseRandomLocationAction(val cities: Array<String>) : Action() {
+        data class UseRealLocationAction(val locationApiDelegate: LocationApiDelegate) : Action()
+        data class UseRandomLocationAction(
+            val locationApiDelegate: LocationApiDelegate,
+            val cities: Array<String>
+        ) : Action() {
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (javaClass != other?.javaClass) return false
@@ -74,8 +77,12 @@ class FakeLocationFeature(
             }
         }
 
-        object UseSpecificLocationAction : Action()
-        data class SetFakeLocationAction(val latitude: Double, val longitude: Double) : Action()
+        data class UseSpecificLocationAction(val locationApiDelegate: LocationApiDelegate) : Action()
+        data class SetFakeLocationAction(
+            val locationApiDelegate: LocationApiDelegate,
+            val latitude: Double,
+            val longitude: Double
+        ) : Action()
     }
 
     sealed class Effect {
@@ -139,7 +146,7 @@ class FakeLocationFeature(
                             action.latitude,
                             action.longitude
                         )
-                        // TODO: Call fake location api with specific coordinates here.
+                        action.locationApiDelegate.setFakeLocation(action.latitude, action.longitude)
                         val success = DummyDataSource.setLocationMode(
                             LocationMode.CUSTOM_LOCATION,
                             location
@@ -156,7 +163,7 @@ class FakeLocationFeature(
                     }
                     is Action.UseRandomLocationAction -> {
                         val randomCity = CityDataSource.getRandomCity(action.cities)
-                        // TODO: Call fake location api with random location here.
+                        action.locationApiDelegate.setFakeLocation(randomCity.latitude, randomCity.longitude)
                         val success = DummyDataSource.setLocationMode(
                             LocationMode.RANDOM_LOCATION,
                             randomCity.toRandomLocation()
@@ -171,8 +178,8 @@ class FakeLocationFeature(
                             )
                         }
                     }
-                    Action.UseRealLocationAction -> {
-                        // TODO: Call turn off fake location api here.
+                    is Action.UseRealLocationAction -> {
+                        action.locationApiDelegate.stopFakeLocation()
                         val success = DummyDataSource.setLocationMode(LocationMode.REAL_LOCATION)
                         if (success) {
                             flowOf(
@@ -184,7 +191,7 @@ class FakeLocationFeature(
                             )
                         }
                     }
-                    Action.UseSpecificLocationAction -> {
+                    is Action.UseSpecificLocationAction -> {
                         flowOf(Effect.SpecificLocationSelectedEffect)
                     }
                 }
