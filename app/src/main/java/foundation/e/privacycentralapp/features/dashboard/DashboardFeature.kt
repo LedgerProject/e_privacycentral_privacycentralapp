@@ -168,7 +168,6 @@ class DashboardFeature(
                         )
                         Action.ShowDashboardAction -> flow {
                             emit(Effect.LoadingDashboardEffect)
-                            kotlinx.coroutines.delay(2000)
                             emit(
                                 Effect.OpenDashboardEffect(
                                     DummyDataSource.trackersCount,
