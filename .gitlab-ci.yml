@@ -40,7 +40,7 @@ nightly-tasks:
 quality-analysis:
   stage: qa
   script:
-    - ./gradlew spotlessCheck
+    - ./gradlew spotlessCheck lint
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
@@ -69,7 +69,7 @@ build-debug:
 test-debug:
   stage: test
   script:
-    - ./gradlew testDebug --stacktrace
+    - ./gradlew test --stacktrace
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
