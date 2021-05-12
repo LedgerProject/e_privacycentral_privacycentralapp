@@ -24,11 +24,11 @@ android {
 	flavorDimensions 'os'
 	productFlavors {
 		e {
-			applicationId 'foundation.e.privacymodulesdemo.e'
+			applicationIdSuffix '.e'
 			dimension 'os'
 		}
 		google {
-			applicationId 'foundation.e.privacymodeulesdemo.google'
+			applicationIdSuffix '.google'
 			dimension 'os'
 		}
 	}
