@@ -17,6 +17,7 @@ local.properties
 /.idea/assetWizardSettings.xml
 /.idea/jarRepositories.xml
 /.idea/google-java-format.xml
+/.idea/runConfigurations.xml
 gradle.xml
 markdown-*.xml
 *.iml
@@ -38,3 +39,6 @@ captures/
 # Built application files
 *.apk
 *.aar
+
+# Lineage test build keys
+lineage_keys/
