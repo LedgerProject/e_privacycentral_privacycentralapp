@@ -15,12 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package foundation.e.privacycentralapp
+package foundation.e.privacycentralapp.common
 
-import android.app.Application
-
-class PrivacyCentralApplication : Application() {
-
-    // Initialize the dependency container.
-    val dependencyContainer: DependencyContainer by lazy { DependencyContainer(this) }
+// Definition of a Factory interface with a function to create objects of a type
+interface Factory<T> {
+    fun create(): T
 }

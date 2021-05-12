@@ -19,22 +19,29 @@ package foundation.e.privacycentralapp.features.location
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import foundation.e.privacycentralapp.common.Factory
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-class FakeLocationViewModel : ViewModel() {
+class FakeLocationViewModel(private val locationApi: LocationApiDelegate) : ViewModel() {
 
     private val _actions = MutableSharedFlow<FakeLocationFeature.Action>()
     val actions = _actions.asSharedFlow()
 
     val fakeLocationFeature: FakeLocationFeature by lazy {
-        FakeLocationFeature.create(coroutineScope = viewModelScope)
+        FakeLocationFeature.create(coroutineScope = viewModelScope, locationApi = locationApi)
     }
 
     fun submitAction(action: FakeLocationFeature.Action) {
         viewModelScope.launch {
             _actions.emit(action)
         }
+    }
+}
+
+class FakeLocationViewModelFactory(private val locationApi: LocationApiDelegate) : Factory<FakeLocationViewModel> {
+    override fun create(): FakeLocationViewModel {
+        return FakeLocationViewModel((locationApi))
     }
 }

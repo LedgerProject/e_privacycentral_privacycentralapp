@@ -23,7 +23,6 @@ import foundation.e.privacymodules.location.IFakeLocation
 import foundation.e.privacymodules.permissions.PermissionsPrivacyModule
 import foundation.e.privacymodules.permissions.data.AppOpModes
 import foundation.e.privacymodules.permissions.data.ApplicationDescription
-import java.lang.Exception
 
 class LocationApiDelegate(
     private val fakeLocationModule: IFakeLocation,
@@ -63,6 +62,7 @@ class LocationApiDelegate(
             Log.e(TAG, "Can't stop FakeLocation", e)
         }
     }
+
     fun startRealLocation() {
         stopFakeLocation()
         try {

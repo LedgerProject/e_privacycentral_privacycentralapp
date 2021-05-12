@@ -36,7 +36,8 @@ class FakeLocationFeature(
     coroutineScope: CoroutineScope,
     reducer: Reducer<State, Effect>,
     actor: Actor<State, Action, Effect>,
-    singleEventProducer: SingleEventProducer<State, Action, Effect, SingleEvent>
+    singleEventProducer: SingleEventProducer<State, Action, Effect, SingleEvent>,
+    private val locationApi: LocationApiDelegate
 ) : BaseFeature<FakeLocationFeature.State, FakeLocationFeature.Action, FakeLocationFeature.Effect, FakeLocationFeature.SingleEvent>(
     initialState,
     actor,
@@ -54,11 +55,12 @@ class FakeLocationFeature(
         data class ErrorEvent(val error: String) : SingleEvent()
     }
 
-    sealed class Action() {
+    sealed class Action {
+
+        // Action which is triggered everytime the location is updated.
         data class UpdateLocationAction(val latLng: LatLng) : Action()
-        data class UseRealLocationAction(val locationApiDelegate: LocationApiDelegate) : Action()
+        object UseRealLocationAction : Action()
         data class UseRandomLocationAction(
-            val locationApiDelegate: LocationApiDelegate,
             val cities: Array<String>
         ) : Action() {
             override fun equals(other: Any?): Boolean {
@@ -77,9 +79,8 @@ class FakeLocationFeature(
             }
         }
 
-        data class UseSpecificLocationAction(val locationApiDelegate: LocationApiDelegate) : Action()
-        data class SetFakeLocationAction(
-            val locationApiDelegate: LocationApiDelegate,
+        object UseSpecificLocationAction : Action()
+        data class SetCustomFakeLocationAction(
             val latitude: Double,
             val longitude: Double
         ) : Action()
@@ -103,7 +104,8 @@ class FakeLocationFeature(
                     0.0
                 )
             ),
-            coroutineScope: CoroutineScope
+            coroutineScope: CoroutineScope,
+            locationApi: LocationApiDelegate
         ) = FakeLocationFeature(
             initialState, coroutineScope,
             reducer = { state, effect ->
@@ -140,13 +142,13 @@ class FakeLocationFeature(
                             action.latLng.longitude
                         )
                     )
-                    is Action.SetFakeLocationAction -> {
+                    is Action.SetCustomFakeLocationAction -> {
                         val location = Location(
                             LocationMode.CUSTOM_LOCATION,
                             action.latitude,
                             action.longitude
                         )
-                        action.locationApiDelegate.setFakeLocation(action.latitude, action.longitude)
+                        locationApi.setFakeLocation(action.latitude, action.longitude)
                         val success = DummyDataSource.setLocationMode(
                             LocationMode.CUSTOM_LOCATION,
                             location
@@ -163,7 +165,7 @@ class FakeLocationFeature(
                     }
                     is Action.UseRandomLocationAction -> {
                         val randomCity = CityDataSource.getRandomCity(action.cities)
-                        action.locationApiDelegate.setFakeLocation(randomCity.latitude, randomCity.longitude)
+                        locationApi.setFakeLocation(randomCity.latitude, randomCity.longitude)
                         val success = DummyDataSource.setLocationMode(
                             LocationMode.RANDOM_LOCATION,
                             randomCity.toRandomLocation()
@@ -179,7 +181,7 @@ class FakeLocationFeature(
                         }
                     }
                     is Action.UseRealLocationAction -> {
-                        action.locationApiDelegate.startRealLocation()
+                        locationApi.startRealLocation()
                         val success = DummyDataSource.setLocationMode(LocationMode.REAL_LOCATION)
                         if (success) {
                             flowOf(
@@ -204,7 +206,8 @@ class FakeLocationFeature(
                     is Effect.ErrorEffect -> SingleEvent.ErrorEvent(effect.message)
                     else -> null
                 }
-            }
+            },
+            locationApi = locationApi
         )
     }
 }

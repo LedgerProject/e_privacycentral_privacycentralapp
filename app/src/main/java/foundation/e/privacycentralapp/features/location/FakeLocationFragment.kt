@@ -21,7 +21,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.os.Looper
-import android.os.Process
 import android.text.Editable
 import android.util.Log
 import android.view.Gravity
@@ -56,19 +55,17 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import foundation.e.flowmvi.MVIView
+import foundation.e.privacycentralapp.DependencyContainer
+import foundation.e.privacycentralapp.PrivacyCentralApplication
 import foundation.e.privacycentralapp.R
 import foundation.e.privacycentralapp.dummy.LocationMode
-import foundation.e.privacymodules.location.FakeLocation
-import foundation.e.privacymodules.location.IFakeLocation
-import foundation.e.privacymodules.permissions.PermissionsPrivacyModule
-import foundation.e.privacymodules.permissions.data.ApplicationDescription
+import foundation.e.privacycentralapp.extensions.viewModelProviderFactoryOf
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
 class FakeLocationFragment :
     Fragment(R.layout.fragment_fake_location),
@@ -77,7 +74,14 @@ class FakeLocationFragment :
 
     private var isCameraMoved: Boolean = false
     private lateinit var permissionsManager: PermissionsManager
-    private val viewModel: FakeLocationViewModel by viewModels()
+
+    private val dependencyContainer: DependencyContainer by lazy {
+        (this.requireActivity().application as PrivacyCentralApplication).dependencyContainer
+    }
+
+    private val viewModel: FakeLocationViewModel by viewModels {
+        viewModelProviderFactoryOf { dependencyContainer.fakeLocationViewModelFactory.create() }
+    }
 
     private lateinit var mapView: FakeLocationMapView
     private lateinit var mapboxMap: MapboxMap
@@ -96,9 +100,8 @@ class FakeLocationFragment :
         object : LocationEngineCallback<LocationEngineResult> {
             override fun onSuccess(result: LocationEngineResult?) {
                 result?.lastLocation?.let {
-                    Log.d(TAG, "Last location: ${it.latitude}, ${it.longitude}")
                     mapboxMap.locationComponent.forceLocationUpdate(
-                        LocationUpdate.Builder().location(it).animationDuration(200)
+                        LocationUpdate.Builder().location(it).animationDuration(100)
                             .build()
                     )
                     if (!isCameraMoved) {
@@ -111,7 +114,8 @@ class FakeLocationFragment :
                             )
                         )
                     }
-                    // Only update location when location mode is set to real location
+                    // Only update location when location mode is set to real location or random location.
+                    // It basically triggers a UI update.
                     if (viewModel.fakeLocationFeature.state.value.location.mode != LocationMode.CUSTOM_LOCATION) {
                         viewModel.submitAction(
                             FakeLocationFeature.Action.UpdateLocationAction(
@@ -136,22 +140,6 @@ class FakeLocationFragment :
         private const val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L
         private const val DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5
         private const val DROPPED_MARKER_LAYER_ID = "DROPPED_MARKER_LAYER_ID"
-    }
-
-    private val fakeLocationModule: IFakeLocation by lazy { FakeLocation(this.requireContext()) }
-    private val permissionsModule by lazy { PermissionsPrivacyModule(this.requireContext()) }
-
-    private val appDesc by lazy {
-        ApplicationDescription(
-            packageName = this.requireContext().packageName,
-            uid = Process.myUid(),
-            label = getString(R.string.app_name),
-            icon = null
-        )
-    }
-
-    private val locationApiDelegate by lazy {
-        LocationApiDelegate(fakeLocationModule, permissionsModule, appDesc)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -185,7 +173,6 @@ class FakeLocationFragment :
                 }
             }
         }
-        locationApiDelegate.startRealLocation()
     }
 
     override fun onAttach(context: Context) {
@@ -222,8 +209,10 @@ class FakeLocationFragment :
 
                     mapboxMap.addOnCameraMoveStartedListener {
                         // Show marker when user starts to move across the map.
-                        if (mapView.isEnabled) {
-                            hoveringMarker?.visibility = View.VISIBLE
+                        hoveringMarker?.visibility = if (mapView.isEnabled) {
+                            View.VISIBLE
+                        } else {
+                            View.GONE
                         }
                         isCameraMoved = true
                     }
@@ -273,7 +262,22 @@ class FakeLocationFragment :
                         inputJob = lifecycleScope.launch {
                             delay(DEBOUNCE_PERIOD)
                             ensureActive()
-                            Log.d("FakeLocation", "Call save location here")
+                            try {
+                                val lat = latEditText.text.toString().toDouble()
+                                val long = longEditText.text.toString().toDouble()
+                                viewModel.submitAction(
+                                    FakeLocationFeature.Action.SetCustomFakeLocationAction(
+                                        lat,
+                                        long
+                                    )
+                                )
+                            } catch (e: NumberFormatException) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    getString(R.string.please_enter_valid_lat_long),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
                     }
                 }
@@ -288,25 +292,21 @@ class FakeLocationFragment :
                 R.id.radio_use_real_location ->
                     if (checked) {
                         viewModel.submitAction(
-                            FakeLocationFeature.Action.UseRealLocationAction(
-                                locationApiDelegate
-                            )
+                            FakeLocationFeature.Action.UseRealLocationAction
                         )
                     }
                 R.id.radio_use_random_location ->
                     if (checked) {
                         viewModel.submitAction(
                             FakeLocationFeature.Action.UseRandomLocationAction(
-                                locationApiDelegate, resources.getStringArray(R.array.cities)
+                                resources.getStringArray(R.array.cities)
                             )
                         )
                     }
                 R.id.radio_use_specific_location ->
                     if (checked) {
                         viewModel.submitAction(
-                            FakeLocationFeature.Action.UseSpecificLocationAction(
-                                locationApiDelegate
-                            )
+                            FakeLocationFeature.Action.UseSpecificLocationAction
                         )
                     }
             }

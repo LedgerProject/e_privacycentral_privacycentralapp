@@ -15,12 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package foundation.e.privacycentralapp
+package foundation.e.privacycentralapp.extensions
 
-import android.app.Application
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 
-class PrivacyCentralApplication : Application() {
-
-    // Initialize the dependency container.
-    val dependencyContainer: DependencyContainer by lazy { DependencyContainer(this) }
+inline fun <VM : ViewModel> viewModelProviderFactoryOf(
+    crossinline f: () -> VM
+): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T = f() as T
 }
