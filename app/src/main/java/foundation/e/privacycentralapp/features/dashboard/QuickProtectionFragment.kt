@@ -18,23 +18,16 @@
 package foundation.e.privacycentralapp.features.dashboard
 
 import android.content.Context
-import android.os.Bundle
-import android.view.View
-import android.widget.Toolbar
 import androidx.activity.addCallback
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import foundation.e.privacycentralapp.R
+import foundation.e.privacycentralapp.common.NavToolbarFragment
 
-class QuickProtectionFragment : Fragment(R.layout.fragment_quick_protection) {
+class QuickProtectionFragment : NavToolbarFragment(R.layout.fragment_quick_protection) {
 
     private val viewModel: DashboardViewModel by activityViewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
-        setupToolbar(toolbar)
-    }
+    override fun getTitle(): String = "Quick protection"
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -43,11 +36,5 @@ class QuickProtectionFragment : Fragment(R.layout.fragment_quick_protection) {
             this.isEnabled = false
             requireActivity().onBackPressed()
         }
-    }
-
-    private fun setupToolbar(toolbar: Toolbar) {
-        val activity = requireActivity()
-        activity.setActionBar(toolbar)
-        activity.title = "Quick protection"
     }
 }

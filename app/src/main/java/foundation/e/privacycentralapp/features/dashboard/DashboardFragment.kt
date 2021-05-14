@@ -26,15 +26,14 @@ import android.view.View
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
-import android.widget.Toolbar
 import androidx.core.widget.NestedScrollView
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import foundation.e.flowmvi.MVIView
 import foundation.e.privacycentralapp.R
+import foundation.e.privacycentralapp.common.ToolbarFragment
 import foundation.e.privacycentralapp.dummy.mapToString
 import foundation.e.privacycentralapp.features.internetprivacy.InternetPrivacyFragment
 import foundation.e.privacycentralapp.features.location.FakeLocationFragment
@@ -43,7 +42,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 
 class DashboardFragment :
-    Fragment(R.layout.fragment_dashboard),
+    ToolbarFragment(R.layout.fragment_dashboard),
     MVIView<DashboardFeature.State, DashboardFeature.Action> {
 
     private val viewModel: DashboardViewModel by activityViewModels()
@@ -97,8 +96,6 @@ class DashboardFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
-        setupToolbar(toolbar)
         addClickToMore(view.findViewById(R.id.personal_leakag_info))
         view.let {
             it.findViewById<TextView>(R.id.tap_to_enable_quick_protection).setOnClickListener {
@@ -116,11 +113,7 @@ class DashboardFragment :
         }
     }
 
-    private fun setupToolbar(toolbar: Toolbar) {
-        val activity = requireActivity()
-        activity.setActionBar(toolbar)
-        activity.title = "My Privacy Dashboard"
-    }
+    override fun getTitle(): String = "My Privacy Dashboard"
 
     private fun addClickToMore(textView: TextView) {
         val clickToMore = SpannableString("Click to learn more")

@@ -31,10 +31,8 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.Toast
-import android.widget.Toolbar
 import androidx.annotation.NonNull
 import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.textfield.TextInputLayout
@@ -52,12 +50,12 @@ import com.mapbox.mapboxsdk.location.LocationUpdate
 import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import foundation.e.flowmvi.MVIView
 import foundation.e.privacycentralapp.DependencyContainer
 import foundation.e.privacycentralapp.PrivacyCentralApplication
 import foundation.e.privacycentralapp.R
+import foundation.e.privacycentralapp.common.NavToolbarFragment
 import foundation.e.privacycentralapp.dummy.LocationMode
 import foundation.e.privacycentralapp.extensions.viewModelProviderFactoryOf
 import kotlinx.coroutines.Job
@@ -68,7 +66,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class FakeLocationFragment :
-    Fragment(R.layout.fragment_fake_location),
+    NavToolbarFragment(R.layout.fragment_fake_location),
     MVIView<FakeLocationFeature.State, FakeLocationFeature.Action>,
     PermissionsListener {
 
@@ -180,6 +178,10 @@ class FakeLocationFragment :
         Mapbox.getInstance(requireContext(), getString(R.string.mapbox_key))
     }
 
+    override fun getTitle(): String {
+        return getString(R.string.my_location_title)
+    }
+
     private fun displayToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT)
             .show()
@@ -187,8 +189,7 @@ class FakeLocationFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
-        setupToolbar(toolbar)
+
         setupViews(view)
         mapView = view.findViewById<FakeLocationMapView>(R.id.mapView)
             .setup(savedInstanceState) { mapboxMap ->
@@ -313,12 +314,6 @@ class FakeLocationFragment :
         }
     }
 
-    private fun setupToolbar(toolbar: Toolbar) {
-        val activity = requireActivity()
-        activity.setActionBar(toolbar)
-        activity.title = "Fake My Location"
-    }
-
     override fun render(state: FakeLocationFeature.State) {
         Log.d("FakeMyLocation", "State: $state")
         latEditText.text =
@@ -418,9 +413,3 @@ class FakeLocationFragment :
         }
     }
 }
-
-fun FakeLocationMapView.setup(savedInstanceState: Bundle?, callback: OnMapReadyCallback) =
-    this.apply {
-        onCreate(savedInstanceState)
-        getMapAsync(callback)
-    }

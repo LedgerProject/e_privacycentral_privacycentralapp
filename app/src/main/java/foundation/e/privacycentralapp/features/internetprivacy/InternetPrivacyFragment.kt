@@ -21,18 +21,17 @@ import android.os.Bundle
 import android.view.View
 import android.widget.RadioButton
 import android.widget.Toast
-import android.widget.Toolbar
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import foundation.e.flowmvi.MVIView
 import foundation.e.privacycentralapp.R
+import foundation.e.privacycentralapp.common.NavToolbarFragment
 import foundation.e.privacycentralapp.dummy.InternetPrivacyMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 
 class InternetPrivacyFragment :
-    Fragment(R.layout.fragment_internet_activity_policy),
+    NavToolbarFragment(R.layout.fragment_internet_activity_policy),
     MVIView<InternetPrivacyFeature.State, InternetPrivacyFeature.Action> {
 
     private val viewModel: InternetPrivacyViewModel by viewModels()
@@ -63,16 +62,10 @@ class InternetPrivacyFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
-        setupToolbar(toolbar)
         bindClickListeners(view)
     }
 
-    private fun setupToolbar(toolbar: Toolbar) {
-        val activity = requireActivity()
-        activity.setActionBar(toolbar)
-        activity.title = "My Internet Activity Privacy"
-    }
+    override fun getTitle(): String = "My Internet Activity Privacy"
 
     private fun bindClickListeners(fragmentView: View) {
         fragmentView.let {

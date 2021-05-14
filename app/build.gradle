@@ -53,9 +53,12 @@ android {
 		sourceCompatibility JavaVersion.VERSION_1_8
 		targetCompatibility JavaVersion.VERSION_1_8
 	}
+
+
 }
 
 dependencies {
+	compileOnly files('libs/e-ui-sdk-1.0.1-q.jar')
 	implementation project(":privacymodulesapi")
 
 	// include the google specific version of the modules, just for the google flavor
