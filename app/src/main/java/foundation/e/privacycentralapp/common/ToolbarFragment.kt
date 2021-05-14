@@ -19,9 +19,9 @@ package foundation.e.privacycentralapp.common
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toolbar
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
+import com.google.android.material.appbar.MaterialToolbar
 import foundation.e.privacycentralapp.R
 
 abstract class ToolbarFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLayoutId) {
@@ -33,10 +33,11 @@ abstract class ToolbarFragment(@LayoutRes contentLayoutId: Int) : Fragment(conte
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         setupToolbar(view.findViewById(R.id.toolbar))
     }
 
-    open fun setupToolbar(toolbar: Toolbar) {
+    open fun setupToolbar(toolbar: MaterialToolbar) {
         toolbar.title = getTitle()
     }
 }

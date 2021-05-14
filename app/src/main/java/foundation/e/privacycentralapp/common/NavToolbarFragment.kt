@@ -17,12 +17,12 @@
 
 package foundation.e.privacycentralapp.common
 
-import android.widget.Toolbar
 import androidx.annotation.LayoutRes
+import com.google.android.material.appbar.MaterialToolbar
 
 abstract class NavToolbarFragment(@LayoutRes contentLayoutId: Int) : ToolbarFragment(contentLayoutId) {
 
-    override fun setupToolbar(toolbar: Toolbar) {
+    override fun setupToolbar(toolbar: MaterialToolbar) {
         super.setupToolbar(toolbar)
         toolbar.apply {
             setNavigationIcon(lineageos.platform.R.drawable.ic_back)

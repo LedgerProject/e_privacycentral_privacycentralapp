@@ -17,12 +17,21 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/white"
-    android:id="@+id/toolbar"
-    android:layout_gravity="top|center"
-    android:layout_height="?android:attr/actionBarSize"
+    android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    tools:layout_height="56dp"
-    />
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:elevation="0dp"
+    >
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:background="@color/white"
+        android:id="@+id/toolbar"
+        app:titleCentered="true"
+        android:elevation="0dp"
+        android:layout_height="?android:attr/actionBarSize"
+        android:layout_width="match_parent"
+        tools:layout_height="56dp"
+        />
+</com.google.android.material.appbar.AppBarLayout>

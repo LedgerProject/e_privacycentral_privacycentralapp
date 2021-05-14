@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,13 +7,12 @@
     android:background="@color/white"
     >
 
-    <include layout="@layout/toolbar"/>
+    <include layout="@layout/topbar"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_marginTop="?android:attr/actionBarSize"
         tools:context=".main.MainActivity"
         >
 
@@ -36,4 +35,4 @@
             tools:listitem="@layout/item_permission_apps"
             android:id="@+id/recylcer_view_permission_apps"/>
     </LinearLayout>
-</FrameLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
