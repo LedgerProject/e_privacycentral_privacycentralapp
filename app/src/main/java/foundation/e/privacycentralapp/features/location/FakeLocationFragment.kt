@@ -178,9 +178,7 @@ class FakeLocationFragment :
         Mapbox.getInstance(requireContext(), getString(R.string.mapbox_key))
     }
 
-    override fun getTitle(): String {
-        return getString(R.string.my_location_title)
-    }
+    override fun getTitle(): String = getString(R.string.my_location_title)
 
     private fun displayToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT)
@@ -315,7 +313,6 @@ class FakeLocationFragment :
     }
 
     override fun render(state: FakeLocationFeature.State) {
-        Log.d("FakeMyLocation", "State: $state")
         latEditText.text =
             Editable.Factory.getInstance().newEditable(state.location.latitude.toString())
         longEditText.text =

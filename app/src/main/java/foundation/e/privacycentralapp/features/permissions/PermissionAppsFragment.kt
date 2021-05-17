@@ -64,7 +64,7 @@ class PermissionAppsFragment :
             .show()
     }
 
-    override fun getTitle(): String = "My Apps Permission"
+    override fun getTitle(): String = getString(R.string.apps_permissions)
 
     override fun render(state: PermissionsFeature.State) {
         state.currentPermission?.let { permission ->

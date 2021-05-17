@@ -65,7 +65,7 @@ class InternetPrivacyFragment :
         bindClickListeners(view)
     }
 
-    override fun getTitle(): String = "My Internet Activity Privacy"
+    override fun getTitle(): String = getString(R.string.internet_activity_privacy)
 
     private fun bindClickListeners(fragmentView: View) {
         fragmentView.let {

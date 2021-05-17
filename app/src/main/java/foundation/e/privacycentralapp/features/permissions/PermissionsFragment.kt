@@ -51,7 +51,7 @@ class PermissionsFragment :
         super.onViewCreated(view, savedInstanceState)
     }
 
-    override fun getTitle(): String = "My Apps Permission"
+    override fun getTitle(): String = getString(R.string.apps_permissions)
 
     override fun render(state: PermissionsFeature.State) {
         view?.findViewById<RecyclerView>(R.id.recylcer_view_permissions)?.apply {

@@ -113,10 +113,10 @@ class DashboardFragment :
         }
     }
 
-    override fun getTitle(): String = "My Privacy Dashboard"
+    override fun getTitle(): String = getString(R.string.privacy_dashboard)
 
     private fun addClickToMore(textView: TextView) {
-        val clickToMore = SpannableString("Click to learn more")
+        val clickToMore = SpannableString(getString(R.string.click_to_learn_more))
         clickToMore.setSpan(
             ForegroundColorSpan(Color.parseColor("#007fff")),
             0,

@@ -27,7 +27,7 @@ class QuickProtectionFragment : NavToolbarFragment(R.layout.fragment_quick_prote
 
     private val viewModel: DashboardViewModel by activityViewModels()
 
-    override fun getTitle(): String = "Quick protection"
+    override fun getTitle(): String = getString(R.string.quick_protection)
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
