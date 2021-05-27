@@ -18,22 +18,20 @@
 package foundation.e.privacycentralapp.features.permissions
 
 import android.os.Bundle
-import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import android.widget.Toolbar
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import foundation.e.flowmvi.MVIView
 import foundation.e.privacycentralapp.R
+import foundation.e.privacycentralapp.common.NavToolbarFragment
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 
 class PermissionAppsFragment :
-    Fragment(R.layout.fragment_permission_apps),
+    NavToolbarFragment(R.layout.fragment_permission_apps),
     MVIView<PermissionsFeature.State, PermissionsFeature.Action> {
 
     private val viewModel: PermissionsViewModel by viewModels()
@@ -66,17 +64,7 @@ class PermissionAppsFragment :
             .show()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
-        setupToolbar(toolbar)
-    }
-
-    private fun setupToolbar(toolbar: Toolbar) {
-        val activity = requireActivity()
-        activity.setActionBar(toolbar)
-        activity.title = "My Apps Permission"
-    }
+    override fun getTitle(): String = getString(R.string.apps_permissions)
 
     override fun render(state: PermissionsFeature.State) {
         state.currentPermission?.let { permission ->

@@ -19,9 +19,7 @@ package foundation.e.privacycentralapp.features.permissions
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toolbar
 import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
@@ -30,10 +28,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import foundation.e.flowmvi.MVIView
 import foundation.e.privacycentralapp.R
+import foundation.e.privacycentralapp.common.NavToolbarFragment
 import kotlinx.coroutines.flow.Flow
 
 class PermissionsFragment :
-    Fragment(R.layout.fragment_permissions),
+    NavToolbarFragment(R.layout.fragment_permissions),
     MVIView<PermissionsFeature.State, PermissionsFeature.Action> {
 
     private val viewModel: PermissionsViewModel by viewModels()
@@ -50,15 +49,9 @@ class PermissionsFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
-        setupToolbar(toolbar)
     }
 
-    private fun setupToolbar(toolbar: Toolbar) {
-        val activity = requireActivity()
-        activity.setActionBar(toolbar)
-        activity.title = "My Apps Permission"
-    }
+    override fun getTitle(): String = getString(R.string.apps_permissions)
 
     override fun render(state: PermissionsFeature.State) {
         view?.findViewById<RecyclerView>(R.id.recylcer_view_permissions)?.apply {

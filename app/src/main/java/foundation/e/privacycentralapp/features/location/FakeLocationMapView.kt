@@ -19,9 +19,11 @@ package foundation.e.privacycentralapp.features.location
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Bundle
 import android.util.AttributeSet
 import android.view.MotionEvent
 import com.mapbox.mapboxsdk.maps.MapView
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 
 class FakeLocationMapView @JvmOverloads constructor(
     context: Context,
@@ -43,3 +45,9 @@ class FakeLocationMapView @JvmOverloads constructor(
         return true
     }
 }
+
+fun FakeLocationMapView.setup(savedInstanceState: Bundle?, callback: OnMapReadyCallback) =
+    this.apply {
+        onCreate(savedInstanceState)
+        getMapAsync(callback)
+    }

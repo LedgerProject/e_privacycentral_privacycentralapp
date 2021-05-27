@@ -9,6 +9,7 @@
     <string name="apps_permissions_subtitle">%1$d apps are requesting %2$d permissions</string>
     <string name="my_location_title">My Location</string>
     <string name="my_location_subtitle">"%1$d apps are using location permission\nCurrent location mode: "</string>
+    <string name="internet_activity_privacy">Internet Activity Privacy</string>
     <string name="internet_activity_privacy_title">My Internet Activity Privacy</string>
     <string name="internet_activity_privacy_subtitle">"Current internet activity mode: "</string>
     <string name="quick_protection_info">Quick protection enables these settings when turned on</string>
@@ -38,4 +39,8 @@
     <string name="user_location_permission_explanation">This app needs location permissions in order to show its functionality.</string>
     <string name="user_location_permission_not_granted">You didn\'t grant location permission</string>
     <string name="please_enter_valid_lat_long">Please enter valid latitude and longitude value</string>
+    <string name="quick_protection">Quick Protection</string>
+    <string name="privacy_dashboard">Privacy Dashboard</string>
+    <string name="click_to_learn_more">Click to learn more</string>
+    <string name="apps_permissions">\"Apps Permission\"</string>
 </resources>

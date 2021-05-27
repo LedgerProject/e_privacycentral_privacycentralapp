@@ -1,79 +1,111 @@
 plugins {
-	id 'com.android.application'
-	id 'kotlin-android'
+    id 'com.android.application'
+    id 'kotlin-android'
 }
 
 android {
-	compileSdkVersion buildConfig.compileSdk
+    compileSdkVersion buildConfig.compileSdk
 
-	defaultConfig {
-		applicationId "foundation.e.privacycentralapp"
-		minSdkVersion buildConfig.minSdk
-		targetSdkVersion buildConfig.targetSdk
-		versionCode buildConfig.version.code
-		versionName buildConfig.version.fullName
+    defaultConfig {
+        applicationId "foundation.e.privacycentralapp"
+        minSdkVersion buildConfig.minSdk
+        targetSdkVersion buildConfig.targetSdk
+        versionCode buildConfig.version.code
+        versionName buildConfig.version.fullName
 
-		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-		resValue("string", "mapbox_key", MAPBOX_KEY)
-	}
+        resValue("string", "mapbox_key", MAPBOX_KEY)
+    }
 
-	// We define here  the OS flavor e, specific for the /e/ OS version, and google, for any
-	// Andriod device. The e or google prefix is then used in resources, dependencies, ... as
-	// expected by the android gradle plugin.
-	flavorDimensions 'os'
-	productFlavors {
-		e {
-			applicationIdSuffix '.e'
-			dimension 'os'
-		}
-		google {
-			applicationIdSuffix '.google'
-			dimension 'os'
-		}
-	}
+    signingConfigs {
+        debug {
+            storeFile rootProject.file(".sign/debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
 
-	buildTypes {
-		release {
-			minifyEnabled false
-			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-		}
-	}
+        // We use test platform keys to sign /e/OS specific debug flavour.
+        eDebug {
+            storeFile rootProject.file(".sign/platform.jks")
+            storePassword "android"
+            keyAlias "platform"
+            keyPassword "android"
+        }
+    }
 
-	signingConfigs {
-		debug {
-			storeFile rootProject.file(".sign/debug.keystore")
-			storePassword "android"
-			keyAlias "androiddebugkey"
-			keyPassword "android"
-		}
-	}
+    // We define here  the OS flavor e, specific for the /e/ OS version, and google, for any
+    // android device. The e or google prefix is then used in resources, dependencies, ... as
+    // expected by the android gradle plugin.
+    flavorDimensions 'os'
+    productFlavors {
+        e {
+            applicationIdSuffix '.e'
+            dimension 'os'
+        }
+        google {
+            applicationIdSuffix '.google'
+            dimension 'os'
+        }
+    }
 
-	compileOptions {
-		sourceCompatibility JavaVersion.VERSION_1_8
-		targetCompatibility JavaVersion.VERSION_1_8
-	}
+    buildTypes {
+        debug {
+            signingConfig null  // Set signing config to null as we use signingConfig per variant.
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    /**
+     * Sets the output name of the variant outputs and also it setup signingConfig based on the product flavor.
+     */
+    applicationVariants.all { variant ->
+        if (variant.buildType.name == "debug") {
+            variant.outputs.all { output ->
+                outputFileName = "PrivacyCentral-${output.name}-${variant.versionName}.apk"
+            }
+            if (variant.getFlavorName() == "e") {
+                variant.mergedFlavor.signingConfig = signingConfigs.eDebug
+            } else {
+                variant.mergedFlavor.signingConfig = signingConfigs.debug
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
-	implementation project(":privacymodulesapi")
+    compileOnly files('libs/e-ui-sdk-1.0.1-q.jar')
+    implementation project(":privacymodulesapi")
 
-	// include the google specific version of the modules, just for the google flavor
-	googleImplementation project(":privacymodulesgoogle")
-	// include the e specific version of the modules, just for the e flavor
-	eImplementation project(":privacymodulese")
-	implementation project(":flow-mvi")
-	implementation Libs.Kotlin.stdlib
-	implementation Libs.AndroidX.coreKtx
-	implementation Libs.AndroidX.Fragment.fragmentKtx
-	implementation 'androidx.appcompat:appcompat:1.2.0'
-	implementation Libs.AndroidX.Lifecycle.runtime
-	implementation Libs.AndroidX.Lifecycle.viewmodel
+    // include the google specific version of the modules, just for the google flavor
+    googleImplementation project(":privacymodulesgoogle")
+    // include the e specific version of the modules, just for the e flavor
+    eImplementation project(":privacymodulese")
+    implementation project(":flow-mvi")
+    implementation Libs.Kotlin.stdlib
+    implementation Libs.AndroidX.coreKtx
+    implementation Libs.AndroidX.Fragment.fragmentKtx
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation Libs.AndroidX.Lifecycle.runtime
+    implementation Libs.AndroidX.Lifecycle.viewmodel
 
-	implementation Libs.MapBox.sdk
-	implementation 'com.google.android.material:material:1.3.0'
+    implementation Libs.MapBox.sdk
+    implementation 'com.google.android.material:material:1.4.0-beta01'
 
-	testImplementation 'junit:junit:4.+'
-	androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-	androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    testImplementation 'junit:junit:4.+'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+}
+
+static def log(Object val) {
+    println("[GradleRepository]: " + val)
 }
