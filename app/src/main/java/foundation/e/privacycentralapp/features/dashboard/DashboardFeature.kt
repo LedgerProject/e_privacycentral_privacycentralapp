@@ -76,6 +76,7 @@ class DashboardFeature(
         object ShowFakeMyLocationAction : Action()
         object ShowInternetActivityPrivacyAction : Action()
         object ShowAppsPermissions : Action()
+        object ShowTrackers : Action()
     }
 
     sealed class Effect {
@@ -98,6 +99,7 @@ class DashboardFeature(
         object OpenFakeMyLocationEffect : Effect()
         object OpenInternetActivityPrivacyEffect : Effect()
         object OpenAppsPermissionsEffect : Effect()
+        object OpenTrackersEffect : Effect()
     }
 
     companion object {
@@ -144,6 +146,7 @@ class DashboardFeature(
                         Effect.OpenFakeMyLocationEffect -> state
                         Effect.OpenAppsPermissionsEffect -> state
                         Effect.OpenInternetActivityPrivacyEffect -> state
+                        Effect.OpenTrackersEffect -> state
                     }
                 },
                 actor = { _: State, action: Action ->
@@ -185,6 +188,7 @@ class DashboardFeature(
                         Action.ShowInternetActivityPrivacyAction -> flowOf(
                             Effect.OpenInternetActivityPrivacyEffect
                         )
+                        Action.ShowTrackers -> flowOf(Effect.OpenTrackersEffect)
                     }
                 },
                 singleEventProducer = { state, _, effect ->
@@ -197,6 +201,8 @@ class DashboardFeature(
                         SingleEvent.NavigateToInternetActivityPrivacySingleEvent
                     else if (state is State.DashboardState && effect is Effect.OpenAppsPermissionsEffect)
                         SingleEvent.NavigateToPermissionsSingleEvent
+                    else if (state is State.DashboardState && effect is Effect.OpenTrackersEffect)
+                        SingleEvent.NavigateToTrackersSingleEvent
                     else null
                 }
             )

@@ -84,6 +84,7 @@ android {
 
 dependencies {
     compileOnly files('libs/e-ui-sdk-1.0.1-q.jar')
+    implementation files('libs/classes.jar')
     implementation project(":privacymodulesapi")
 
     // include the google specific version of the modules, just for the google flavor
