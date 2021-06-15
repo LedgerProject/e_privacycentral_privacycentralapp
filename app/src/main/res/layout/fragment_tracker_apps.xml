@@ -17,7 +17,6 @@
         >
 
         <TextView
-            android:id="@+id/permission_control"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -25,6 +24,7 @@
             android:paddingBottom="16dp"
             android:paddingLeft="32dp"
             android:paddingRight="32dp"
+            android:text="@string/enable_disable_tracker_info"
             android:textColor="@color/black"
             android:textSize="14sp"
             />
@@ -33,6 +33,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:listitem="@layout/item_app_toggle"
-            android:id="@+id/recylcer_view_permission_apps"/>
+            android:id="@+id/recylcer_view_tracker_apps"/>
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

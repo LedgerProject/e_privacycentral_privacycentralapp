@@ -26,21 +26,48 @@
             >
 
             <TextView
-                android:id="@+id/internet_activity_privacy_info"
+                android:id="@+id/trackers_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:paddingTop="16dp"
-                android:text="@string/internet_activity_privacy_info"
+                android:text="@string/manage_trackers_info"
                 android:textColor="@color/black"
                 android:textSize="14sp"
                 />
 
-            <Button android:id="@+id/triggerBlockerService"
-                android:layout_height="wrap_content"
+            <TextView
+                android:id="@+id/learn_more_trackers_info"
                 android:layout_width="wrap_content"
-                android:text="Trigger Blocker"/>
+                android:layout_height="48dp"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center_vertical"
+                android:text="@string/learn_more"
+                android:textColor="#007fff"
+                android:textSize="14sp"
                 />
+
+            <ImageView
+                android:layout_height="300dp"
+                android:layout_width="wrap_content"
+                android:scaleType="centerInside"
+                android:src="@drawable/dummy_trackers_usage"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="16dp"
+                android:text="@string/following_trackers_in_use"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                />
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:listitem="@layout/item_list_tracker"
+                android:id="@+id/recylcer_view_trackers"/>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

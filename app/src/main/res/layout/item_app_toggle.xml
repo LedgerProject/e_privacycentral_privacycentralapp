@@ -24,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_toStartOf="@+id/togglePermission"
+        android:layout_toStartOf="@+id/toggle"
         android:layout_toEndOf="@+id/app_icon"
         android:fontFamily="sans-serif-medium"
         android:paddingStart="32dp"
@@ -35,7 +35,7 @@
         />
 
     <Switch
-        android:id="@+id/togglePermission"
+        android:id="@+id/toggle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

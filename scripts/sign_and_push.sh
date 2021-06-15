@@ -10,7 +10,7 @@ adb root
 wait ${!}
 adb devices
 wait ${!}
-adb install -r PrivacyCentral.apk
+adb install -r build/outputs/apk/e/debug/PrivacyCentral-e-debug-1.0.0-alpha.apk
 wait ${!}
 adb remount && adb push privapp-permissions-foundation.e.privacycentralapp.xml system/etc/permissions
 wait ${!}

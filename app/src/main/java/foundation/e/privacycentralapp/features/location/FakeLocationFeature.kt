@@ -36,8 +36,7 @@ class FakeLocationFeature(
     coroutineScope: CoroutineScope,
     reducer: Reducer<State, Effect>,
     actor: Actor<State, Action, Effect>,
-    singleEventProducer: SingleEventProducer<State, Action, Effect, SingleEvent>,
-    private val locationApi: LocationApiDelegate
+    singleEventProducer: SingleEventProducer<State, Action, Effect, SingleEvent>
 ) : BaseFeature<FakeLocationFeature.State, FakeLocationFeature.Action, FakeLocationFeature.Effect, FakeLocationFeature.SingleEvent>(
     initialState,
     actor,
@@ -206,8 +205,7 @@ class FakeLocationFeature(
                     is Effect.ErrorEffect -> SingleEvent.ErrorEvent(effect.message)
                     else -> null
                 }
-            },
-            locationApi = locationApi
+            }
         )
     }
 }

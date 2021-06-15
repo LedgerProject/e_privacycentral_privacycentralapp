@@ -15,20 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package foundation.e.privacycentralapp
+package foundation.e.privacycentralapp.features.trackers
 
-import android.app.Application
-import foundation.e.privacycentralapp.dummy.TrackersDataSource
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 
-class PrivacyCentralApplication : Application() {
+class TrackersViewModel : ViewModel() {
 
-    // Initialize the dependency container.
-    val dependencyContainer: DependencyContainer by lazy { DependencyContainer(this) }
+    private val _actions = MutableSharedFlow<TrackersFeature.Action>()
+    val actions = _actions.asSharedFlow()
 
-    override fun onCreate() {
-        super.onCreate()
+    val trackersFeature: TrackersFeature by lazy {
+        TrackersFeature.create(coroutineScope = viewModelScope)
+    }
 
-        // Inject blocker service in trackers source.
-        TrackersDataSource.injectBlockerService(dependencyContainer.blockerService)
+    fun submitAction(action: TrackersFeature.Action) {
+        viewModelScope.launch {
+            _actions.emit(action)
+        }
     }
 }

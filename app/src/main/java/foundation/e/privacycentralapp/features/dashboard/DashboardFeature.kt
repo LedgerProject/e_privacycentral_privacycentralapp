@@ -25,6 +25,7 @@ import foundation.e.flowmvi.feature.BaseFeature
 import foundation.e.privacycentralapp.dummy.DummyDataSource
 import foundation.e.privacycentralapp.dummy.InternetPrivacyMode
 import foundation.e.privacycentralapp.dummy.LocationMode
+import foundation.e.privacycentralapp.dummy.TrackersDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -93,6 +94,7 @@ class DashboardFeature(
 
         object LoadingDashboardEffect : Effect()
         data class UpdateActiveTrackersCountEffect(val count: Int) : Effect()
+        data class UpdateTotalTrackersCountEffect(val count: Int) : Effect()
         data class UpdateLocationModeEffect(val mode: LocationMode) : Effect()
         data class UpdateInternetActivityModeEffect(val mode: InternetPrivacyMode) : Effect()
         data class UpdateAppsUsingLocationPermEffect(val apps: Int) : Effect()
@@ -129,6 +131,11 @@ class DashboardFeature(
                                 state.copy(activeTrackersCount = effect.count)
                             } else state
                         }
+                        is Effect.UpdateTotalTrackersCountEffect -> {
+                            if (state is State.DashboardState) {
+                                state.copy(trackersCount = effect.count)
+                            } else state
+                        }
                         is Effect.UpdateInternetActivityModeEffect -> {
                             if (state is State.DashboardState) {
                                 state.copy(internetPrivacyMode = effect.mode)
@@ -153,8 +160,20 @@ class DashboardFeature(
                     Log.d("Feature", "action: $action")
                     when (action) {
                         Action.ObserveDashboardAction -> merge(
-                            DummyDataSource.activeTrackersCount.map {
-                                Effect.UpdateActiveTrackersCountEffect(it)
+                            TrackersDataSource.trackers.map {
+                                var activeTrackersCount: Int = 0
+                                outer@ for (tracker in it) {
+                                    for (app in tracker.trackedApps) {
+                                        if(!app.isEnabled)  {
+                                            continue@outer
+                                        }
+                                    }
+                                    activeTrackersCount++
+                                }
+                                Effect.UpdateActiveTrackersCountEffect(activeTrackersCount)
+                            },
+                            TrackersDataSource.trackers.map {
+                                Effect.UpdateTotalTrackersCountEffect(it.size)
                             },
                             DummyDataSource.appsUsingLocationPerm.map {
                                 Effect.UpdateAppsUsingLocationPermEffect(it.size)

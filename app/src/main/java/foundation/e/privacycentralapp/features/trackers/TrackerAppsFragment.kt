@@ -18,9 +18,7 @@
 package foundation.e.privacycentralapp.features.trackers
 
 import android.os.Bundle
-import android.view.View
-import androidx.fragment.app.add
-import androidx.fragment.app.commit
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,49 +27,50 @@ import foundation.e.flowmvi.MVIView
 import foundation.e.privacycentralapp.R
 import foundation.e.privacycentralapp.common.NavToolbarFragment
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 
-class TrackersFragment :
-    NavToolbarFragment(R.layout.fragment_trackers),
+class TrackerAppsFragment :
+    NavToolbarFragment(R.layout.fragment_tracker_apps),
     MVIView<TrackersFeature.State, TrackersFeature.Action> {
 
     private val viewModel: TrackersViewModel by viewModels()
-    private lateinit var trackersAdapter: TrackersAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launchWhenStarted {
-            viewModel.trackersFeature.takeView(this, this@TrackersFragment)
+            viewModel.trackersFeature.takeView(this, this@TrackerAppsFragment)
         }
         lifecycleScope.launchWhenStarted {
-            viewModel.submitAction(TrackersFeature.Action.ObserveTrackers)
+            viewModel.trackersFeature.singleEvents.collect { event ->
+                when (event) {
+                    is TrackersFeature.SingleEvent.ErrorEvent -> displayToast(event.error)
+                }
+            }
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        trackersAdapter = TrackersAdapter {
-            viewModel.submitAction(TrackersFeature.Action.SetSelectedTracker(it))
-        }
-        view.findViewById<RecyclerView>(R.id.recylcer_view_trackers)?.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            setHasFixedSize(true)
-            adapter = trackersAdapter
-        }
+    private fun displayToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT)
+            .show()
     }
 
-    override fun getTitle(): String {
-        return getString(R.string.trackers)
-    }
+    override fun getTitle(): String = getString(R.string.tracker)
 
     override fun render(state: TrackersFeature.State) {
-        if (state.currentSelectedTracker != null) {
-            requireActivity().supportFragmentManager.commit {
-                add<TrackerAppsFragment>(R.id.container)
-                setReorderingAllowed(true)
-                addToBackStack("trackers")
+        state.currentSelectedTracker?.let { tracker ->
+            view?.findViewById<RecyclerView>(R.id.recylcer_view_tracker_apps)?.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+                setHasFixedSize(true)
+                adapter = TrackerAppsAdapter(tracker) { tracker, grant ->
+                    viewModel.submitAction(
+                       TrackersFeature.Action.ToggleTrackerAction(
+                            tracker,
+                            grant
+                        )
+                    )
+                }
             }
-        } else {
-            trackersAdapter.setData(state.trackers)
+            getToolbar()?.title = tracker.name
         }
     }
 
