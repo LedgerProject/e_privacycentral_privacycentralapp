@@ -18,8 +18,10 @@
 package foundation.e.privacycentralapp.features.trackers
 
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.Toast
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -33,7 +35,9 @@ class TrackerAppsFragment :
     NavToolbarFragment(R.layout.fragment_tracker_apps),
     MVIView<TrackersFeature.State, TrackersFeature.Action> {
 
-    private val viewModel: TrackersViewModel by viewModels()
+    private val viewModel: TrackersViewModel by activityViewModels()
+
+    private val TAG = "TrackerAppsFragment"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +48,11 @@ class TrackerAppsFragment :
             viewModel.trackersFeature.singleEvents.collect { event ->
                 when (event) {
                     is TrackersFeature.SingleEvent.ErrorEvent -> displayToast(event.error)
+                    is TrackersFeature.SingleEvent.BlockerErrorEvent -> {
+                        displayToast("Couldn't toggle")
+                        // Re-render the current state to reset the switches.
+                        render(viewModel.trackersFeature.state.value)
+                    }
                 }
             }
         }
@@ -56,19 +65,24 @@ class TrackerAppsFragment :
 
     override fun getTitle(): String = getString(R.string.tracker)
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        view.findViewById<RecyclerView>(R.id.recylcer_view_tracker_apps)?.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            setHasFixedSize(true)
+        }
+    }
+
     override fun render(state: TrackersFeature.State) {
+        Log.d(TAG, "render() called with: state = $state")
         state.currentSelectedTracker?.let { tracker ->
-            view?.findViewById<RecyclerView>(R.id.recylcer_view_tracker_apps)?.apply {
-                layoutManager = LinearLayoutManager(requireContext())
-                setHasFixedSize(true)
-                adapter = TrackerAppsAdapter(tracker) { tracker, grant ->
-                    viewModel.submitAction(
-                       TrackersFeature.Action.ToggleTrackerAction(
-                            tracker,
-                            grant
-                        )
+            view?.findViewById<RecyclerView>(R.id.recylcer_view_tracker_apps)?.adapter = TrackerAppsAdapter(tracker) { it, grant ->
+                viewModel.submitAction(
+                    TrackersFeature.Action.ToggleTrackerAction(
+                        it,
+                        grant
                     )
-                }
+                )
             }
             getToolbar()?.title = tracker.name
         }

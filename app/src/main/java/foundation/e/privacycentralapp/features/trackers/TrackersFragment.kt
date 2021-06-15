@@ -19,9 +19,9 @@ package foundation.e.privacycentralapp.features.trackers
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,7 +34,7 @@ class TrackersFragment :
     NavToolbarFragment(R.layout.fragment_trackers),
     MVIView<TrackersFeature.State, TrackersFeature.Action> {
 
-    private val viewModel: TrackersViewModel by viewModels()
+    private val viewModel: TrackersViewModel by activityViewModels()
     private lateinit var trackersAdapter: TrackersAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,9 +59,7 @@ class TrackersFragment :
         }
     }
 
-    override fun getTitle(): String {
-        return getString(R.string.trackers)
-    }
+    override fun getTitle() = getString(R.string.trackers)
 
     override fun render(state: TrackersFeature.State) {
         if (state.currentSelectedTracker != null) {

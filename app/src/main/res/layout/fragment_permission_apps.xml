@@ -2,37 +2,45 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:background="@color/white"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
     >
 
-    <include layout="@layout/topbar"/>
+    <include layout="@layout/topbar" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <androidx.core.widget.NestedScrollView
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context=".main.MainActivity"
+        android:layout_width="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         >
 
-        <TextView
-            android:id="@+id/permission_control"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp"
-            android:paddingLeft="32dp"
-            android:paddingRight="32dp"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
+        <LinearLayout
             android:layout_height="match_parent"
-            tools:listitem="@layout/item_app_toggle"
-            android:id="@+id/recylcer_view_permission_apps"/>
-    </LinearLayout>
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            tools:context=".main.MainActivity"
+            >
+
+            <TextView
+                android:id="@+id/permission_control"
+                android:layout_gravity="center_horizontal"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:paddingBottom="16dp"
+                android:paddingLeft="32dp"
+                android:paddingRight="32dp"
+                android:paddingTop="16dp"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recylcer_view_permission_apps"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                tools:listitem="@layout/item_app_toggle"
+                />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

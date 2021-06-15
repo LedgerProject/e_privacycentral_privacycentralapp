@@ -82,9 +82,11 @@ object TrackersDataSource {
         if (result) {
             _trackers.value = _trackers.value.map {
                 if (it.name == tracker.name) {
-                    it.copy(trackedApps = it.trackedApps.map { app ->
-                        app.copy(isEnabled = enable)
-                    })
+                    it.copy(
+                        trackedApps = it.trackedApps.map { app ->
+                            app.copy(isEnabled = enable)
+                        }
+                    )
                 } else it
             }
         }

@@ -40,7 +40,7 @@ class TrackersFeature(
     actor,
     reducer,
     coroutineScope,
-    { message -> Log.d("PermissionsFeature", message) },
+    { message -> Log.d("TrackersFeature", message) },
     singleEventProducer
 ) {
     data class State(
@@ -112,7 +112,9 @@ class TrackersFeature(
             singleEventProducer = { _, _, effect ->
                 when (effect) {
                     is Effect.ErrorEffect -> SingleEvent.ErrorEvent(effect.message)
-                    is Effect.TrackerToggleEffect -> SingleEvent.BlockerErrorEvent
+                    is Effect.TrackerToggleEffect -> {
+                        if (!effect.result) SingleEvent.BlockerErrorEvent else null
+                    }
                     else -> null
                 }
             }

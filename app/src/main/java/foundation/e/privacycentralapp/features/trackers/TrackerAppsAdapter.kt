@@ -43,8 +43,10 @@ class TrackerAppsAdapter(
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_app_toggle, parent, false)
         val holder = TrackerViewHolder(view)
-        holder.toggleBlocker.setOnCheckedChangeListener { _, isChecked ->
-            listener(tracker, isChecked)
+        holder.toggleBlocker.setOnClickListener {
+            if (it is Switch) {
+                listener(tracker, it.isChecked)
+            }
         }
         return holder
     }

@@ -2,16 +2,22 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:background="@color/white"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
     >
 
-    <include layout="@layout/topbar"/>
+    <include layout="@layout/topbar" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        >
 
         <LinearLayout
-            android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_width="match_parent"
             android:orientation="vertical"
             android:paddingLeft="32dp"
             android:paddingRight="32dp"
@@ -20,9 +26,9 @@
 
             <TextView
                 android:id="@+id/permission_control"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
                 android:paddingTop="16dp"
                 android:text="@string/permission_control_info"
                 android:textColor="@color/black"
@@ -30,20 +36,22 @@
                 />
 
             <TextView
-                android:id="@+id/learn_more_permissions"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center_vertical"
+                android:id="@+id/learn_more_permissions"
+                android:layout_height="48dp"
+                android:layout_width="wrap_content"
                 android:text="@string/learn_more"
                 android:textColor="#007fff"
                 android:textSize="14sp"
                 />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="match_parent"
+                android:id="@+id/recylcer_view_permissions"
                 android:layout_height="match_parent"
+                android:layout_width="match_parent"
                 tools:listitem="@layout/item_permission"
-                android:id="@+id/recylcer_view_permissions"/>
+                />
         </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -2,46 +2,46 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_width="match_parent"
     >
 
-    <include layout="@layout/topbar"/>
+    <include layout="@layout/topbar" />
 
     <ProgressBar
         android:id="@+id/loadingSpinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:indeterminate="true"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
         />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollContainer"
-        android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_width="match_parent"
         android:visibility="gone"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         >
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
             android:background="@color/white"
             android:gravity="center_horizontal"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
             android:orientation="vertical"
             tools:context=".main.MainActivity"
             >
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:gravity="center"
-                android:paddingLeft="32dp"
-                android:paddingTop="16dp"
-                android:paddingRight="32dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
                 android:paddingBottom="16dp"
+                android:paddingLeft="32dp"
+                android:paddingRight="32dp"
+                android:paddingTop="16dp"
                 android:text="@string/privacy_dashboard_info"
                 android:textColor="@color/black"
                 android:textSize="14sp"
@@ -49,91 +49,91 @@
 
             <ImageView
                 android:id="@+id/togglePrivacyCentral"
-                android:layout_width="96dp"
                 android:layout_height="96dp"
-                android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_width="96dp"
                 android:src="@drawable/ic_privacy_toggle"
                 />
 
             <TextView
-                android:id="@+id/tap_to_enable_quick_protection"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:drawableEnd="@drawable/ic_chevron_right_24dp"
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center"
-                android:paddingLeft="32dp"
-                android:paddingTop="16dp"
-                android:paddingRight="32dp"
+                android:id="@+id/tap_to_enable_quick_protection"
+                android:layout_gravity="center_horizontal"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
                 android:paddingBottom="16dp"
+                android:paddingLeft="32dp"
+                android:paddingRight="32dp"
+                android:paddingTop="16dp"
                 android:text="@string/tap_to_enable_quick_protection"
                 android:textColor="@color/black"
                 android:textSize="14sp"
                 />
 
             <ImageView
-                android:layout_width="match_parent"
                 android:layout_height="160dp"
+                android:layout_width="match_parent"
                 android:src="@drawable/dummy_leakage_analytics"
                 />
 
             <TextView
-                android:id="@+id/personal_leakag_info"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:gravity="center"
+                android:id="@+id/personal_leakag_info"
+                android:layout_gravity="center_horizontal"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:paddingBottom="16dp"
                 android:paddingLeft="32dp"
                 android:paddingRight="32dp"
-                android:paddingBottom="16dp"
                 android:text="@string/personal_leakage_info"
                 android:textColor="@color/black"
                 android:textSize="12sp"
                 />
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:background="#f9f9f9"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
                 android:orientation="vertical"
                 >
 
                 <RelativeLayout
                     android:id="@+id/am_i_tracked"
-                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="32dp"
-                    android:paddingTop="16dp"
-                    android:paddingRight="32dp"
+                    android:layout_width="match_parent"
                     android:paddingBottom="16dp"
+                    android:paddingLeft="32dp"
+                    android:paddingRight="32dp"
+                    android:paddingTop="16dp"
                     >
 
                     <ImageView
                         android:id="@+id/am_i_tracked_icon"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
+                        android:layout_height="36dp"
+                        android:layout_width="36dp"
                         android:src="@drawable/ic_tracked"
                         />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_toStartOf="@+id/am_i_tracked_chevron"
                         android:layout_toEndOf="@+id/am_i_tracked_icon"
+                        android:layout_toStartOf="@+id/am_i_tracked_chevron"
+                        android:layout_width="match_parent"
                         android:orientation="vertical"
-                        android:paddingStart="16dp"
                         android:paddingEnd="32dp"
+                        android:paddingStart="16dp"
                         >
 
                         <TextView
-                            android:id="@+id/am_i_tracked_title"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-medium"
+                            android:id="@+id/am_i_tracked_title"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
                             android:text="@string/am_i_tracked_title"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -141,8 +141,8 @@
 
                         <TextView
                             android:id="@+id/am_i_tracked_subtitle"
-                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
                             android:text="@string/am_i_tracked_subtitle"
                             android:textColor="@color/black"
                             android:textSize="14sp"
@@ -151,48 +151,48 @@
 
                     <ImageView
                         android:id="@+id/am_i_tracked_chevron"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
+                        android:layout_height="24dp"
+                        android:layout_width="24dp"
                         android:src="@drawable/ic_chevron_right_24dp"
                         />
                 </RelativeLayout>
 
                 <RelativeLayout
                     android:id="@+id/apps_permissions"
-                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="32dp"
-                    android:paddingTop="16dp"
-                    android:paddingRight="32dp"
+                    android:layout_width="match_parent"
                     android:paddingBottom="16dp"
+                    android:paddingLeft="32dp"
+                    android:paddingRight="32dp"
+                    android:paddingTop="16dp"
                     >
 
                     <ImageView
                         android:id="@+id/apps_permissions_icon"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
+                        android:layout_height="36dp"
+                        android:layout_width="36dp"
                         android:src="@drawable/ic_apps_permissions"
                         />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_toStartOf="@+id/apps_permissions_chevron"
                         android:layout_toEndOf="@+id/apps_permissions_icon"
+                        android:layout_toStartOf="@+id/apps_permissions_chevron"
+                        android:layout_width="match_parent"
                         android:orientation="vertical"
-                        android:paddingStart="16dp"
                         android:paddingEnd="32dp"
+                        android:paddingStart="16dp"
                         >
 
                         <TextView
-                            android:id="@+id/apps_permissions_title"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-medium"
+                            android:id="@+id/apps_permissions_title"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
                             android:text="@string/apps_permissions_title"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -200,8 +200,8 @@
 
                         <TextView
                             android:id="@+id/apps_permissions_subtitle"
-                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
                             android:text="@string/apps_permissions_subtitle"
                             android:textColor="@color/black"
                             android:textSize="14sp"
@@ -210,48 +210,48 @@
 
                     <ImageView
                         android:id="@+id/apps_permissions_chevron"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
+                        android:layout_height="24dp"
+                        android:layout_width="24dp"
                         android:src="@drawable/ic_chevron_right_24dp"
                         />
                 </RelativeLayout>
 
                 <RelativeLayout
                     android:id="@+id/my_location"
-                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="32dp"
-                    android:paddingTop="16dp"
-                    android:paddingRight="32dp"
+                    android:layout_width="match_parent"
                     android:paddingBottom="16dp"
+                    android:paddingLeft="32dp"
+                    android:paddingRight="32dp"
+                    android:paddingTop="16dp"
                     >
 
                     <ImageView
                         android:id="@+id/my_location_icon"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
+                        android:layout_height="36dp"
+                        android:layout_width="36dp"
                         android:src="@drawable/ic_my_location"
                         />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_toStartOf="@+id/my_location_chevron"
                         android:layout_toEndOf="@+id/my_location_icon"
+                        android:layout_toStartOf="@+id/my_location_chevron"
+                        android:layout_width="match_parent"
                         android:orientation="vertical"
-                        android:paddingStart="16dp"
                         android:paddingEnd="32dp"
+                        android:paddingStart="16dp"
                         >
 
                         <TextView
-                            android:id="@+id/my_location_title"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-medium"
+                            android:id="@+id/my_location_title"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
                             android:text="@string/my_location_title"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -259,8 +259,8 @@
 
                         <TextView
                             android:id="@+id/my_location_subtitle"
-                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
                             android:text="@string/my_location_subtitle"
                             android:textColor="@color/black"
                             android:textSize="14sp"
@@ -269,48 +269,48 @@
 
                     <ImageView
                         android:id="@+id/my_location_chevron"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
+                        android:layout_height="24dp"
+                        android:layout_width="24dp"
                         android:src="@drawable/ic_chevron_right_24dp"
                         />
                 </RelativeLayout>
 
                 <RelativeLayout
                     android:id="@+id/internet_activity_privacy"
-                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="32dp"
-                    android:paddingTop="16dp"
-                    android:paddingRight="32dp"
+                    android:layout_width="match_parent"
                     android:paddingBottom="16dp"
+                    android:paddingLeft="32dp"
+                    android:paddingRight="32dp"
+                    android:paddingTop="16dp"
                     >
 
                     <ImageView
                         android:id="@+id/internet_activity_privacy_icon"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
+                        android:layout_height="36dp"
+                        android:layout_width="36dp"
                         android:src="@drawable/ic_internet_activity"
                         />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_toStartOf="@+id/internet_activity_privacy_chevron"
                         android:layout_toEndOf="@+id/internet_activity_privacy_icon"
+                        android:layout_toStartOf="@+id/internet_activity_privacy_chevron"
+                        android:layout_width="match_parent"
                         android:orientation="vertical"
-                        android:paddingStart="16dp"
                         android:paddingEnd="32dp"
+                        android:paddingStart="16dp"
                         >
 
                         <TextView
-                            android:id="@+id/internet_activity_privacy_title"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-medium"
+                            android:id="@+id/internet_activity_privacy_title"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
                             android:text="@string/internet_activity_privacy_title"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -318,8 +318,8 @@
 
                         <TextView
                             android:id="@+id/internet_activity_privacy_subtitle"
-                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
                             android:text="@string/internet_activity_privacy_subtitle"
                             android:textColor="@color/black"
                             android:textSize="14sp"
@@ -328,10 +328,10 @@
 
                     <ImageView
                         android:id="@+id/internet_activity_privacy_chevron"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
+                        android:layout_height="24dp"
+                        android:layout_width="24dp"
                         android:src="@drawable/ic_chevron_right_24dp"
                         />
                 </RelativeLayout>

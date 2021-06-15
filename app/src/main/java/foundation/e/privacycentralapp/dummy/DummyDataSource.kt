@@ -227,5 +227,4 @@ object DummyDataSource {
             _appsUsingLocationPerm.value = _populatedPermissions.value[permissionId].packagesAllowed
         }
     }
-
 }

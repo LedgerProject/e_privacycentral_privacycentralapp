@@ -18,20 +18,20 @@
   -->
 
 <com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     app:elevation="0dp"
     >
 
     <com.google.android.material.appbar.MaterialToolbar
         android:background="@color/white"
-        android:id="@+id/toolbar"
-        app:titleCentered="true"
         android:elevation="0dp"
+        android:id="@+id/toolbar"
         android:layout_height="?android:attr/actionBarSize"
         android:layout_width="match_parent"
+        app:titleCentered="true"
         tools:layout_height="56dp"
         />
 </com.google.android.material.appbar.AppBarLayout>

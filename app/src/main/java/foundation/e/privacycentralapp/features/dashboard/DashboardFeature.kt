@@ -164,7 +164,7 @@ class DashboardFeature(
                                 var activeTrackersCount: Int = 0
                                 outer@ for (tracker in it) {
                                     for (app in tracker.trackedApps) {
-                                        if(!app.isEnabled)  {
+                                        if (!app.isEnabled) {
                                             continue@outer
                                         }
                                     }
