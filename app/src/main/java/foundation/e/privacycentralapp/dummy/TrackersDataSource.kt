@@ -43,19 +43,19 @@ object TrackersDataSource {
     val youtube = TrackedApp("Youtube", true, R.drawable.ic_facebook)
 
     val crashlytics = Tracker(
-        "Google Crashlytics (Demo)",
+        "Google Crashlytics Demo (google.com) ",
         domain = "google.com",
         trackedApps = listOf(facebook, firefox)
     )
 
     val facebookAds = Tracker(
-        "Facebook (Demo)",
-        domain = "google.com",
+        "Facebook IP Demo",
+        domain = "157.240.16.35",
         trackedApps = listOf(facebook, whatsapp)
     )
     val rubiconTracker = Tracker(
-        "Rubicon Projects",
-        domain = "google.com",
+        "Rubicon Projects (block google)",
+        domain = "google",
         trackedApps = listOf(google, blisslauncher, youtube)
     )
     val googleAnalytics = Tracker(

@@ -80,7 +80,10 @@ class TrackersFeature(
                     is Effect.TrackersLoadedEffect -> State(effect.trackers)
                     is Effect.TrackerSelectedEffect -> state.copy(currentSelectedTracker = effect.tracker)
                     is Effect.ErrorEffect -> state
-                    is Effect.TrackerToggleEffect -> state
+                    is Effect.TrackerToggleEffect -> {
+                        Log.d("Tracker effect", "$state")
+                        state
+                    }
                 }
             },
             actor = { state, action ->
@@ -99,7 +102,7 @@ class TrackersFeature(
                     is Action.ToggleTrackerAction -> {
                         if (state.currentSelectedTracker != null) {
                             val result = TrackersDataSource.toggleTracker(
-                                state.currentSelectedTracker,
+                                action.tracker,
                                 action.grant
                             )
                             flowOf(Effect.TrackerToggleEffect(result))
