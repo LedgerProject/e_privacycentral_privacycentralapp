@@ -17,6 +17,7 @@
 
 package foundation.e.privacycentralapp.features.trackers
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -33,6 +34,7 @@ class TrackersViewModel : ViewModel() {
     }
 
     fun submitAction(action: TrackersFeature.Action) {
+        Log.d("TrackersViewModel", "submitting action")
         viewModelScope.launch {
             _actions.emit(action)
         }

@@ -72,6 +72,16 @@ object TrackersDataSource {
         this.blockerService = blockerInterface
     }
 
+    fun getTracker(name: String): Tracker? {
+        try {
+            return _trackers.value.first {
+                it.name == name
+            }
+        } catch (e: NoSuchElementException) {
+            return null
+        }
+    }
+
     fun toggleTracker(tracker: Tracker, enable: Boolean): Boolean {
         val result = if (!enable) {
             blockerService.blockDomain(tracker.domain)

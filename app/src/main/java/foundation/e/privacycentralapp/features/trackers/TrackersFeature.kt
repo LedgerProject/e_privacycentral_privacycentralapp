@@ -60,6 +60,7 @@ class TrackersFeature(
             val tracker: Tracker,
             val grant: Boolean
         ) : Action()
+        data class ObserveTracker(val tracker: String?) : Action()
     }
 
     sealed class Effect {
@@ -67,6 +68,7 @@ class TrackersFeature(
         data class TrackerSelectedEffect(val tracker: Tracker) : Effect()
         data class TrackerToggleEffect(val result: Boolean) : Effect()
         data class ErrorEffect(val message: String) : Effect()
+        data class TrackerLoadedEffect(val tracker: Tracker) : Effect()
     }
 
     companion object {
@@ -81,8 +83,10 @@ class TrackersFeature(
                     is Effect.TrackerSelectedEffect -> state.copy(currentSelectedTracker = effect.tracker)
                     is Effect.ErrorEffect -> state
                     is Effect.TrackerToggleEffect -> {
-                        Log.d("Tracker effect", "$state")
                         state
+                    }
+                    is Effect.TrackerLoadedEffect -> {
+                        state.copy(currentSelectedTracker = effect.tracker)
                     }
                 }
             },
@@ -108,6 +112,18 @@ class TrackersFeature(
                             flowOf(Effect.TrackerToggleEffect(result))
                         } else {
                             flowOf(Effect.ErrorEffect("Can't toggle tracker"))
+                        }
+                    }
+                    is Action.ObserveTracker -> {
+                        if (action.tracker == null) {
+                            flowOf(Effect.ErrorEffect("Null tracker id passed"))
+                        } else {
+                            val tracker = TrackersDataSource.getTracker(action.tracker)
+                            if (tracker != null) {
+                                flowOf(Effect.TrackerLoadedEffect(tracker))
+                            } else {
+                                flowOf(Effect.ErrorEffect("Can't find tracker with name ${action.tracker}"))
+                            }
                         }
                     }
                 }

@@ -21,7 +21,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -35,7 +35,7 @@ class TrackerAppsFragment :
     NavToolbarFragment(R.layout.fragment_tracker_apps),
     MVIView<TrackersFeature.State, TrackersFeature.Action> {
 
-    private val viewModel: TrackersViewModel by activityViewModels()
+    private val viewModel: TrackersViewModel by viewModels()
 
     private val TAG = "TrackerAppsFragment"
 
@@ -55,6 +55,15 @@ class TrackerAppsFragment :
                     }
                 }
             }
+        }
+        lifecycleScope.launchWhenStarted {
+            viewModel.submitAction(
+                TrackersFeature.Action.ObserveTracker(
+                    requireArguments().getString(
+                        "TRACKER"
+                    )
+                )
+            )
         }
     }
 
