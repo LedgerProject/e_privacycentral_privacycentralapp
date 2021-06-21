@@ -44,23 +44,23 @@ object TrackersDataSource {
 
     val crashlytics = Tracker(
         "Google Crashlytics Demo (google.com) ",
-        domain = "google.com",
+        domain = "|06|google|03|com",
         trackedApps = listOf(facebook, firefox)
     )
 
     val facebookAds = Tracker(
         "Facebook IP Demo",
-        domain = "157.240.16.35",
+        domain = "|08|facebook|03|com",
         trackedApps = listOf(facebook, whatsapp)
     )
     val rubiconTracker = Tracker(
         "Rubicon Projects (block google)",
-        domain = "google",
+        domain = "|03|www|06|google|03|com",
         trackedApps = listOf(google, blisslauncher, youtube)
     )
     val googleAnalytics = Tracker(
         "Google Analytics",
-        domain = "google.com",
+        domain = "google",
         trackedApps = listOf(facebook, firefox)
     )
 
