@@ -42,5 +42,10 @@
     <string name="quick_protection">Quick Protection</string>
     <string name="privacy_dashboard">Privacy Dashboard</string>
     <string name="click_to_learn_more">Click to learn more</string>
-    <string name="apps_permissions">\"Apps Permission\"</string>
+    <string name="apps_permissions">Apps Permission</string>
+    <string name="trackers">Trackers</string>
+    <string name="manage_trackers_info">See trackers usage over time and manage trackers available in applications</string>
+    <string name="following_trackers_in_use">Following trackers are in use</string>
+    <string name="enable_disable_tracker_info">Enable or disable this tracker for the following apps</string>
+    <string name="tracker">Tracker</string>
 </resources>

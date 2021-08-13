@@ -26,6 +26,7 @@ import foundation.e.privacymodules.location.FakeLocation
 import foundation.e.privacymodules.location.IFakeLocation
 import foundation.e.privacymodules.permissions.PermissionsPrivacyModule
 import foundation.e.privacymodules.permissions.data.ApplicationDescription
+import lineageos.blockers.BlockerInterface
 
 /**
  * Simple container to hold application wide dependencies.
@@ -55,4 +56,6 @@ class DependencyContainer constructor(val app: Application) {
     val fakeLocationViewModelFactory by lazy {
         FakeLocationViewModelFactory(locationApi)
     }
+
+    val blockerService = BlockerInterface.getInstance(context)
 }

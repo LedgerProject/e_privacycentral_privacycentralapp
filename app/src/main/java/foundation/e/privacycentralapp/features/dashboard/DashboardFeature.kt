@@ -25,6 +25,7 @@ import foundation.e.flowmvi.feature.BaseFeature
 import foundation.e.privacycentralapp.dummy.DummyDataSource
 import foundation.e.privacycentralapp.dummy.InternetPrivacyMode
 import foundation.e.privacycentralapp.dummy.LocationMode
+import foundation.e.privacycentralapp.dummy.TrackersDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -76,6 +77,7 @@ class DashboardFeature(
         object ShowFakeMyLocationAction : Action()
         object ShowInternetActivityPrivacyAction : Action()
         object ShowAppsPermissions : Action()
+        object ShowTrackers : Action()
     }
 
     sealed class Effect {
@@ -92,12 +94,14 @@ class DashboardFeature(
 
         object LoadingDashboardEffect : Effect()
         data class UpdateActiveTrackersCountEffect(val count: Int) : Effect()
+        data class UpdateTotalTrackersCountEffect(val count: Int) : Effect()
         data class UpdateLocationModeEffect(val mode: LocationMode) : Effect()
         data class UpdateInternetActivityModeEffect(val mode: InternetPrivacyMode) : Effect()
         data class UpdateAppsUsingLocationPermEffect(val apps: Int) : Effect()
         object OpenFakeMyLocationEffect : Effect()
         object OpenInternetActivityPrivacyEffect : Effect()
         object OpenAppsPermissionsEffect : Effect()
+        object OpenTrackersEffect : Effect()
     }
 
     companion object {
@@ -127,6 +131,11 @@ class DashboardFeature(
                                 state.copy(activeTrackersCount = effect.count)
                             } else state
                         }
+                        is Effect.UpdateTotalTrackersCountEffect -> {
+                            if (state is State.DashboardState) {
+                                state.copy(trackersCount = effect.count)
+                            } else state
+                        }
                         is Effect.UpdateInternetActivityModeEffect -> {
                             if (state is State.DashboardState) {
                                 state.copy(internetPrivacyMode = effect.mode)
@@ -144,14 +153,27 @@ class DashboardFeature(
                         Effect.OpenFakeMyLocationEffect -> state
                         Effect.OpenAppsPermissionsEffect -> state
                         Effect.OpenInternetActivityPrivacyEffect -> state
+                        Effect.OpenTrackersEffect -> state
                     }
                 },
                 actor = { _: State, action: Action ->
                     Log.d("Feature", "action: $action")
                     when (action) {
                         Action.ObserveDashboardAction -> merge(
-                            DummyDataSource.activeTrackersCount.map {
-                                Effect.UpdateActiveTrackersCountEffect(it)
+                            TrackersDataSource.trackers.map {
+                                var activeTrackersCount: Int = 0
+                                outer@ for (tracker in it) {
+                                    for (app in tracker.trackedApps) {
+                                        if (!app.isEnabled) {
+                                            continue@outer
+                                        }
+                                    }
+                                    activeTrackersCount++
+                                }
+                                Effect.UpdateActiveTrackersCountEffect(activeTrackersCount)
+                            },
+                            TrackersDataSource.trackers.map {
+                                Effect.UpdateTotalTrackersCountEffect(it.size)
                             },
                             DummyDataSource.appsUsingLocationPerm.map {
                                 Effect.UpdateAppsUsingLocationPermEffect(it.size)
@@ -185,6 +207,7 @@ class DashboardFeature(
                         Action.ShowInternetActivityPrivacyAction -> flowOf(
                             Effect.OpenInternetActivityPrivacyEffect
                         )
+                        Action.ShowTrackers -> flowOf(Effect.OpenTrackersEffect)
                     }
                 },
                 singleEventProducer = { state, _, effect ->
@@ -197,6 +220,8 @@ class DashboardFeature(
                         SingleEvent.NavigateToInternetActivityPrivacySingleEvent
                     else if (state is State.DashboardState && effect is Effect.OpenAppsPermissionsEffect)
                         SingleEvent.NavigateToPermissionsSingleEvent
+                    else if (state is State.DashboardState && effect is Effect.OpenTrackersEffect)
+                        SingleEvent.NavigateToTrackersSingleEvent
                     else null
                 }
             )

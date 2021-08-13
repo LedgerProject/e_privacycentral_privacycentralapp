@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package foundation.e.privacycentralapp.features.permissions
+package foundation.e.privacycentralapp.features.trackers
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -25,36 +25,37 @@ import android.widget.Switch
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import foundation.e.privacycentralapp.R
+import foundation.e.privacycentralapp.dummy.Tracker
 
-class PermissionAppsAdapter(
-    private val dataSet: List<Pair<String, Boolean>>,
-    private val listener: (String, Boolean) -> Unit
+class TrackerAppsAdapter(
+    private var tracker: Tracker,
+    private val listener: (Tracker, Boolean) -> Unit
 ) :
-    RecyclerView.Adapter<PermissionAppsAdapter.PermissionViewHolder>() {
+    RecyclerView.Adapter<TrackerAppsAdapter.TrackerViewHolder>() {
 
-    class PermissionViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val appName: TextView = view.findViewById(R.id.app_title)
-
+    class TrackerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val titleView: TextView = view.findViewById(R.id.app_title)
         @SuppressLint("UseSwitchCompatOrMaterialCode")
-        val togglePermission: Switch = view.findViewById(R.id.toggle)
+        val toggleBlocker: Switch = view.findViewById(R.id.toggle)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PermissionViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackerViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_app_toggle, parent, false)
-        val holder = PermissionViewHolder(view)
-        holder.togglePermission.setOnCheckedChangeListener { _, isChecked ->
-            listener(dataSet[holder.adapterPosition].first, isChecked)
+        val holder = TrackerViewHolder(view)
+        holder.toggleBlocker.setOnClickListener {
+            if (it is Switch) {
+                listener(tracker, it.isChecked)
+            }
         }
-        view.findViewById<Switch>(R.id.toggle)
         return holder
     }
 
-    override fun onBindViewHolder(holder: PermissionViewHolder, position: Int) {
-        val permission = dataSet[position]
-        holder.appName.text = permission.first
-        holder.togglePermission.isChecked = permission.second
+    override fun onBindViewHolder(holder: TrackerViewHolder, position: Int) {
+        val app = tracker.trackedApps[position]
+        holder.titleView.text = app.appName
+        holder.toggleBlocker.isChecked = app.isEnabled
     }
 
-    override fun getItemCount(): Int = dataSet.size
+    override fun getItemCount(): Int = tracker.trackedApps.size
 }

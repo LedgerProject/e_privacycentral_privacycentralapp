@@ -2,23 +2,23 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:background="@color/white"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
     >
 
-    <include layout="@layout/topbar"/>
+    <include layout="@layout/topbar" />
 
     <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="32dp"
+        android:layout_width="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         >
 
         <LinearLayout
-            android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_width="match_parent"
             android:orientation="vertical"
             android:paddingLeft="32dp"
             android:paddingRight="32dp"
@@ -27,9 +27,9 @@
 
             <TextView
                 android:id="@+id/internet_activity_privacy_info"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
                 android:paddingTop="16dp"
                 android:text="@string/internet_activity_privacy_info"
                 android:textColor="@color/black"
@@ -37,23 +37,23 @@
                 />
 
             <TextView
-                android:id="@+id/learn_more_internet_activity_privacy_info"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center_vertical"
+                android:id="@+id/learn_more_internet_activity_privacy_info"
+                android:layout_height="48dp"
+                android:layout_width="wrap_content"
                 android:text="@string/learn_more"
                 android:textColor="#007fff"
                 android:textSize="14sp"
                 />
 
             <TextView
-                android:id="@+id/my_internet_activity_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:paddingTop="16dp"
+                android:id="@+id/my_internet_activity_header"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
                 android:paddingBottom="8dp"
+                android:paddingTop="16dp"
                 android:text="@string/internet_activity_privacy_title"
                 android:textColor="@color/black"
                 android:textSize="14sp"
@@ -61,37 +61,41 @@
 
             <RadioGroup
                 android:id="@+id/internet_activity_privacy_choices"
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_width="match_parent"
                 android:orientation="vertical"
                 >
 
                 <foundation.e.privacycentralapp.common.RightRadioButton
                     android:id="@+id/radio_use_real_ip"
-                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
                     android:text="@string/use_real_ip"
                     android:textSize="16sp"
                     />
+
                 <TextView
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
                     android:text="@string/i_can_be_tracked"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp"
+                    />
 
                 <foundation.e.privacycentralapp.common.RightRadioButton
                     android:id="@+id/radio_use_hidden_ip"
-                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
                     android:text="@string/hidden_ip"
                     android:textSize="16sp"
-                    android:layout_marginTop="8dp"
                     />
+
                 <TextView
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
                     android:text="@string/i_am_anonymous"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp"
+                    />
             </RadioGroup>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

@@ -17,21 +17,13 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:fontFamily="sans-serif-medium"
+    android:id="@+id/tracker_title"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    app:elevation="0dp"
-    >
-
-    <com.google.android.material.appbar.MaterialToolbar
-        android:background="@color/white"
-        android:elevation="0dp"
-        android:id="@+id/toolbar"
-        android:layout_height="?android:attr/actionBarSize"
-        android:layout_width="match_parent"
-        app:titleCentered="true"
-        tools:layout_height="56dp"
-        />
-</com.google.android.material.appbar.AppBarLayout>
+    android:textColor="@color/accent"
+    android:textSize="16sp"
+    tools:text="Google Crashlytics"
+    />

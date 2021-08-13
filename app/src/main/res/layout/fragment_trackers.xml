@@ -11,60 +11,65 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_height="match_parent"
+        android:layout_marginBottom="32dp"
         android:layout_width="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         >
 
         <LinearLayout
             android:layout_height="match_parent"
-            android:layout_marginBottom="56dp"
             android:layout_width="match_parent"
             android:orientation="vertical"
+            android:paddingLeft="32dp"
+            android:paddingRight="32dp"
             tools:context=".main.MainActivity"
             >
 
             <TextView
-                android:id="@+id/quick_protection_info"
+                android:id="@+id/trackers_info"
                 android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:paddingLeft="32dp"
-                android:paddingRight="32dp"
                 android:paddingTop="16dp"
-                android:text="@string/quick_protection_info"
+                android:text="@string/manage_trackers_info"
                 android:textColor="@color/black"
                 android:textSize="14sp"
                 />
 
             <TextView
                 android:fontFamily="sans-serif-medium"
-                android:id="@+id/quick_protection_settings_list"
+                android:gravity="center_vertical"
+                android:id="@+id/learn_more_trackers_info"
+                android:layout_height="48dp"
+                android:layout_width="wrap_content"
+                android:text="@string/learn_more"
+                android:textColor="#007fff"
+                android:textSize="14sp"
+                />
+
+            <ImageView
+                android:layout_height="300dp"
+                android:layout_width="wrap_content"
+                android:scaleType="centerInside"
+                android:src="@drawable/dummy_trackers_usage"
+                />
+
+            <TextView
                 android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:paddingBottom="16dp"
-                android:paddingLeft="32dp"
-                android:paddingRight="32dp"
                 android:paddingTop="16dp"
-                android:text="@string/quick_protection_settings_list"
+                android:text="@string/following_trackers_in_use"
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:textSize="16sp"
+                />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recylcer_view_trackers"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                tools:listitem="@layout/item_list_tracker"
                 />
         </LinearLayout>
-
     </androidx.core.widget.NestedScrollView>
-
-    <TextView
-        android:fontFamily="sans-serif-medium"
-        android:gravity="center_vertical|end"
-        android:id="@+id/learn_more"
-        android:layout_gravity="bottom|end"
-        android:layout_height="56dp"
-        android:layout_width="wrap_content"
-        android:paddingLeft="32dp"
-        android:paddingRight="32dp"
-        android:text="@string/learn_more"
-        android:textColor="#007fff"
-        android:textSize="14sp"
-        />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

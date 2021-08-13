@@ -120,7 +120,7 @@ open class BaseFeature<State : Any, in Action : Any, in Effect : Any, SingleEven
     ) {
         onEach { action ->
             callerCoroutineScope.launch {
-                logger.invoke("Received action $action")
+                logger.invoke("Received action $action $this")
                 actor.invoke(_state.value, action)
                     .onEach { effect ->
                         mutex.withLock {

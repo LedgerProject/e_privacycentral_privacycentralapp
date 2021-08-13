@@ -38,6 +38,7 @@ import foundation.e.privacycentralapp.dummy.mapToString
 import foundation.e.privacycentralapp.features.internetprivacy.InternetPrivacyFragment
 import foundation.e.privacycentralapp.features.location.FakeLocationFragment
 import foundation.e.privacycentralapp.features.permissions.PermissionsFragment
+import foundation.e.privacycentralapp.features.trackers.TrackersFragment
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 
@@ -84,6 +85,11 @@ class DashboardFragment :
                         }
                     }
                     DashboardFeature.SingleEvent.NavigateToTrackersSingleEvent -> {
+                        requireActivity().supportFragmentManager.commit {
+                            add<TrackersFragment>(R.id.container)
+                            setReorderingAllowed(true)
+                            addToBackStack("dashboard")
+                        }
                     }
                 }
             }
@@ -109,6 +115,9 @@ class DashboardFragment :
             }
             it.findViewById<RelativeLayout>(R.id.apps_permissions).setOnClickListener {
                 viewModel.submitAction(DashboardFeature.Action.ShowAppsPermissions)
+            }
+            it.findViewById<RelativeLayout>(R.id.am_i_tracked).setOnClickListener {
+                viewModel.submitAction(DashboardFeature.Action.ShowTrackers)
             }
         }
     }

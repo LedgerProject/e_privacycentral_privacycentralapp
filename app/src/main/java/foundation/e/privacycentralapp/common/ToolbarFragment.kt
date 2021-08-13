@@ -40,4 +40,6 @@ abstract class ToolbarFragment(@LayoutRes contentLayoutId: Int) : Fragment(conte
     open fun setupToolbar(toolbar: MaterialToolbar) {
         toolbar.title = getTitle()
     }
+
+    fun getToolbar(): MaterialToolbar? = view?.findViewById(R.id.toolbar)
 }
