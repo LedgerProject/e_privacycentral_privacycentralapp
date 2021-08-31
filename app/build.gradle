@@ -95,6 +95,9 @@ dependencies {
     googleImplementation project(":privacymodulesgoogle")
     // include the e specific version of the modules, just for the e flavor
     eImplementation project(":privacymodulese")
+
+    implementation 'foundation.e:privacymodule.tor:0.1.0'
+
     implementation project(":flow-mvi")
     implementation Libs.Kotlin.stdlib
     implementation Libs.AndroidX.coreKtx

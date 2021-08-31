@@ -11,11 +11,14 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_height="match_parent"
-        android:layout_marginBottom="32dp"
         android:layout_width="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         >
-
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
         <LinearLayout
             android:layout_height="match_parent"
             android:layout_width="match_parent"
@@ -97,6 +100,83 @@
                     android:textSize="14sp"
                     />
             </RadioGroup>
+            <TextView android:id="@+id/ipscrambling_tor_status"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:paddingTop="24dp"
+                android:text="@string/ipscrambling_is_starting"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:visibility="gone"
+                />
+
+            <ProgressBar
+                android:id="@+id/ipscrambling_loading"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="24dp"
+                android:layout_gravity="center"
+                />
+
+            <LinearLayout
+                android:id="@+id/ipscrambling_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="32dp"
+                >
+                <TextView
+                    android:id="@+id/ipscrambling_location_label"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content" android:text="@string/ipscrambling_location_label"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    />
+                <Spinner android:id="@+id/ipscrambling_select_location"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/ipscrambling_activated"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:paddingTop="32dp"
+                android:text="@string/ipscrambling_all_apps_scrambled"
+                android:textColor="@color/black"
+                android:paddingBottom="8dp"
+                android:textSize="16sp"
+                android:visibility="gone"
+                />
+        </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view_scrambled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                />
+            <TextView
+                android:id="@+id/ipscrambling_select_apps"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:paddingStart="32dp"
+                android:paddingEnd="32dp"
+                android:paddingTop="32dp"
+                android:paddingBottom="8dp"
+                android:text="@string/ipscrambling_select_app"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:visibility="gone"
+                />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view_to_select"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
