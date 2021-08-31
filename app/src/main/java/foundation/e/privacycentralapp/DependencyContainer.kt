@@ -20,8 +20,11 @@ package foundation.e.privacycentralapp
 import android.app.Application
 import android.content.Context
 import android.os.Process
+import foundation.e.privacycentralapp.features.internetprivacy.InternetPrivacyViewModelFactory
 import foundation.e.privacycentralapp.features.location.FakeLocationViewModelFactory
 import foundation.e.privacycentralapp.features.location.LocationApiDelegate
+import foundation.e.privacymodules.ipscrambler.IpScramblerModule
+import foundation.e.privacymodules.ipscramblermodule.IIpScramblerModule
 import foundation.e.privacymodules.location.FakeLocation
 import foundation.e.privacymodules.location.IFakeLocation
 import foundation.e.privacymodules.permissions.PermissionsPrivacyModule
@@ -39,6 +42,7 @@ class DependencyContainer constructor(val app: Application) {
 
     private val fakeLocationModule: IFakeLocation by lazy { FakeLocation(app.applicationContext) }
     private val permissionsModule by lazy { PermissionsPrivacyModule(app.applicationContext) }
+    private val ipScramblerModule: IIpScramblerModule by lazy { IpScramblerModule(app.applicationContext) }
 
     private val appDesc by lazy {
         ApplicationDescription(
@@ -58,4 +62,8 @@ class DependencyContainer constructor(val app: Application) {
     }
 
     val blockerService = BlockerInterface.getInstance(context)
+
+    val internetPrivacyViewModelFactory by lazy {
+        InternetPrivacyViewModelFactory(ipScramblerModule, permissionsModule)
+    }
 }

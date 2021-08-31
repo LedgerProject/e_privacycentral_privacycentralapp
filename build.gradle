@@ -70,7 +70,9 @@ allprojects {
                 password = MAPBOX_SECRET_KEY ?: ""
             }
         }
-
+        maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
+        maven { url 'https://jitpack.io' }
+        maven { url '../embeddedmavenrepository/'}
     }
 }
 
