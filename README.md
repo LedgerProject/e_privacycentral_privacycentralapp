@@ -1,6 +1,8 @@
 # PrivacyCentralApp
 An app to let you control and protect your privacy.
 
+Forked to https://github.com/LedgerProject/e_privacycentralapp, embending all /e/ submodules.
+
 # Features
 The following features are currently part of PrivacyCentral app.
 1. Centralized overview dashboard.
