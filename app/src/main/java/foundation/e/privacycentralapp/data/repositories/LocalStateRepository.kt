@@ -31,10 +31,7 @@ class LocalStateRepository(context: Context) {
         get() = sharedPref.getBoolean(KEY_QUICK_PRIVACY, false)
         set(value) = set(KEY_QUICK_PRIVACY, value)
 
-
     private fun set(key: String, value: Boolean) {
-        sharedPref.edit().putBoolean(key, value).apply()
+        sharedPref.edit().putBoolean(key, value).commit()
     }
-
-
 }

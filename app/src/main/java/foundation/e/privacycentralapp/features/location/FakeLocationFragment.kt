@@ -56,7 +56,7 @@ import foundation.e.privacycentralapp.DependencyContainer
 import foundation.e.privacycentralapp.PrivacyCentralApplication
 import foundation.e.privacycentralapp.R
 import foundation.e.privacycentralapp.common.NavToolbarFragment
-import foundation.e.privacycentralapp.dummy.LocationMode
+import foundation.e.privacycentralapp.domain.entities.LocationMode
 import foundation.e.privacycentralapp.extensions.viewModelProviderFactoryOf
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -178,7 +178,7 @@ class FakeLocationFragment :
         Mapbox.getInstance(requireContext(), getString(R.string.mapbox_key))
     }
 
-    override fun getTitle(): String = getString(R.string.my_location_title)
+    override fun getTitle(): String = getString(R.string.dashboard_location_title)
 
     private fun displayToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT)

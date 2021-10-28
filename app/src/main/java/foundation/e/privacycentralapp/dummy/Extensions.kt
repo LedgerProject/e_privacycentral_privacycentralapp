@@ -19,6 +19,8 @@ package foundation.e.privacycentralapp.dummy
 
 import android.content.Context
 import foundation.e.privacycentralapp.R
+import foundation.e.privacycentralapp.domain.entities.InternetPrivacyMode
+import foundation.e.privacycentralapp.domain.entities.LocationMode
 
 fun LocationMode.mapToString(context: Context): String = when (this) {
     LocationMode.REAL_LOCATION -> context.getString(R.string.real_location_mode)

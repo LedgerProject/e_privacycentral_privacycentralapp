@@ -8,5 +8,9 @@
         <item name="colorControlNormal">#007fff</item>
         <!-- Status bar color. -->
         <!-- Customize your theme here. -->
+        <item name="android:textColor">@color/black_text</item>
+        <item name="android:textSize">16sp</item>
     </style>
+
+    <!-- fonts : roboto 400 -->
 </resources>

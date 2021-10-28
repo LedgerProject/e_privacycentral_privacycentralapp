@@ -17,6 +17,7 @@
 
 package foundation.e.privacycentralapp.dummy
 
+import foundation.e.privacycentralapp.domain.entities.LocationMode
 import kotlin.random.Random
 
 data class City(val name: String, val latitude: Double, val longitude: Double) {

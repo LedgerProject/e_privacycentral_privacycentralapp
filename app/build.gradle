@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -83,6 +84,10 @@ android {
 
     aaptOptions {
         additionalParameters '-I', 'app/libs/e-ui-sdk-1.0.1-q.jar'
+    }
+
+    buildFeatures {
+        dataBinding true
     }
 }
 

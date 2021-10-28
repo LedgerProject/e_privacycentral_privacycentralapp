@@ -35,8 +35,8 @@ import foundation.e.flowmvi.MVIView
 import foundation.e.privacycentralapp.DependencyContainer
 import foundation.e.privacycentralapp.PrivacyCentralApplication
 import foundation.e.privacycentralapp.R
-import foundation.e.privacycentralapp.common.NavToolbarFragment
 import foundation.e.privacycentralapp.common.ToggleAppsAdapter
+import foundation.e.privacycentralapp.common.ToolbarFragment
 import foundation.e.privacycentralapp.extensions.viewModelProviderFactoryOf
 import foundation.e.privacymodules.ipscramblermodule.IIpScramblerModule
 import kotlinx.coroutines.flow.Flow
@@ -44,7 +44,7 @@ import kotlinx.coroutines.flow.collect
 import java.util.Locale
 
 class InternetPrivacyFragment :
-    NavToolbarFragment(R.layout.fragment_internet_activity_policy),
+    ToolbarFragment(R.layout.fragment_internet_activity_policy),
     MVIView<InternetPrivacyFeature.State, InternetPrivacyFeature.Action> {
 
     private val dependencyContainer: DependencyContainer by lazy {

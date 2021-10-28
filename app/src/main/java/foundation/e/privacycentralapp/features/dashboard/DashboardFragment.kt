@@ -17,36 +17,50 @@
 
 package foundation.e.privacycentralapp.features.dashboard
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.View
-import android.widget.ProgressBar
-import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.core.widget.NestedScrollView
+import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import foundation.e.flowmvi.MVIView
+import foundation.e.privacycentralapp.DependencyContainer
+import foundation.e.privacycentralapp.PrivacyCentralApplication
 import foundation.e.privacycentralapp.R
-import foundation.e.privacycentralapp.common.ToolbarFragment
-import foundation.e.privacycentralapp.dummy.mapToString
+import foundation.e.privacycentralapp.common.NavToolbarFragment
+import foundation.e.privacycentralapp.databinding.FragmentDashboardBinding
+import foundation.e.privacycentralapp.domain.entities.InternetPrivacyMode
+import foundation.e.privacycentralapp.domain.entities.LocationMode
+import foundation.e.privacycentralapp.extensions.viewModelProviderFactoryOf
+import foundation.e.privacycentralapp.features.dashboard.DashboardFeature.State.DisabledState
+import foundation.e.privacycentralapp.features.dashboard.DashboardFeature.State.EnabledState
+import foundation.e.privacycentralapp.features.dashboard.DashboardFeature.State.LoadingState
 import foundation.e.privacycentralapp.features.internetprivacy.InternetPrivacyFragment
 import foundation.e.privacycentralapp.features.location.FakeLocationFragment
-import foundation.e.privacycentralapp.features.permissions.PermissionsFragment
 import foundation.e.privacycentralapp.features.trackers.TrackersFragment
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 
 class DashboardFragment :
-    ToolbarFragment(R.layout.fragment_dashboard),
+    NavToolbarFragment(R.layout.fragment_dashboard),
     MVIView<DashboardFeature.State, DashboardFeature.Action> {
 
-    private val viewModel: DashboardViewModel by activityViewModels()
+    private val dependencyContainer: DependencyContainer by lazy {
+        (this.requireActivity().application as PrivacyCentralApplication).dependencyContainer
+    }
+
+    private val viewModel: DashboardViewModel by activityViewModels {
+        viewModelProviderFactoryOf { dependencyContainer.dashBoardViewModelFactory.create() }
+    }
+
+    private lateinit var binding: FragmentDashboardBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,11 +92,8 @@ class DashboardFragment :
                         }
                     }
                     is DashboardFeature.SingleEvent.NavigateToPermissionsSingleEvent -> {
-                        requireActivity().supportFragmentManager.commit {
-                            add<PermissionsFragment>(R.id.container)
-                            setReorderingAllowed(true)
-                            addToBackStack("dashboard")
-                        }
+                        val intent = Intent("android.intent.action.MANAGE_PERMISSIONS")
+                        requireActivity().startActivity(intent)
                     }
                     DashboardFeature.SingleEvent.NavigateToTrackersSingleEvent -> {
                         requireActivity().supportFragmentManager.commit {
@@ -94,35 +105,37 @@ class DashboardFragment :
                 }
             }
         }
-        lifecycleScope.launchWhenStarted {
-            viewModel.submitAction(DashboardFeature.Action.ShowDashboardAction)
-            viewModel.submitAction(DashboardFeature.Action.ObserveDashboardAction)
-        }
+        // lifecycleScope.launchWhenStarted {
+        // viewModel.submitAction(DashboardFeature.Action.ShowDashboardAction)
+        // viewModel.submitAction(DashboardFeature.Action.ObserveDashboardAction)
+        // }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        addClickToMore(view.findViewById(R.id.personal_leakag_info))
-        view.let {
-            it.findViewById<TextView>(R.id.tap_to_enable_quick_protection).setOnClickListener {
-                viewModel.submitAction(DashboardFeature.Action.ShowQuickPrivacyProtectionInfoAction)
-            }
-            it.findViewById<RelativeLayout>(R.id.my_location).setOnClickListener {
-                viewModel.submitAction(DashboardFeature.Action.ShowFakeMyLocationAction)
-            }
-            it.findViewById<RelativeLayout>(R.id.internet_activity_privacy).setOnClickListener {
-                viewModel.submitAction(DashboardFeature.Action.ShowInternetActivityPrivacyAction)
-            }
-            it.findViewById<RelativeLayout>(R.id.apps_permissions).setOnClickListener {
-                viewModel.submitAction(DashboardFeature.Action.ShowAppsPermissions)
-            }
-            it.findViewById<RelativeLayout>(R.id.am_i_tracked).setOnClickListener {
-                viewModel.submitAction(DashboardFeature.Action.ShowTrackers)
-            }
+        binding = FragmentDashboardBinding.bind(view)
+
+        binding.togglePrivacyCentral.setOnClickListener {
+            viewModel.submitAction(DashboardFeature.Action.TogglePrivacyAction)
+        }
+        binding.myLocation.container.setOnClickListener {
+            viewModel.submitAction(DashboardFeature.Action.ShowFakeMyLocationAction)
+        }
+        binding.internetActivityPrivacy.container.setOnClickListener {
+            viewModel.submitAction(DashboardFeature.Action.ShowInternetActivityPrivacyAction)
+        }
+        binding.appsPermissions.container.setOnClickListener {
+            viewModel.submitAction(DashboardFeature.Action.ShowAppsPermissions)
+        }
+
+        binding.amITracked.container.setOnClickListener {
+            viewModel.submitAction(DashboardFeature.Action.ShowTrackers)
         }
     }
 
-    override fun getTitle(): String = getString(R.string.privacy_dashboard)
+    override fun getTitle(): String {
+        return getString(R.string.dashboard_title)
+    }
 
     private fun addClickToMore(textView: TextView) {
         val clickToMore = SpannableString(getString(R.string.click_to_learn_more))
@@ -136,65 +149,96 @@ class DashboardFragment :
     }
 
     override fun render(state: DashboardFeature.State) {
-        when (state) {
-            is DashboardFeature.State.InitialState, is DashboardFeature.State.LoadingDashboardState -> {
-                view?.let {
-                    it.findViewById<ProgressBar>(R.id.loadingSpinner).visibility = View.VISIBLE
-                    it.findViewById<NestedScrollView>(R.id.scrollContainer).visibility = View.GONE
-                }
-            }
-            is DashboardFeature.State.DashboardState -> {
-                view?.let { view ->
-                    view.findViewById<ProgressBar>(R.id.loadingSpinner).visibility = View.GONE
-                    view.findViewById<NestedScrollView>(R.id.scrollContainer).visibility =
-                        View.VISIBLE
-                    view.findViewById<TextView>(R.id.am_i_tracked_subtitle).text = getString(
-                        R.string.am_i_tracked_subtitle,
-                        state.trackersCount,
-                        state.activeTrackersCount
-                    )
-                    view.findViewById<TextView>(R.id.apps_permissions_subtitle).text = getString(
-                        R.string.apps_permissions_subtitle,
-                        state.totalApps,
-                        state.permissionCount
-                    )
-                    view.findViewById<TextView>(R.id.my_location_subtitle).let { textView ->
-                        textView.text = getString(
-                            R.string.my_location_subtitle,
-                            state.appsUsingLocationPerm,
-                        )
-                        textView.append(
-                            SpannableString(state.locationMode.mapToString(requireContext()))
-                                .also {
-                                    it.setSpan(
-                                        ForegroundColorSpan(Color.parseColor("#007fff")),
-                                        0,
-                                        it.length,
-                                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                                    )
-                                }
-                        )
-                    }
-                    view.findViewById<TextView>(R.id.internet_activity_privacy_subtitle)
-                        .let { textView ->
-                            textView.text = getString(R.string.internet_activity_privacy_subtitle)
-                            textView.append(
-                                SpannableString(state.internetPrivacyMode.mapToString(requireContext()))
-                                    .also {
-                                        it.setSpan(
-                                            ForegroundColorSpan(Color.parseColor("#007fff")),
-                                            0,
-                                            it.length,
-                                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                                        )
-                                    }
-                            )
-                        }
-                }
-            }
-            DashboardFeature.State.QuickProtectionState -> {
-            }
+        val enabled = state is EnabledState
+        binding.stateLabel.text = getString(
+            if (enabled) R.string.dashboard_state_label_on
+            else R.string.dashboard_state_label_off
+        )
+
+        binding.togglePrivacyCentral.setImageResource(
+            if (enabled) R.drawable.ic_quick_privacy_on
+            else R.drawable.ic_quick_privacy_off
+        )
+        binding.stateLabel.setTextColor(
+            getColor(
+                requireContext(),
+                if (enabled) R.color.green_on
+                else R.color.orange_off
+            )
+        )
+
+        val trackersEnabled = state is EnabledState &&
+            state.isAllTrackersBlocked
+        binding.stateTrackers.text = getString(
+            if (trackersEnabled) R.string.dashboard_state_trackers_on
+            else R.string.dashboard_state_trackers_off
+        )
+        binding.stateTrackers.setTextColor(
+            getColor(
+                requireContext(),
+                if (trackersEnabled) R.color.green_on
+                else R.color.black_text
+            )
+        )
+
+        val geolocEnabled = state is EnabledState && state.locationMode != LocationMode.REAL_LOCATION
+        binding.stateGeolocation.text = getString(
+            if (geolocEnabled) R.string.dashboard_state_geolocation_on
+            else R.string.dashboard_state_geolocation_off
+        )
+        binding.stateGeolocation.setTextColor(
+            getColor(
+                requireContext(),
+                if (geolocEnabled) R.color.green_on
+                else R.color.black_text
+            )
+        )
+
+        val ipAddressEnabled = state is EnabledState && state.internetPrivacyMode != InternetPrivacyMode.REAL_IP
+        binding.stateIpAddress.text = getString(
+            if (ipAddressEnabled) R.string.dashboard_state_ipaddress_on
+            else R.string.dashboard_state_ipaddress_off
+        )
+        binding.stateIpAddress.setTextColor(
+            getColor(
+                requireContext(),
+                if (ipAddressEnabled) R.color.green_on
+                else R.color.black_text
+            )
+        )
+
+        // binding.graphTotal.text = if (state == DashboardFeature.State.LoadingState) {
+        //     ""
+        // } else {
+        //     val value = if (state is DashboardFeature.State.EnabledState) state.totalGraph
+        //     else if (state is DashboardFeature.State.DisabledState) state.totalGraph
+        //     else 0 // dummy
+        //     getString(R.string.dashboard_graph_total, value)
+        // }
+
+        binding.amITracked.subtitle.text = if (state == LoadingState) ""
+        else {
+            val value = if (state is EnabledState) state.activeTrackersCount
+            else if (state is DisabledState) state.activeTrackersCount
+            else 0 // dummy
+            getString(R.string.dashboard_am_i_tracked_subtitle, 77, value)
         }
+
+        binding.myLocation.subtitle.text = getString(
+            if (state is EnabledState &&
+                state.locationMode != LocationMode.REAL_LOCATION
+            )
+                R.string.dashboard_location_subtitle_on
+            else R.string.dashboard_location_subtitle_off
+        )
+
+        binding.internetActivityPrivacy.subtitle.text = getString(
+            if (state is DashboardFeature.State.EnabledState &&
+                state.internetPrivacyMode != InternetPrivacyMode.REAL_IP
+            )
+                R.string.dashboard_internet_activity_privacy_subtitle_on
+            else R.string.dashboard_internet_activity_privacy_subtitle_on
+        )
     }
 
     override fun actions(): Flow<DashboardFeature.Action> = viewModel.actions

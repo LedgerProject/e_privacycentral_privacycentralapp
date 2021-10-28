@@ -18,6 +18,8 @@
 package foundation.e.privacycentralapp.dummy
 
 import foundation.e.privacycentralapp.R
+import foundation.e.privacycentralapp.domain.entities.InternetPrivacyMode
+import foundation.e.privacycentralapp.domain.entities.LocationMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlin.random.Random
@@ -51,14 +53,6 @@ data class Permission(
     val packagesRequested: Set<String> = emptySet(),
     val packagesAllowed: Set<String> = emptySet()
 )
-
-enum class LocationMode {
-    REAL_LOCATION, RANDOM_LOCATION, CUSTOM_LOCATION
-}
-
-enum class InternetPrivacyMode {
-    REAL_IP, HIDE_IP
-}
 
 data class Location(val mode: LocationMode, val latitude: Double, val longitude: Double)
 

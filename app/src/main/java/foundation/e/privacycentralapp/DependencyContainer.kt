@@ -20,6 +20,9 @@ package foundation.e.privacycentralapp
 import android.app.Application
 import android.content.Context
 import android.os.Process
+import foundation.e.privacycentralapp.data.repositories.LocalStateRepository
+import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
+import foundation.e.privacycentralapp.features.dashboard.DashBoardViewModelFactory
 import foundation.e.privacycentralapp.features.internetprivacy.InternetPrivacyViewModelFactory
 import foundation.e.privacycentralapp.features.location.FakeLocationViewModelFactory
 import foundation.e.privacycentralapp.features.location.LocationApiDelegate
@@ -40,6 +43,7 @@ class DependencyContainer constructor(val app: Application) {
 
     val context: Context by lazy { app.applicationContext }
 
+    // Drivers
     private val fakeLocationModule: IFakeLocation by lazy { FakeLocation(app.applicationContext) }
     private val permissionsModule by lazy { PermissionsPrivacyModule(app.applicationContext) }
     private val ipScramblerModule: IIpScramblerModule by lazy { IpScramblerModule(app.applicationContext) }
@@ -55,6 +59,18 @@ class DependencyContainer constructor(val app: Application) {
 
     private val locationApi by lazy {
         LocationApiDelegate(fakeLocationModule, permissionsModule, appDesc)
+    }
+
+    // Repositories
+    private val localStateRepository by lazy { LocalStateRepository(context) }
+
+    // Usecases
+    private val getQuickPrivacyStateUseCase by lazy {
+        GetQuickPrivacyStateUseCase(localStateRepository)
+    }
+
+    val dashBoardViewModelFactory by lazy {
+        DashBoardViewModelFactory(getQuickPrivacyStateUseCase)
     }
 
     val fakeLocationViewModelFactory by lazy {

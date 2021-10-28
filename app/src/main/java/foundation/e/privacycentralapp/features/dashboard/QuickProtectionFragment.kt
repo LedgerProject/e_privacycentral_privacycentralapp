@@ -32,7 +32,7 @@ class QuickProtectionFragment : NavToolbarFragment(R.layout.fragment_quick_prote
     override fun onAttach(context: Context) {
         super.onAttach(context)
         requireActivity().onBackPressedDispatcher.addCallback(this, true) {
-            viewModel.submitAction(DashboardFeature.Action.ShowDashboardAction)
+            // viewModel.submitAction(DashboardFeature.Action.ShowDashboardAction)
             this.isEnabled = false
             requireActivity().onBackPressed()
         }

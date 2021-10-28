@@ -9,4 +9,16 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="accent">@lineageos.platform:color/color_default_accent</color>
+
+    <color name="black_text">#DE000000</color>
+
+    <color name="grey_text">#99000000</color>
+    <color name="grey_text_2">#61000000</color>
+    <color name="grey_divider">#14212121</color>
+
+    <color name="orange_off">#FC7222</color>
+    <color name="green_on">#169659</color>
+
+
+
 </resources>

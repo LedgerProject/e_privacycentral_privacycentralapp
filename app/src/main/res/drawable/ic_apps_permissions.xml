@@ -1,22 +1,16 @@
-<!--
-  ~ Copyright (C) 2021 E FOUNDATION
-  ~
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  ~
-  ~ This program is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  -->
-
-<vector android:height="23.99944dp" android:viewportHeight="42.738"
-    android:viewportWidth="42.739" android:width="24dp" xmlns:android="http://schemas.android.com/apk/res/android">
-    <path android:fillColor="#fb3846" android:pathData="M42.74,5L42.74,37.738A5,5 0,0 1,37.74 42.738L5.001,42.738A5,5 0,0 1,0.001 37.738L0.001,5A5,5 0,0 1,5.001 0L37.74,0A5,5 0,0 1,42.74 5z"/>
-    <path android:fillColor="#fff" android:pathData="M37.541,20.967l-6.692,-2.579v-7.529a2.638,2.638 0,0 0,-1.673 -2.37l-6.972,-2.579a2.5,2.5 0,0 0,-1.743 0l-6.972,2.579a2.638,2.638 0,0 0,-1.673 2.37v7.529l-6.693,2.579a2.41,2.41 0,0 0,-1.6 2.3v7.668a2.529,2.529 0,0 0,1.324 2.3l6.972,3.486a2.66,2.66 0,0 0,2.3 0l7.25,-3.625 7.181,3.625a2.66,2.66 0,0 0,2.3 0l6.971,-3.486a2.589,2.589 0,0 0,1.394 -2.3v-7.668a2.474,2.474 0,0 0,-1.674 -2.3zM28.478,18.457l-5.926,2.231v-4.741l5.926,-2.579zM14.256,10.789l7.111,-2.719 7.111,2.719 -7.111,2.928zM20.112,31.076l-5.926,2.928v-5.507l5.926,-2.719zM20.112,23.268l-7.111,2.858 -7.111,-2.858v-0.07l7.111,-2.649 7.111,2.649zM36.844,31.076l-5.926,2.928v-5.507l5.926,-2.719zM36.844,23.268l-7.111,2.858 -7.111,-2.858v-0.07l7.111,-2.649 7.111,2.649z"/>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="32dp"
+    android:height="32dp"
+    android:viewportWidth="32"
+    android:viewportHeight="32">
+  <path
+      android:pathData="M25.2477,32H6.7523C3.0261,32 0,28.9739 0,25.2477V6.7523C0,3.0261 3.0261,0 6.7523,0H25.2477C28.9739,0 32,3.0261 32,6.7523V25.2477C32,28.9739 28.9739,32 25.2477,32Z"
+      android:fillColor="#2CCF69"/>
+  <path
+      android:pathData="M15.5561,11.2783C16.4042,11.2783 17.0917,10.5908 17.0917,9.7427C17.0917,8.8946 16.4042,8.207 15.5561,8.207C14.708,8.207 14.0204,8.8946 14.0204,9.7427C14.0204,10.5908 14.708,11.2783 15.5561,11.2783Z"
+      android:fillColor="#ffffff"/>
+  <path
+      android:pathData="M9.0081,11.2376C9.1878,7.7463 12.1103,4.9745 15.607,5.0002L15.6126,5.0002C19.1791,5.0515 22.0825,7.9509 22.0825,11.5492C22.0825,13.8682 20.8794,15.9216 19.0338,17.0852V23.6536C19.0338,25.4451 17.5734,26.9056 15.7819,26.9056H12.8461C12.4096,26.9056 12.0557,26.5517 12.0557,26.1152V22.4567C12.0557,22.0202 12.4096,21.6663 12.8461,21.6663H13.5913V20.3565H12.8461C12.4096,20.3565 12.0557,20.0027 12.0557,19.5661V17.0835C10.138,15.8679 8.8878,13.6911 9.008,11.2395L9.0081,11.2376ZM13.6365,18.7757H14.3818C14.8183,18.7757 15.1722,19.1296 15.1722,19.5661V22.4567C15.1722,22.8933 14.8183,23.2471 14.3818,23.2471H13.6365V25.3248H15.7819C16.7003,25.3248 17.453,24.5721 17.453,23.6536V16.6304C17.453,16.3379 17.6145,16.0694 17.8728,15.9322C19.4504,15.0947 20.5017,13.4398 20.5017,11.5492C20.5017,8.8252 18.3029,6.6214 15.5926,6.5809C12.9483,6.563 10.7237,8.6679 10.5868,11.3179C10.4901,13.2992 11.5766,15.0536 13.2194,15.9336C13.4762,16.0712 13.6365,16.339 13.6365,16.6304V18.7757Z"
+      android:fillColor="#ffffff"
+      android:fillType="evenOdd"/>
 </vector>

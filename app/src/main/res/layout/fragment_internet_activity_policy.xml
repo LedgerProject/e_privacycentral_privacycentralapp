@@ -57,7 +57,7 @@
                 android:layout_width="wrap_content"
                 android:paddingBottom="8dp"
                 android:paddingTop="16dp"
-                android:text="@string/internet_activity_privacy_title"
+                android:text="@string/dashboard_internet_activity_privacy_title"
                 android:textColor="@color/black"
                 android:textSize="14sp"
                 />

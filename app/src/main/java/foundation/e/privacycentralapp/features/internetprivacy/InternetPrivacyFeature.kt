@@ -239,19 +239,6 @@ class InternetPrivacyFeature(
                     action is Action.UseHiddenIPAction
                         && effect is Effect.ShowAndroidVpnDisclaimerEffect ->
                         SingleEvent.StartAndroidVpnActivityEvent(effect.intent)
-
-                    // Action.UseRealIPAction, Action.UseHiddenIPAction -> when (effect) {
-                    //     is Effect.ModeUpdatedEffect -> {
-                    //         if (effect.mode == InternetPrivacyMode.REAL_IP) {
-                    //             SingleEvent.RealIPSelectedEvent
-                    //         } else {
-                    //             SingleEvent.HiddenIPSelectedEvent
-                    //         }
-                    //     }
-                    //     is Effect.ErrorEffect -> {
-                    //         SingleEvent.ErrorEvent(effect.message)
-                    //     }
-                    // }
                     else -> null
                 }
             }

@@ -1,17 +1,37 @@
 <resources>
     <string name="app_name">PrivacyCentralApp</string>
-    <string name="privacy_dashboard_info">Privacy dashboard helps you control and better protect your privacy</string>
-    <string name="tap_to_enable_quick_protection">Tap to enable quick privacy protection</string>
-    <string name="personal_leakage_info">Personal data leakage over past 24 hours. </string>
-    <string name="am_i_tracked_title">Am I tracked?</string>
-    <string name="am_i_tracked_subtitle">Currently there are %1$d trackers in your apps, %2$d trackers are active</string>
-    <string name="apps_permissions_title">Apps Permissions</string>
-    <string name="apps_permissions_subtitle">%1$d apps are requesting %2$d permissions</string>
-    <string name="my_location_title">My Location</string>
-    <string name="my_location_subtitle">"%1$d apps are using location permission\nCurrent location mode: "</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Quick Privacy</string>
+    <string name="dashboard_state_label_off">Your online privacy is not protected</string>
+    <string name="dashboard_state_label_on">Your online privacy is now protected!</string>
+    <string name="dashboard_change_state_explanations">Tap to enable your privacy preferences</string>
+    <string name="dashboard_state_trackers_label">Trackers:</string>
+    <string name="dashboard_state_trackers_off">Vulnerable</string>
+    <string name="dashboard_state_trackers_on">Denied</string>
+    <string name="dashboard_state_geolocation_label">Geolocation:</string>
+    <string name="dashboard_state_geolocation_off">Exposed</string>
+    <string name="dashboard_state_geolocation_on">Fake</string>
+    <string name="dashboard_state_ipaddress_label">IP address:</string>
+    <string name="dashboard_state_ipaddress_off">Exposed</string>
+    <string name="dashboard_state_ipaddress_on">Hidden</string>
+    <string name="dashboard_graph_label">Personal data leakage</string>
+    <string name="dashboard_graph_period">Last 24 hours</string>
+    <string name="dashboard_graph_total">%d hits</string>
+
+    <string name="dashboard_am_i_tracked_title">Am I tracked?</string>
+    <string name="dashboard_am_i_tracked_subtitle">%1$d app trackers, %2$d active trackers</string>
+    <string name="dashboard_apps_permissions_title">Apps Permissions</string>
+    <string name="dashboard_apps_permissions_subtitle">Manage your permissions</string>
+    <string name="dashboard_location_title">Geolocation mode</string>
+    <string name="dashboard_location_subtitle_off">Real geolocation</string>
+    <string name="dashboard_location_subtitle_on">Fake geolocation</string>
+    <string name="dashboard_internet_activity_privacy_title">My internet activity privacy</string>
+    <string name="dashboard_internet_activity_privacy_subtitle_off">Real IP address exposed</string>
+    <string name="dashboard_internet_activity_privacy_subtitle_on">Real IP address hidden</string>
+
+    <!-- -->
     <string name="internet_activity_privacy">Internet Activity Privacy</string>
-    <string name="internet_activity_privacy_title">My Internet Activity Privacy</string>
-    <string name="internet_activity_privacy_subtitle">"Current internet activity mode: "</string>
     <string name="quick_protection_info">Quick protection enables these settings when turned on</string>
     <string name="quick_protection_settings_list"> - All trackers are turned off.\n- Your geolocation will be faked.\n- Your real IP address will be hidden.</string>
     <string name="learn_more">Learn more</string>

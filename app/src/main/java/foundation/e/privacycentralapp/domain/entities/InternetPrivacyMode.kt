@@ -15,16 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package foundation.e.privacycentralapp.domain.usecases
+package foundation.e.privacycentralapp.domain.entities
 
-import foundation.e.privacycentralapp.data.repositories.LocalStateRepository
-
-class GetQuickPrivacyStateUseCase(private val localStateRepository: LocalStateRepository) {
-    val isQuickPrivacyEnabled = localStateRepository.isQuickPrivacyEnabled
-
-    fun toggle(): Boolean {
-        val newState = !localStateRepository.isQuickPrivacyEnabled
-        localStateRepository.isQuickPrivacyEnabled = newState
-        return newState
-    }
+enum class InternetPrivacyMode {
+    REAL_IP, HIDE_IP
 }

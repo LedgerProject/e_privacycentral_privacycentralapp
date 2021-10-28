@@ -19,19 +19,23 @@ package foundation.e.privacycentralapp.features.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import foundation.e.privacycentralapp.common.Factory
+import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-class DashboardViewModel : ViewModel() {
+class DashboardViewModel(
+    private val getPrivacyStateUseCase: GetQuickPrivacyStateUseCase
+) : ViewModel() {
 
     private val _actions = MutableSharedFlow<DashboardFeature.Action>()
     val actions = _actions.asSharedFlow()
 
     val dashboardFeature: DashboardFeature by lazy {
         DashboardFeature.create(
-            DashboardFeature.State.InitialState,
-            coroutineScope = viewModelScope
+            coroutineScope = viewModelScope,
+            getPrivacyStateUseCase = getPrivacyStateUseCase
         )
     }
 
@@ -39,5 +43,13 @@ class DashboardViewModel : ViewModel() {
         viewModelScope.launch {
             _actions.emit(action)
         }
+    }
+}
+
+class DashBoardViewModelFactory(
+    private val getPrivacyStateUseCase: GetQuickPrivacyStateUseCase
+) : Factory<DashboardViewModel> {
+    override fun create(): DashboardViewModel {
+        return DashboardViewModel(getPrivacyStateUseCase)
     }
 }

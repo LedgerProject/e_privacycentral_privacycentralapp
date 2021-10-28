@@ -23,10 +23,10 @@ import foundation.e.flowmvi.Actor
 import foundation.e.flowmvi.Reducer
 import foundation.e.flowmvi.SingleEventProducer
 import foundation.e.flowmvi.feature.BaseFeature
+import foundation.e.privacycentralapp.domain.entities.LocationMode
 import foundation.e.privacycentralapp.dummy.CityDataSource
 import foundation.e.privacycentralapp.dummy.DummyDataSource
 import foundation.e.privacycentralapp.dummy.Location
-import foundation.e.privacycentralapp.dummy.LocationMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flowOf
 
