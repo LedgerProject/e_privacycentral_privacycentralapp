@@ -21,12 +21,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import foundation.e.privacycentralapp.common.Factory
 import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
+import foundation.e.privacycentralapp.domain.usecases.IpScramblingStateUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class DashboardViewModel(
-    private val getPrivacyStateUseCase: GetQuickPrivacyStateUseCase
+    private val getPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
+    private val ipScramblingStateUseCase: IpScramblingStateUseCase
 ) : ViewModel() {
 
     private val _actions = MutableSharedFlow<DashboardFeature.Action>()
@@ -35,7 +37,8 @@ class DashboardViewModel(
     val dashboardFeature: DashboardFeature by lazy {
         DashboardFeature.create(
             coroutineScope = viewModelScope,
-            getPrivacyStateUseCase = getPrivacyStateUseCase
+            getPrivacyStateUseCase = getPrivacyStateUseCase,
+            ipScramblingStateUseCase = ipScramblingStateUseCase
         )
     }
 
@@ -47,9 +50,10 @@ class DashboardViewModel(
 }
 
 class DashBoardViewModelFactory(
-    private val getPrivacyStateUseCase: GetQuickPrivacyStateUseCase
+    private val getPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
+    private val ipScramblingStateUseCase: IpScramblingStateUseCase
 ) : Factory<DashboardViewModel> {
     override fun create(): DashboardViewModel {
-        return DashboardViewModel(getPrivacyStateUseCase)
+        return DashboardViewModel(getPrivacyStateUseCase, ipScramblingStateUseCase)
     }
 }

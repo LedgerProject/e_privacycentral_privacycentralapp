@@ -18,6 +18,7 @@
 package foundation.e.privacycentralapp.features.internetprivacy
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -35,16 +36,17 @@ import foundation.e.flowmvi.MVIView
 import foundation.e.privacycentralapp.DependencyContainer
 import foundation.e.privacycentralapp.PrivacyCentralApplication
 import foundation.e.privacycentralapp.R
+import foundation.e.privacycentralapp.common.NavToolbarFragment
 import foundation.e.privacycentralapp.common.ToggleAppsAdapter
-import foundation.e.privacycentralapp.common.ToolbarFragment
+import foundation.e.privacycentralapp.databinding.FragmentInternetActivityPolicyBinding
+import foundation.e.privacycentralapp.domain.entities.InternetPrivacyMode
 import foundation.e.privacycentralapp.extensions.viewModelProviderFactoryOf
-import foundation.e.privacymodules.ipscramblermodule.IIpScramblerModule
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import java.util.Locale
 
 class InternetPrivacyFragment :
-    ToolbarFragment(R.layout.fragment_internet_activity_policy),
+    NavToolbarFragment(R.layout.fragment_internet_activity_policy),
     MVIView<InternetPrivacyFeature.State, InternetPrivacyFeature.Action> {
 
     private val dependencyContainer: DependencyContainer by lazy {
@@ -55,6 +57,8 @@ class InternetPrivacyFragment :
         viewModelProviderFactoryOf { dependencyContainer.internetPrivacyViewModelFactory.create() }
     }
 
+    private lateinit var binding: FragmentInternetActivityPolicyBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launchWhenStarted {
@@ -63,9 +67,15 @@ class InternetPrivacyFragment :
         lifecycleScope.launchWhenStarted {
             viewModel.internetPrivacyFeature.singleEvents.collect { event ->
                 when (event) {
-                    is InternetPrivacyFeature.SingleEvent.ErrorEvent -> displayToast(event.error)
-                    is InternetPrivacyFeature.SingleEvent.StartAndroidVpnActivityEvent ->
+                    is InternetPrivacyFeature.SingleEvent.ErrorEvent -> {
+                        displayToast(event.error)
+                        viewModel
+                    }
+                    is InternetPrivacyFeature.SingleEvent.StartAndroidVpnActivityEvent -> {
+                        Log.d("TestsVPN", event.intent.toString())
+                        Log.d("TestsVPN", event.intent.action.toString())
                         launchAndroidVpnDisclaimer.launch(event.intent)
+                    }
                     InternetPrivacyFeature.SingleEvent.HiddenIPSelectedEvent -> displayToast("Your IP is hidden")
                     InternetPrivacyFeature.SingleEvent.RealIPSelectedEvent -> displayToast("Your IP is visible to internet")
                 }
@@ -87,6 +97,7 @@ class InternetPrivacyFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding = FragmentInternetActivityPolicyBinding.bind(view)
 
         listOf(R.id.recycler_view_scrambled, R.id.recycler_view_to_select).forEach { viewId ->
             view.findViewById<RecyclerView>(viewId)?.apply {
@@ -125,26 +136,26 @@ class InternetPrivacyFragment :
         view?.let {
             it.findViewById<RadioButton>(R.id.radio_use_hidden_ip).apply {
                 isChecked = state.mode in listOf(
-                    IIpScramblerModule.Status.ON,
-                    IIpScramblerModule.Status.STARTING
+                    InternetPrivacyMode.HIDE_IP,
+                    InternetPrivacyMode.HIDE_IP_LOADING
                 )
-                isEnabled = state.mode != IIpScramblerModule.Status.STARTING
+                isEnabled = state.mode != InternetPrivacyMode.HIDE_IP_LOADING
             }
             it.findViewById<RadioButton>(R.id.radio_use_real_ip)?.apply {
                 isChecked =
                     state.mode in listOf(
-                    IIpScramblerModule.Status.OFF,
-                    IIpScramblerModule.Status.STOPPING
+                    InternetPrivacyMode.REAL_IP,
+                    InternetPrivacyMode.REAL_IP_LOADING
                 )
-                isEnabled = state.mode != IIpScramblerModule.Status.STOPPING
+                isEnabled = state.mode != InternetPrivacyMode.REAL_IP_LOADING
             }
             it.findViewById<TextView>(R.id.ipscrambling_tor_status)?.apply {
                 when (state.mode) {
-                    IIpScramblerModule.Status.STARTING -> {
+                    InternetPrivacyMode.HIDE_IP_LOADING -> {
                         text = getString(R.string.ipscrambling_is_starting)
                         visibility = View.VISIBLE
                     }
-                    IIpScramblerModule.Status.STOPPING -> {
+                    InternetPrivacyMode.REAL_IP_LOADING -> {
                         text = getString(R.string.ipscrambling_is_stopping)
                         visibility = View.VISIBLE
                     }
@@ -205,8 +216,8 @@ class InternetPrivacyFragment :
 
             when {
                 state.mode in listOf(
-                    IIpScramblerModule.Status.STARTING,
-                    IIpScramblerModule.Status.STOPPING
+                    InternetPrivacyMode.HIDE_IP_LOADING,
+                    InternetPrivacyMode.REAL_IP_LOADING
                 )
                     || state.availableApps.isEmpty() -> {
                     progressBar?.visibility = View.VISIBLE

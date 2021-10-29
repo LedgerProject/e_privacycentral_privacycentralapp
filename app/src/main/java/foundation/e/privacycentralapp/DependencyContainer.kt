@@ -22,6 +22,7 @@ import android.content.Context
 import android.os.Process
 import foundation.e.privacycentralapp.data.repositories.LocalStateRepository
 import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
+import foundation.e.privacycentralapp.domain.usecases.IpScramblingStateUseCase
 import foundation.e.privacycentralapp.features.dashboard.DashBoardViewModelFactory
 import foundation.e.privacycentralapp.features.internetprivacy.InternetPrivacyViewModelFactory
 import foundation.e.privacycentralapp.features.location.FakeLocationViewModelFactory
@@ -32,6 +33,7 @@ import foundation.e.privacymodules.location.FakeLocation
 import foundation.e.privacymodules.location.IFakeLocation
 import foundation.e.privacymodules.permissions.PermissionsPrivacyModule
 import foundation.e.privacymodules.permissions.data.ApplicationDescription
+import kotlinx.coroutines.GlobalScope
 import lineageos.blockers.BlockerInterface
 
 /**
@@ -68,9 +70,12 @@ class DependencyContainer constructor(val app: Application) {
     private val getQuickPrivacyStateUseCase by lazy {
         GetQuickPrivacyStateUseCase(localStateRepository)
     }
+    private val ipScramblingStateUseCase by lazy {
+        IpScramblingStateUseCase(ipScramblerModule, localStateRepository, GlobalScope)
+    }
 
     val dashBoardViewModelFactory by lazy {
-        DashBoardViewModelFactory(getQuickPrivacyStateUseCase)
+        DashBoardViewModelFactory(getQuickPrivacyStateUseCase, ipScramblingStateUseCase)
     }
 
     val fakeLocationViewModelFactory by lazy {
@@ -80,6 +85,6 @@ class DependencyContainer constructor(val app: Application) {
     val blockerService = BlockerInterface.getInstance(context)
 
     val internetPrivacyViewModelFactory by lazy {
-        InternetPrivacyViewModelFactory(ipScramblerModule, permissionsModule)
+        InternetPrivacyViewModelFactory(ipScramblerModule, permissionsModule, getQuickPrivacyStateUseCase, ipScramblingStateUseCase)
     }
 }

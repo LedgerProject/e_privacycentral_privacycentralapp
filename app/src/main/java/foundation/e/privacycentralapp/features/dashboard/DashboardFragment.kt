@@ -105,10 +105,11 @@ class DashboardFragment :
                 }
             }
         }
-        // lifecycleScope.launchWhenStarted {
-        // viewModel.submitAction(DashboardFeature.Action.ShowDashboardAction)
-        // viewModel.submitAction(DashboardFeature.Action.ObserveDashboardAction)
-        // }
+        lifecycleScope.launchWhenStarted {
+            viewModel.submitAction(DashboardFeature.Action.InitAction)
+            // viewModel.submitAction(DashboardFeature.Action.ShowDashboardAction)
+            // viewModel.submitAction(DashboardFeature.Action.ObserveDashboardAction)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -195,10 +196,18 @@ class DashboardFragment :
         )
 
         val ipAddressEnabled = state is EnabledState && state.internetPrivacyMode != InternetPrivacyMode.REAL_IP
+        val isLoading = state is EnabledState && state.internetPrivacyMode in listOf(
+            InternetPrivacyMode.HIDE_IP_LOADING,
+            InternetPrivacyMode.REAL_IP_LOADING
+        )
         binding.stateIpAddress.text = getString(
             if (ipAddressEnabled) R.string.dashboard_state_ipaddress_on
             else R.string.dashboard_state_ipaddress_off
         )
+
+        binding.stateIpAddressLoader.visibility = if (isLoading) View.VISIBLE else View.GONE
+        binding.stateIpAddress.visibility = if (!isLoading) View.VISIBLE else View.GONE
+
         binding.stateIpAddress.setTextColor(
             getColor(
                 requireContext(),
@@ -233,11 +242,11 @@ class DashboardFragment :
         )
 
         binding.internetActivityPrivacy.subtitle.text = getString(
-            if (state is DashboardFeature.State.EnabledState &&
+            if (state is EnabledState &&
                 state.internetPrivacyMode != InternetPrivacyMode.REAL_IP
             )
                 R.string.dashboard_internet_activity_privacy_subtitle_on
-            else R.string.dashboard_internet_activity_privacy_subtitle_on
+            else R.string.dashboard_internet_activity_privacy_subtitle_off
         )
     }
 

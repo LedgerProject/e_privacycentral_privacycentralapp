@@ -123,11 +123,18 @@
                         android:id="@+id/state_ip_address"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/dashboard_state_ipaddress_off"
+android:text="@string/dashboard_state_ipaddress_off"
                         android:textSize="12sp"
                         android:textColor="@color/black_text"
                         android:textAllCaps="true"
+                        android:visibility="gone"
                         />
+                    <ProgressBar
+                        android:id="@+id/state_ip_address_loader"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:indeterminate="true"
+                        android:visibility="visible"/>
                 </LinearLayout>
             </LinearLayout>
 

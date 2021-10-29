@@ -25,16 +25,18 @@ import foundation.e.flowmvi.Actor
 import foundation.e.flowmvi.Reducer
 import foundation.e.flowmvi.SingleEventProducer
 import foundation.e.flowmvi.feature.BaseFeature
+import foundation.e.privacycentralapp.domain.entities.InternetPrivacyMode
+import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
+import foundation.e.privacycentralapp.domain.usecases.IpScramblingStateUseCase
 import foundation.e.privacymodules.ipscramblermodule.IIpScramblerModule
 import foundation.e.privacymodules.permissions.PermissionsPrivacyModule
 import foundation.e.privacymodules.permissions.data.ApplicationDescription
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 
 // Define a state machine for Internet privacy feature
@@ -53,11 +55,12 @@ class InternetPrivacyFeature(
     singleEventProducer
 ) {
     data class State(
-        val mode: IIpScramblerModule.Status,
+        val mode: InternetPrivacyMode,
         val availableApps: List<ApplicationDescription>,
         val ipScrambledApps: Collection<String>,
         val selectedLocation: String,
-        val availableLocationIds: List<String>
+        val availableLocationIds: List<String>,
+        val forceRedraw: Boolean = false
     ) {
 
         val isAllAppsScrambled get() = ipScrambledApps.isEmpty()
@@ -93,8 +96,10 @@ class InternetPrivacyFeature(
     }
 
     sealed class Effect {
-        data class ModeUpdatedEffect(val mode: IIpScramblerModule.Status) : Effect()
         object NoEffect : Effect()
+        data class ModeUpdatedEffect(val mode: InternetPrivacyMode) : Effect()
+        data class QuickPrivacyUpdatedEffect(val enabled: Boolean) : Effect()
+        object QuickPrivacyDisabledWarningEffect : Effect()
         data class ShowAndroidVpnDisclaimerEffect(val intent: Intent) : Effect()
         data class IpScrambledAppsUpdatedEffect(val ipScrambledApps: Collection<String>) : Effect()
         data class AvailableAppsListEffect(val apps: List<ApplicationDescription>) : Effect()
@@ -106,7 +111,7 @@ class InternetPrivacyFeature(
     companion object {
         fun create(
             initialState: State = State(
-                IIpScramblerModule.Status.STOPPING,
+                mode = InternetPrivacyMode.REAL_IP,
                 availableApps = emptyList(),
                 ipScrambledApps = emptyList(),
                 availableLocationIds = emptyList(),
@@ -114,7 +119,9 @@ class InternetPrivacyFeature(
             ),
             coroutineScope: CoroutineScope,
             ipScramblerModule: IIpScramblerModule,
-            permissionsModule: PermissionsPrivacyModule
+            permissionsModule: PermissionsPrivacyModule,
+            getQuickPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
+            ipScramblingStateUseCase: IpScramblingStateUseCase
         ) = InternetPrivacyFeature(
             initialState, coroutineScope,
             reducer = { state, effect ->
@@ -124,25 +131,15 @@ class InternetPrivacyFeature(
                     is Effect.AvailableAppsListEffect -> state.copy(availableApps = effect.apps)
                     is Effect.AvailableCountriesEffect -> state.copy(availableLocationIds = effect.availableLocationsIds)
                     is Effect.LocationSelectedEffect -> state.copy(selectedLocation = effect.locationId)
+                    Effect.QuickPrivacyDisabledWarningEffect -> state.copy(forceRedraw = !state.forceRedraw)
                     else -> state
                 }
             },
             actor = { state, action ->
                 when {
                     action is Action.LoadInternetModeAction -> merge(
-                        callbackFlow {
-                            val listener = object : IIpScramblerModule.Listener {
-                                override fun onStatusChanged(newStatus: IIpScramblerModule.Status) {
-                                    offer(Effect.ModeUpdatedEffect(newStatus))
-                                }
-
-                                override fun log(message: String) {}
-                                override fun onTrafficUpdate(upload: Long, download: Long, read: Long, write: Long) {}
-                            }
-                            ipScramblerModule.addListener(listener)
-                            ipScramblerModule.requestStatus()
-                            awaitClose { ipScramblerModule.removeListener(listener) }
-                        },
+                        getQuickPrivacyStateUseCase.quickPrivacyEnabledFlow.map { Effect.QuickPrivacyUpdatedEffect(it) },
+                        ipScramblingStateUseCase.internetPrivacyMode.map { Effect.ModeUpdatedEffect(it) },
                         flow {
                             // TODO: filter deactivated apps"
                             val apps = permissionsModule.getInstalledApplications()
@@ -179,12 +176,12 @@ class InternetPrivacyFeature(
                     action is Action.AndroidVpnActivityResultAction ->
                         if (action.resultCode == Activity.RESULT_OK) {
                             if (state.mode in listOf(
-                                    IIpScramblerModule.Status.OFF,
-                                    IIpScramblerModule.Status.STOPPING
+                                    InternetPrivacyMode.REAL_IP,
+                                    InternetPrivacyMode.REAL_IP_LOADING
                                 )
                             ) {
-                                ipScramblerModule.start()
-                                flowOf(Effect.ModeUpdatedEffect(IIpScramblerModule.Status.STARTING))
+                                ipScramblingStateUseCase.toggle(hideIp = true)
+                                flowOf(Effect.ModeUpdatedEffect(InternetPrivacyMode.HIDE_IP_LOADING))
                             } else {
                                 flowOf(Effect.ErrorEffect("Vpn already started"))
                             }
@@ -193,23 +190,30 @@ class InternetPrivacyFeature(
                         }
 
                     action is Action.UseRealIPAction && state.mode in listOf(
-                        IIpScramblerModule.Status.ON,
-                        IIpScramblerModule.Status.STARTING,
-                        IIpScramblerModule.Status.STOPPING
+                        InternetPrivacyMode.HIDE_IP,
+                        InternetPrivacyMode.HIDE_IP_LOADING,
+                        InternetPrivacyMode.REAL_IP_LOADING
                     ) -> {
-                        ipScramblerModule.stop()
-                        flowOf(Effect.ModeUpdatedEffect(IIpScramblerModule.Status.STOPPING))
+                        if (getQuickPrivacyStateUseCase.isQuickPrivacyEnabled) {
+                            ipScramblingStateUseCase.toggle(hideIp = false)
+                            flowOf(Effect.ModeUpdatedEffect(InternetPrivacyMode.REAL_IP_LOADING))
+                        } else {
+                            flowOf(Effect.QuickPrivacyDisabledWarningEffect)
+                        }
                     }
                     action is Action.UseHiddenIPAction
                         && state.mode in listOf(
-                            IIpScramblerModule.Status.OFF,
-                            IIpScramblerModule.Status.STOPPING
+                            InternetPrivacyMode.REAL_IP,
+                            InternetPrivacyMode.REAL_IP_LOADING
                         ) -> {
-                        ipScramblerModule.prepareAndroidVpn()?.let {
-                            flowOf(Effect.ShowAndroidVpnDisclaimerEffect(it))
-                        } ?: run {
-                            ipScramblerModule.start()
-                            flowOf(Effect.ModeUpdatedEffect(IIpScramblerModule.Status.STARTING))
+                        if (getQuickPrivacyStateUseCase.isQuickPrivacyEnabled) {
+                            ipScramblingStateUseCase.toggle(hideIp = true)?.let {
+                                flowOf(Effect.ShowAndroidVpnDisclaimerEffect(it))
+                            } ?: run {
+                                flowOf(Effect.ModeUpdatedEffect(InternetPrivacyMode.HIDE_IP_LOADING))
+                            }
+                        } else {
+                            flowOf(Effect.QuickPrivacyDisabledWarningEffect)
                         }
                     }
 
@@ -235,6 +239,7 @@ class InternetPrivacyFeature(
             singleEventProducer = { _, action, effect ->
                 when {
                     effect is Effect.ErrorEffect -> SingleEvent.ErrorEvent(effect.message)
+                    effect == Effect.QuickPrivacyDisabledWarningEffect -> SingleEvent.ErrorEvent("Enabled Quick Privacy to use functionalities")
 
                     action is Action.UseHiddenIPAction
                         && effect is Effect.ShowAndroidVpnDisclaimerEffect ->

@@ -18,18 +18,31 @@
 package foundation.e.privacycentralapp.data.repositories
 
 import android.content.Context
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class LocalStateRepository(context: Context) {
     companion object {
         private const val SHARED_PREFS_FILE = "localState"
         private const val KEY_QUICK_PRIVACY = "quickPrivacy"
+        private const val KEY_IP_SCRAMBLING = "ipScrambling"
     }
 
-    val sharedPref = context.getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
+    private val sharedPref = context.getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
 
+    private val quickPrivacyEnabledMutableFlow = MutableStateFlow<Boolean>(sharedPref.getBoolean(KEY_QUICK_PRIVACY, false))
     var isQuickPrivacyEnabled: Boolean
-        get() = sharedPref.getBoolean(KEY_QUICK_PRIVACY, false)
-        set(value) = set(KEY_QUICK_PRIVACY, value)
+        get() = quickPrivacyEnabledMutableFlow.value
+        set(value) {
+            set(KEY_QUICK_PRIVACY, value)
+            quickPrivacyEnabledMutableFlow.value = value
+        }
+
+    var quickPrivacyEnabledFlow: Flow<Boolean> = quickPrivacyEnabledMutableFlow
+
+    var isIpScramblingEnabled: Boolean
+        get() = sharedPref.getBoolean(KEY_IP_SCRAMBLING, false)
+        set(value) = set(KEY_IP_SCRAMBLING, value)
 
     private fun set(key: String, value: Boolean) {
         sharedPref.edit().putBoolean(key, value).commit()

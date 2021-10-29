@@ -20,6 +20,8 @@ package foundation.e.privacycentralapp.features.internetprivacy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import foundation.e.privacycentralapp.common.Factory
+import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
+import foundation.e.privacycentralapp.domain.usecases.IpScramblingStateUseCase
 import foundation.e.privacymodules.ipscramblermodule.IIpScramblerModule
 import foundation.e.privacymodules.permissions.PermissionsPrivacyModule
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -28,7 +30,9 @@ import kotlinx.coroutines.launch
 
 class InternetPrivacyViewModel(
     private val ipScramblerModule: IIpScramblerModule,
-    private val permissionsModule: PermissionsPrivacyModule
+    private val permissionsModule: PermissionsPrivacyModule,
+    private val getQuickPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
+    private val ipScramblingStateUseCase: IpScramblingStateUseCase
 ) : ViewModel() {
 
     private val _actions = MutableSharedFlow<InternetPrivacyFeature.Action>()
@@ -38,7 +42,9 @@ class InternetPrivacyViewModel(
         InternetPrivacyFeature.create(
             coroutineScope = viewModelScope,
             ipScramblerModule = ipScramblerModule,
-            permissionsModule = permissionsModule
+            permissionsModule = permissionsModule,
+            getQuickPrivacyStateUseCase = getQuickPrivacyStateUseCase,
+            ipScramblingStateUseCase = ipScramblingStateUseCase
         )
     }
 
@@ -51,10 +57,12 @@ class InternetPrivacyViewModel(
 
 class InternetPrivacyViewModelFactory(
     private val ipScramblerModule: IIpScramblerModule,
-    private val permissionsModule: PermissionsPrivacyModule
+    private val permissionsModule: PermissionsPrivacyModule,
+    private val getQuickPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
+    private val ipScramblingStateUseCase: IpScramblingStateUseCase
 ) :
     Factory<InternetPrivacyViewModel> {
     override fun create(): InternetPrivacyViewModel {
-        return InternetPrivacyViewModel(ipScramblerModule, permissionsModule)
+        return InternetPrivacyViewModel(ipScramblerModule, permissionsModule, getQuickPrivacyStateUseCase, ipScramblingStateUseCase)
     }
 }

@@ -25,8 +25,11 @@ import foundation.e.flowmvi.feature.BaseFeature
 import foundation.e.privacycentralapp.domain.entities.InternetPrivacyMode
 import foundation.e.privacycentralapp.domain.entities.LocationMode
 import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
+import foundation.e.privacycentralapp.domain.usecases.IpScramblingStateUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 
 // Define a state machine for Dashboard Feature
 class DashboardFeature(
@@ -70,6 +73,8 @@ class DashboardFeature(
     }
 
     sealed class Action {
+        object InitAction : Action()
+
         object TogglePrivacyAction : Action()
         // object ShowQuickPrivacyProtectionInfoAction : Action()
         // object ObserveDashboardAction : Action()
@@ -81,7 +86,9 @@ class DashboardFeature(
     }
 
     sealed class Effect {
+        object NoEffect : Effect()
         data class UpdateStateEffect(val isEnabled: Boolean) : Effect()
+        data class IpScramblingModeUpdatedEffect(val mode: InternetPrivacyMode) : Effect()
 
         object OpenQuickPrivacyProtectionEffect : Effect()
         data class OpenDashboardEffect(
@@ -110,7 +117,8 @@ class DashboardFeature(
     companion object {
         fun create(
             coroutineScope: CoroutineScope,
-            getPrivacyStateUseCase: GetQuickPrivacyStateUseCase
+            getPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
+            ipScramblingStateUseCase: IpScramblingStateUseCase
         ): DashboardFeature =
             DashboardFeature(
                 initialState = State.DisabledState(),
@@ -138,6 +146,8 @@ class DashboardFeature(
                             )
                             else -> state
                         }
+                        is Effect.IpScramblingModeUpdatedEffect -> if (state is State.EnabledState) state.copy(internetPrivacyMode = effect.mode)
+                        else state
 
                         /*is Effect.OpenDashboardEffect -> State.DashboardState(
                             effect.trackersCount,
@@ -191,13 +201,23 @@ class DashboardFeature(
                     when (action) {
                         Action.TogglePrivacyAction -> {
                             if (state != State.LoadingState) {
-                                flowOf(Effect.UpdateStateEffect(getPrivacyStateUseCase.toggle()))
-                            } else {
-                                flowOf(Effect.UpdateStateEffect(getPrivacyStateUseCase.isQuickPrivacyEnabled))
+                                getPrivacyStateUseCase.toggle()
                             }
+                            flowOf(Effect.NoEffect)
                         }
 
-                        /*Action.ObserveDashboardAction -> merge(
+                        Action.InitAction -> merge(
+                            getPrivacyStateUseCase.quickPrivacyEnabledFlow.map {
+
+                                Effect.UpdateStateEffect(it)
+                            },
+                            ipScramblingStateUseCase.internetPrivacyMode.map {
+                                Effect.IpScramblingModeUpdatedEffect(it)
+                            }
+                        )
+                        /*
+                            Action.ObserveDashboardAction -> {
+                            merge(
                             TrackersDataSource.trackers.map {
                                 var activeTrackersCount: Int = 0
                                 outer@ for (tracker in it) {

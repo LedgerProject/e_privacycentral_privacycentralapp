@@ -20,7 +20,8 @@ package foundation.e.privacycentralapp.domain.usecases
 import foundation.e.privacycentralapp.data.repositories.LocalStateRepository
 
 class GetQuickPrivacyStateUseCase(private val localStateRepository: LocalStateRepository) {
-    val isQuickPrivacyEnabled = localStateRepository.isQuickPrivacyEnabled
+    val quickPrivacyEnabledFlow = localStateRepository.quickPrivacyEnabledFlow
+    val isQuickPrivacyEnabled get() = localStateRepository.isQuickPrivacyEnabled
 
     fun toggle(): Boolean {
         val newState = !localStateRepository.isQuickPrivacyEnabled

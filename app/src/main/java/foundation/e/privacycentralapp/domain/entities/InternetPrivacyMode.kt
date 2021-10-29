@@ -18,5 +18,8 @@
 package foundation.e.privacycentralapp.domain.entities
 
 enum class InternetPrivacyMode {
-    REAL_IP, HIDE_IP
+    REAL_IP,
+    HIDE_IP,
+    HIDE_IP_LOADING,
+    REAL_IP_LOADING
 }
