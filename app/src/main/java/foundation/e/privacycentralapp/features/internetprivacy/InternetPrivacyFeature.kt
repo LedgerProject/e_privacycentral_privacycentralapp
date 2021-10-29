@@ -17,7 +17,6 @@
 
 package foundation.e.privacycentralapp.features.internetprivacy
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
@@ -26,18 +25,20 @@ import foundation.e.flowmvi.Reducer
 import foundation.e.flowmvi.SingleEventProducer
 import foundation.e.flowmvi.feature.BaseFeature
 import foundation.e.privacycentralapp.domain.entities.InternetPrivacyMode
+import foundation.e.privacycentralapp.domain.usecases.AppListUseCase
 import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.IpScramblingStateUseCase
 import foundation.e.privacymodules.ipscramblermodule.IIpScramblerModule
-import foundation.e.privacymodules.permissions.PermissionsPrivacyModule
 import foundation.e.privacymodules.permissions.data.ApplicationDescription
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.shareIn
 
 // Define a state machine for Internet privacy feature
 class InternetPrivacyFeature(
@@ -62,18 +63,8 @@ class InternetPrivacyFeature(
         val availableLocationIds: List<String>,
         val forceRedraw: Boolean = false
     ) {
-
-        val isAllAppsScrambled get() = ipScrambledApps.isEmpty()
-        fun getScrambledApps(): List<Pair<ApplicationDescription, Boolean>> {
-            return availableApps
-                .filter { it.packageName in ipScrambledApps }
-                .map { it to true }
-        }
-
         fun getApps(): List<Pair<ApplicationDescription, Boolean>> {
-            return availableApps
-                .filter { it.packageName !in ipScrambledApps }
-                .map { it to false }
+            return availableApps.map { it to (it.packageName in ipScrambledApps) }
         }
 
         val selectedLocationPosition get() = availableLocationIds.indexOf(selectedLocation)
@@ -102,7 +93,10 @@ class InternetPrivacyFeature(
         object QuickPrivacyDisabledWarningEffect : Effect()
         data class ShowAndroidVpnDisclaimerEffect(val intent: Intent) : Effect()
         data class IpScrambledAppsUpdatedEffect(val ipScrambledApps: Collection<String>) : Effect()
-        data class AvailableAppsListEffect(val apps: List<ApplicationDescription>) : Effect()
+        data class AvailableAppsListEffect(
+            val apps: List<ApplicationDescription>,
+            val ipScrambledApps: Collection<String>
+        ) : Effect()
         data class LocationSelectedEffect(val locationId: String) : Effect()
         data class AvailableCountriesEffect(val availableLocationsIds: List<String>) : Effect()
         data class ErrorEffect(val message: String) : Effect()
@@ -119,16 +113,19 @@ class InternetPrivacyFeature(
             ),
             coroutineScope: CoroutineScope,
             ipScramblerModule: IIpScramblerModule,
-            permissionsModule: PermissionsPrivacyModule,
             getQuickPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
-            ipScramblingStateUseCase: IpScramblingStateUseCase
+            ipScramblingStateUseCase: IpScramblingStateUseCase,
+            appListUseCase: AppListUseCase
         ) = InternetPrivacyFeature(
             initialState, coroutineScope,
             reducer = { state, effect ->
                 when (effect) {
                     is Effect.ModeUpdatedEffect -> state.copy(mode = effect.mode)
                     is Effect.IpScrambledAppsUpdatedEffect -> state.copy(ipScrambledApps = effect.ipScrambledApps)
-                    is Effect.AvailableAppsListEffect -> state.copy(availableApps = effect.apps)
+                    is Effect.AvailableAppsListEffect -> state.copy(
+                        availableApps = effect.apps,
+                        ipScrambledApps = effect.ipScrambledApps
+                    )
                     is Effect.AvailableCountriesEffect -> state.copy(availableLocationIds = effect.availableLocationsIds)
                     is Effect.LocationSelectedEffect -> state.copy(selectedLocation = effect.locationId)
                     Effect.QuickPrivacyDisabledWarningEffect -> state.copy(forceRedraw = !state.forceRedraw)
@@ -139,33 +136,21 @@ class InternetPrivacyFeature(
                 when {
                     action is Action.LoadInternetModeAction -> merge(
                         getQuickPrivacyStateUseCase.quickPrivacyEnabledFlow.map { Effect.QuickPrivacyUpdatedEffect(it) },
-                        ipScramblingStateUseCase.internetPrivacyMode.map { Effect.ModeUpdatedEffect(it) },
+                        flowOf(Effect.QuickPrivacyUpdatedEffect(true)),
+                        ipScramblingStateUseCase.internetPrivacyMode.map { Effect.ModeUpdatedEffect(it) }.shareIn(scope = coroutineScope, started = SharingStarted.Lazily, replay = 0),
+                        flowOf(Effect.ModeUpdatedEffect(InternetPrivacyMode.REAL_IP)),
                         flow {
-                            // TODO: filter deactivated apps"
-                            val apps = permissionsModule.getInstalledApplications()
-                                .filter {
-                                    permissionsModule.getPermissions(it.packageName)
-                                        .contains(Manifest.permission.INTERNET)
-                                }.map {
-                                    it.icon = permissionsModule.getApplicationIcon(it.packageName)
-                                    it
-                                }.sortedWith(object : Comparator<ApplicationDescription> {
-                                    override fun compare(
-                                        p0: ApplicationDescription?,
-                                        p1: ApplicationDescription?
-                                    ): Int {
-                                        return if (p0?.icon != null && p1?.icon != null) {
-                                            p0.label.toString().compareTo(p1.label.toString())
-                                        } else if (p0?.icon == null) {
-                                            1
-                                        } else {
-                                            -1
-                                        }
-                                    }
-                                })
-                            emit(Effect.AvailableAppsListEffect(apps))
+                            val apps = appListUseCase.getAppsUsingInternet()
+                            if (ipScramblerModule.appList.isEmpty()) {
+                                ipScramblerModule.appList = apps.map { it.packageName }.toMutableSet()
+                            }
+                            emit(
+                                Effect.AvailableAppsListEffect(
+                                    apps,
+                                    ipScramblerModule.appList
+                                )
+                            )
                         },
-                        flowOf(Effect.IpScrambledAppsUpdatedEffect(ipScramblerModule.appList)),
                         flow {
                             val locationIds = mutableListOf("")
                             locationIds.addAll(ipScramblerModule.getAvailablesLocations().sorted())

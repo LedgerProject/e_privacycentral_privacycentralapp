@@ -19,13 +19,14 @@ package foundation.e.privacycentralapp.common
 
 import androidx.annotation.LayoutRes
 import com.google.android.material.appbar.MaterialToolbar
+import foundation.e.privacycentralapp.R
 
 abstract class NavToolbarFragment(@LayoutRes contentLayoutId: Int) : ToolbarFragment(contentLayoutId) {
 
     override fun setupToolbar(toolbar: MaterialToolbar) {
         super.setupToolbar(toolbar)
         toolbar.apply {
-            setNavigationIcon(lineageos.platform.R.drawable.ic_back)
+            setNavigationIcon(R.drawable.ic_ic_chevron_left_24dp)
             setNavigationOnClickListener {
                 requireActivity().onBackPressed()
             }

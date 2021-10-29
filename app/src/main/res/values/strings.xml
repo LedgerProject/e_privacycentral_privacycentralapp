@@ -30,8 +30,20 @@
     <string name="dashboard_internet_activity_privacy_subtitle_off">Real IP address exposed</string>
     <string name="dashboard_internet_activity_privacy_subtitle_on">Real IP address hidden</string>
 
+    <!-- IpScrambling -->
+    <string name="ipscrambling_title">My internet activity</string>
+    <string name="ipscrambling_info">Choose if you want to expose your real IP address or hide when Quick Privacy is enabled.</string>
+    <string name="ipscrambling_real_ip_label">Use real IP address</string>
+    <string name="ipscrambling_real_ip_subtitle">I can be tracked by my IP address</string>
+    <string name="ipscrambling_hide_ip_label">Hide IP address</string>
+    <string name="ipscrambling_hide_ip_subtitle">I am anonymous on the internet</string>
+    <string name="ipscrambling_tor_disclaimer"><b>Note:</b> when active, this setting will slow down your Internet connectivity speed (uses Thor network).</string>
+    <string name="ipscrambling_location_label">Force a country of origin:</string>
+    <string name="ipscrambling_any_location">Any country</string>
+
+    <string name="ipscrambling_select_app">Apply this setting to all selected apps:</string>
+
     <!-- -->
-    <string name="internet_activity_privacy">Internet Activity Privacy</string>
     <string name="quick_protection_info">Quick protection enables these settings when turned on</string>
     <string name="quick_protection_settings_list"> - All trackers are turned off.\n- Your geolocation will be faked.\n- Your real IP address will be hidden.</string>
     <string name="learn_more">Learn more</string>
@@ -42,19 +54,12 @@
     <string name="longitude">Longitude</string>
     <string name="latitude">Latitude</string>
     <string name="add_location">Add location</string>
-    <string name="internet_activity_privacy_info">Choose if you want to expose your real IP address or hide when connected to the internet (uses the tor network).</string>
-    <string name="use_real_ip">Use real IP address</string>
-    <string name="i_can_be_tracked">I can be tracked by my IP address</string>
-    <string name="hidden_ip">Hide IP address</string>
-    <string name="i_am_anonymous">I am anonymous on the internet</string>
     <string name="i_am_exposing">I am exposing my real IP address</string>
     <string name="ipscrambling_all_apps_scrambled">All apps use hidden IP</string>
     <string name="ipscrambling_only_selected_apps_scrambled">Only the following apps use hidden IP</string>
-    <string name="ipscrambling_select_app">Select Apps to hide IP</string>
+
     <string name="ipscrambling_is_starting">Tor is starting...</string>
     <string name="ipscrambling_is_stopping">Tor is stopping...</string>
-    <string name="ipscrambling_location_label">Hidden IP\'s location</string>
-    <string name="ipscrambling_any_location">any</string>
 
     ipscrambling_any_location
     <string name="permission_control_info">Manage and control apps requesting various permissions.</string>

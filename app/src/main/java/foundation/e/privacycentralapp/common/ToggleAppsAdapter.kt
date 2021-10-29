@@ -17,10 +17,10 @@
 
 package foundation.e.privacycentralapp.common
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.Switch
 import android.widget.TextView
@@ -28,22 +28,22 @@ import androidx.recyclerview.widget.RecyclerView
 import foundation.e.privacycentralapp.R
 import foundation.e.privacymodules.permissions.data.ApplicationDescription
 
-open class ToggleAppsAdapter(
+class ToggleAppsAdapter(
+    private val itemsLayout: Int,
     private val listener: (String, Boolean) -> Unit
 ) :
-    RecyclerView.Adapter<ToggleAppsAdapter.PermissionViewHolder>() {
+    RecyclerView.Adapter<ToggleAppsAdapter.ViewHolder>() {
 
-    class PermissionViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val appName: TextView = view.findViewById(R.id.app_title)
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val appName: TextView = view.findViewById(R.id.title)
 
-        @SuppressLint("UseSwitchCompatOrMaterialCode")
-        val togglePermission: Switch = view.findViewById(R.id.toggle)
+        val togglePermission: CheckBox = view.findViewById(R.id.toggle)
 
         fun bind(item: Pair<ApplicationDescription, Boolean>) {
             appName.text = item.first.label
             togglePermission.isChecked = item.second
 
-            itemView.findViewById<ImageView>(R.id.app_icon).setImageDrawable(item.first.icon)
+            itemView.findViewById<ImageView>(R.id.icon).setImageDrawable(item.first.icon)
         }
     }
 
@@ -53,10 +53,10 @@ open class ToggleAppsAdapter(
             notifyDataSetChanged()
         }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PermissionViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_app_toggle, parent, false)
-        val holder = PermissionViewHolder(view)
+            .inflate(itemsLayout, parent, false)
+        val holder = ViewHolder(view)
         holder.togglePermission.setOnCheckedChangeListener { _, isChecked ->
             listener(dataSet[holder.adapterPosition].first.packageName, isChecked)
         }
@@ -64,7 +64,7 @@ open class ToggleAppsAdapter(
         return holder
     }
 
-    override fun onBindViewHolder(holder: PermissionViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val permission = dataSet[position]
         holder.bind(permission)
     }

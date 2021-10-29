@@ -21,6 +21,7 @@ import android.app.Application
 import android.content.Context
 import android.os.Process
 import foundation.e.privacycentralapp.data.repositories.LocalStateRepository
+import foundation.e.privacycentralapp.domain.usecases.AppListUseCase
 import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.IpScramblingStateUseCase
 import foundation.e.privacycentralapp.features.dashboard.DashBoardViewModelFactory
@@ -73,6 +74,9 @@ class DependencyContainer constructor(val app: Application) {
     private val ipScramblingStateUseCase by lazy {
         IpScramblingStateUseCase(ipScramblerModule, localStateRepository, GlobalScope)
     }
+    private val appListUseCase by lazy {
+        AppListUseCase(permissionsModule)
+    }
 
     val dashBoardViewModelFactory by lazy {
         DashBoardViewModelFactory(getQuickPrivacyStateUseCase, ipScramblingStateUseCase)
@@ -85,6 +89,6 @@ class DependencyContainer constructor(val app: Application) {
     val blockerService = BlockerInterface.getInstance(context)
 
     val internetPrivacyViewModelFactory by lazy {
-        InternetPrivacyViewModelFactory(ipScramblerModule, permissionsModule, getQuickPrivacyStateUseCase, ipScramblingStateUseCase)
+        InternetPrivacyViewModelFactory(ipScramblerModule, getQuickPrivacyStateUseCase, ipScramblingStateUseCase, appListUseCase)
     }
 }

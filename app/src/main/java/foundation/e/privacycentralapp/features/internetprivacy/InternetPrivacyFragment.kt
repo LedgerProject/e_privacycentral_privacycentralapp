@@ -18,20 +18,14 @@
 package foundation.e.privacycentralapp.features.internetprivacy
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.ProgressBar
-import android.widget.RadioButton
-import android.widget.Spinner
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import foundation.e.flowmvi.MVIView
 import foundation.e.privacycentralapp.DependencyContainer
 import foundation.e.privacycentralapp.PrivacyCentralApplication
@@ -69,15 +63,10 @@ class InternetPrivacyFragment :
                 when (event) {
                     is InternetPrivacyFeature.SingleEvent.ErrorEvent -> {
                         displayToast(event.error)
-                        viewModel
                     }
                     is InternetPrivacyFeature.SingleEvent.StartAndroidVpnActivityEvent -> {
-                        Log.d("TestsVPN", event.intent.toString())
-                        Log.d("TestsVPN", event.intent.action.toString())
                         launchAndroidVpnDisclaimer.launch(event.intent)
                     }
-                    InternetPrivacyFeature.SingleEvent.HiddenIPSelectedEvent -> displayToast("Your IP is hidden")
-                    InternetPrivacyFeature.SingleEvent.RealIPSelectedEvent -> displayToast("Your IP is visible to internet")
                 }
             }
         }
@@ -99,134 +88,97 @@ class InternetPrivacyFragment :
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentInternetActivityPolicyBinding.bind(view)
 
-        listOf(R.id.recycler_view_scrambled, R.id.recycler_view_to_select).forEach { viewId ->
-            view.findViewById<RecyclerView>(viewId)?.apply {
-                layoutManager = LinearLayoutManager(requireContext())
-                setHasFixedSize(true)
-                adapter = ToggleAppsAdapter { packageName, isIpScrambled ->
-                    viewModel.submitAction(
-                        InternetPrivacyFeature.Action.ToggleAppIpScrambled(
-                            packageName,
-                            isIpScrambled
-                        )
+        binding.apps.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            setHasFixedSize(true)
+            adapter = ToggleAppsAdapter(R.layout.ipscrambling_item_app_toggle) { packageName, isIpScrambled ->
+                viewModel.submitAction(
+                    InternetPrivacyFeature.Action.ToggleAppIpScrambled(
+                        packageName,
+                        isIpScrambled
                     )
-                }
+                )
             }
         }
 
-        bindClickListeners(view)
-    }
+        binding.radioUseRealIp.container.setOnClickListener {
+            viewModel.submitAction(InternetPrivacyFeature.Action.UseRealIPAction)
+        }
 
-    override fun getTitle(): String = getString(R.string.internet_activity_privacy)
-
-    private fun bindClickListeners(fragmentView: View) {
-        fragmentView.let {
-            it.findViewById<RadioButton>(R.id.radio_use_real_ip)
-                .setOnClickListener {
-                    viewModel.submitAction(InternetPrivacyFeature.Action.UseRealIPAction)
-                }
-            it.findViewById<RadioButton>(R.id.radio_use_hidden_ip)
-                .setOnClickListener {
-                    viewModel.submitAction(InternetPrivacyFeature.Action.UseHiddenIPAction)
-                }
+        binding.radioUseHiddenIp.container.setOnClickListener {
+            viewModel.submitAction(InternetPrivacyFeature.Action.UseHiddenIPAction)
         }
     }
+
+    override fun getTitle(): String = getString(R.string.ipscrambling_title)
 
     override fun render(state: InternetPrivacyFeature.State) {
-        view?.let {
-            it.findViewById<RadioButton>(R.id.radio_use_hidden_ip).apply {
-                isChecked = state.mode in listOf(
-                    InternetPrivacyMode.HIDE_IP,
-                    InternetPrivacyMode.HIDE_IP_LOADING
-                )
-                isEnabled = state.mode != InternetPrivacyMode.HIDE_IP_LOADING
-            }
-            it.findViewById<RadioButton>(R.id.radio_use_real_ip)?.apply {
-                isChecked =
-                    state.mode in listOf(
-                    InternetPrivacyMode.REAL_IP,
-                    InternetPrivacyMode.REAL_IP_LOADING
-                )
-                isEnabled = state.mode != InternetPrivacyMode.REAL_IP_LOADING
-            }
-            it.findViewById<TextView>(R.id.ipscrambling_tor_status)?.apply {
-                when (state.mode) {
-                    InternetPrivacyMode.HIDE_IP_LOADING -> {
-                        text = getString(R.string.ipscrambling_is_starting)
-                        visibility = View.VISIBLE
-                    }
-                    InternetPrivacyMode.REAL_IP_LOADING -> {
-                        text = getString(R.string.ipscrambling_is_stopping)
-                        visibility = View.VISIBLE
-                    }
-                    else -> {
-                        text = ""
-                        visibility = View.GONE
-                    }
-                }
-            }
-
-            it.findViewById<Spinner>(R.id.ipscrambling_select_location)?.apply {
-                adapter = ArrayAdapter(
-                    requireContext(), android.R.layout.simple_spinner_item,
-                    state.availableLocationIds.map {
-                        if (it == "") {
-                            getString(R.string.ipscrambling_any_location)
-                        } else {
-                            Locale("", it).displayCountry
-                        }
-                    }
-                ).apply {
-                    setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                }
-
-                setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
-                        viewModel.submitAction(InternetPrivacyFeature.Action.SelectLocationAction(position))
-                    }
-
-                    override fun onNothingSelected(parentView: AdapterView<*>?) {}
-                })
-
-                setSelection(state.selectedLocationPosition)
-            }
-
-            it.findViewById<TextView>(R.id.ipscrambling_activated)?.apply {
-                text = getString(
-                    if (state.isAllAppsScrambled) R.string.ipscrambling_all_apps_scrambled
-                    else R.string.ipscrambling_only_selected_apps_scrambled
-                )
-            }
-
-            it.findViewById<RecyclerView>(R.id.recycler_view_scrambled)?.apply {
-                (adapter as ToggleAppsAdapter?)?.dataSet = state.getScrambledApps()
-            }
-            it.findViewById<RecyclerView>(R.id.recycler_view_to_select)?.apply {
-                (adapter as ToggleAppsAdapter?)?.dataSet = state.getApps()
-            }
-
-            val viewIdsToHide = listOf(
-                R.id.ipscrambling_activated,
-                R.id.recycler_view_scrambled,
-                R.id.ipscrambling_select_apps,
-                R.id.recycler_view_to_select,
-                R.id.ipscrambling_location
+        binding.radioUseHiddenIp.radiobutton.apply {
+            isChecked = state.mode in listOf(
+                InternetPrivacyMode.HIDE_IP,
+                InternetPrivacyMode.HIDE_IP_LOADING
             )
-            val progressBar = it.findViewById<ProgressBar>(R.id.ipscrambling_loading)
-
-            when {
+            isEnabled = state.mode != InternetPrivacyMode.HIDE_IP_LOADING
+        }
+        binding.radioUseRealIp.radiobutton.apply {
+            isChecked =
                 state.mode in listOf(
-                    InternetPrivacyMode.HIDE_IP_LOADING,
-                    InternetPrivacyMode.REAL_IP_LOADING
-                )
-                    || state.availableApps.isEmpty() -> {
-                    progressBar?.visibility = View.VISIBLE
-                    viewIdsToHide.forEach { viewId -> it.findViewById<View>(viewId)?.visibility = View.GONE }
+                InternetPrivacyMode.REAL_IP,
+                InternetPrivacyMode.REAL_IP_LOADING
+            )
+            isEnabled = state.mode != InternetPrivacyMode.REAL_IP_LOADING
+        }
+
+        binding.ipscramblingSelectLocation.apply {
+            adapter = ArrayAdapter(
+                requireContext(), android.R.layout.simple_spinner_item,
+                state.availableLocationIds.map {
+                    if (it == "") {
+                        getString(R.string.ipscrambling_any_location)
+                    } else {
+                        Locale("", it).displayCountry
+                    }
                 }
-                else -> {
-                    progressBar?.visibility = View.GONE
-                    viewIdsToHide.forEach { viewId -> it.findViewById<View>(viewId)?.visibility = View.VISIBLE }
+            ).apply {
+                setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            }
+
+            setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
+                    viewModel.submitAction(InternetPrivacyFeature.Action.SelectLocationAction(position))
                 }
+
+                override fun onNothingSelected(parentView: AdapterView<*>?) {}
+            })
+
+            setSelection(state.selectedLocationPosition)
+        }
+
+        // TODO: this should not be mandatory.
+        binding.apps.post {
+            (binding.apps.adapter as ToggleAppsAdapter?)?.dataSet = state.getApps()
+        }
+
+        val viewIdsToHide = listOf(
+            binding.ipscramblingLocationLabel,
+            binding.selectLocationContainer,
+            binding.ipscramblingSelectLocation,
+            binding.ipscramblingSelectApps,
+            binding.apps
+        )
+
+        when {
+            state.mode in listOf(
+                InternetPrivacyMode.HIDE_IP_LOADING,
+                InternetPrivacyMode.REAL_IP_LOADING
+            )
+                || state.availableApps.isEmpty() -> {
+                binding.loader.visibility = View.VISIBLE
+                viewIdsToHide.forEach { it.visibility = View.GONE }
+            }
+            else -> {
+                binding.loader.visibility = View.GONE
+                viewIdsToHide.forEach { it.visibility = View.VISIBLE }
             }
         }
     }

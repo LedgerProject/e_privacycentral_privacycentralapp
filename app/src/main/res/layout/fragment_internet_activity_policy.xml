@@ -24,9 +24,7 @@
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:orientation="vertical"
-            android:paddingLeft="32dp"
-            android:paddingRight="32dp"
-            tools:context=".main.MainActivity"
+            android:padding="16dp"
             >
 
             <TextView
@@ -34,33 +32,8 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:paddingTop="16dp"
-                android:text="@string/internet_activity_privacy_info"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                />
-
-            <TextView
-                android:fontFamily="sans-serif-medium"
-                android:gravity="center_vertical"
-                android:id="@+id/learn_more_internet_activity_privacy_info"
-                android:layout_height="48dp"
-                android:layout_width="wrap_content"
-                android:text="@string/learn_more"
-                android:textColor="#007fff"
-                android:textSize="14sp"
-                />
-
-            <TextView
-                android:fontFamily="sans-serif-medium"
-                android:id="@+id/my_internet_activity_header"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:paddingBottom="8dp"
-                android:paddingTop="16dp"
-                android:text="@string/dashboard_internet_activity_privacy_title"
-                android:textColor="@color/black"
-                android:textSize="14sp"
+                android:text="@string/ipscrambling_info"
+                android:lineSpacingExtra="5sp"
                 />
 
             <RadioGroup
@@ -69,114 +42,82 @@
                 android:layout_width="match_parent"
                 android:orientation="vertical"
                 >
-
-                <foundation.e.privacycentralapp.common.RightRadioButton
+                <include layout="@layout/ipscrambling_item_selectmode"
+                android:id="@+id/radio_use_hidden_ip"
+                android:layout_width="match_parent"
+                android:layout_height="88dp"
+                app:title="@{@string/ipscrambling_hide_ip_label}"
+                app:subtitle="@{@string/ipscrambling_hide_ip_subtitle}"
+                />
+                <include layout="@layout/ipscrambling_item_selectmode"
                     android:id="@+id/radio_use_real_ip"
-                    android:layout_height="wrap_content"
                     android:layout_width="match_parent"
-                    android:text="@string/use_real_ip"
-                    android:textSize="16sp"
-                    />
-
-                <TextView
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:text="@string/i_can_be_tracked"
-                    android:textSize="14sp"
-                    />
-
-                <foundation.e.privacycentralapp.common.RightRadioButton
-                    android:id="@+id/radio_use_hidden_ip"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:text="@string/hidden_ip"
-                    android:textSize="16sp"
-                    />
-
-                <TextView
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:text="@string/i_am_anonymous"
-                    android:textSize="14sp"
+                    android:layout_height="88dp"
+                    app:title="@{@string/ipscrambling_real_ip_label}"
+                    app:subtitle="@{@string/ipscrambling_real_ip_subtitle}"
                     />
             </RadioGroup>
-            <TextView android:id="@+id/ipscrambling_tor_status"
+
+            <TextView  android:id="@+id/tor_disclaimer"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:paddingTop="24dp"
-                android:text="@string/ipscrambling_is_starting"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:visibility="gone"
+                android:padding="4dp"
+                android:textSize="12sp"
+                android:textColor="@color/black_text_2"
+                android:text="@string/ipscrambling_tor_disclaimer"
+
                 />
 
             <ProgressBar
-                android:id="@+id/ipscrambling_loading"
+                android:id="@+id/loader"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_margin="24dp"
                 android:layout_gravity="center"
+                android:visibility="gone"
                 />
-
-            <LinearLayout
-                android:id="@+id/ipscrambling_location"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="32dp"
-                >
-                <TextView
-                    android:id="@+id/ipscrambling_location_label"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content" android:text="@string/ipscrambling_location_label"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    />
-                <Spinner android:id="@+id/ipscrambling_select_location"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    />
-            </LinearLayout>
 
             <TextView
-                android:id="@+id/ipscrambling_activated"
+                android:id="@+id/ipscrambling_location_label"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:paddingTop="32dp"
-                android:text="@string/ipscrambling_all_apps_scrambled"
-                android:textColor="@color/black"
-                android:paddingBottom="8dp"
-                android:textSize="16sp"
-                android:visibility="gone"
+                android:layout_marginTop="16dp"
+                android:text="@string/ipscrambling_location_label"
+                android:textColor="@color/black_text"
+                android:textFontWeight="500"
+                android:textSize="14sp"
                 />
-        </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view_scrambled"
+            <FrameLayout
+                android:id="@+id/select_location_container"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                />
+                android:layout_height="54dp"
+                android:background="@drawable/outlined_background"
+                android:layout_marginTop="16dp"
+                android:padding="1dp"
+                >
+                <Spinner android:id="@+id/ipscrambling_select_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    />
+            </FrameLayout>
             <TextView
                 android:id="@+id/ipscrambling_select_apps"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:paddingStart="32dp"
-                android:paddingEnd="32dp"
-                android:paddingTop="32dp"
-                android:paddingBottom="8dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="16dp"
                 android:text="@string/ipscrambling_select_app"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:visibility="gone"
+                android:textColor="@color/black_text"
+                android:textFontWeight="500"
+                android:textSize="14sp"
                 />
+        </LinearLayout>
+
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view_to_select"
+                android:id="@+id/apps"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="gone"
                 />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
