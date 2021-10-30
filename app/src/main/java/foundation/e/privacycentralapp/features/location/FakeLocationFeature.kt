@@ -45,7 +45,9 @@ class FakeLocationFeature(
     { message -> Log.d("FakeLocationFeature", message) },
     singleEventProducer
 ) {
-    data class State(val location: Location)
+    data class State(
+        val location: Location
+    )
 
     sealed class SingleEvent {
         object RandomLocationSelectedEvent : SingleEvent()

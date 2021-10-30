@@ -65,7 +65,6 @@ class IpScramblingStateUseCase(
     init {
         coroutineScope.launch {
             localStateRepository.quickPrivacyEnabledFlow.collect {
-                Log.d("testQPFlow", "QuickPrivacy enabled: $it")
                 applySettings(it, localStateRepository.isIpScramblingEnabled)
             }
         }
