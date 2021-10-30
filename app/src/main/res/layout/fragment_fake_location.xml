@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<layout>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
@@ -18,7 +19,7 @@
 
         <LinearLayout
             android:layout_height="match_parent"
-            android:layout_marginBottom="32dp"
+            android:padding="16dp"
             android:layout_width="match_parent"
             android:orientation="vertical"
             tools:context=".main.MainActivity"
@@ -29,25 +30,8 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:paddingLeft="32dp"
-                android:paddingRight="32dp"
-                android:paddingTop="16dp"
-                android:text="@string/fake_location_info"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                />
-
-            <TextView
-                android:fontFamily="sans-serif-medium"
-                android:gravity="center_vertical"
-                android:id="@+id/learn_more_fake_location"
-                android:layout_height="48dp"
-                android:layout_width="wrap_content"
-                android:paddingLeft="32dp"
-                android:paddingRight="32dp"
-                android:text="@string/learn_more"
-                android:textColor="#007fff"
-                android:textSize="14sp"
+                android:text="@string/location_info"
+                android:lineSpacingExtra="5sp"
                 />
 
             <RadioGroup
@@ -55,56 +39,56 @@
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:orientation="vertical"
-                android:paddingLeft="32dp"
-                android:paddingRight="32dp"
+                android:layout_marginTop="16dp"
                 >
 
                 <foundation.e.privacycentralapp.common.RightRadioButton
                     android:id="@+id/radio_use_real_location"
-                    android:layout_height="wrap_content"
+                    android:layout_height="52dp"
                     android:layout_width="match_parent"
-                    android:text="@string/use_real_location"
-                    android:textSize="16sp"
+                    android:text="@string/location_use_real_location"
+                    android:textSize="14sp"
                     />
 
                 <foundation.e.privacycentralapp.common.RightRadioButton
                     android:id="@+id/radio_use_random_location"
-                    android:layout_height="wrap_content"
+                    android:layout_height="52dp"
                     android:layout_width="match_parent"
-                    android:text="@string/use_random_location"
-                    android:textSize="16sp"
+                    android:text="@string/location_use_random_location"
+                    android:textSize="14sp"
                     />
 
                 <foundation.e.privacycentralapp.common.RightRadioButton
                     android:id="@+id/radio_use_specific_location"
-                    android:layout_height="wrap_content"
+                    android:layout_height="52dp"
                     android:layout_width="match_parent"
-                    android:text="@string/use_specific_location"
-                    android:textSize="16sp"
+                    android:text="@string/location_use_specific_location"
+                    android:textSize="14sp"
                     />
             </RadioGroup>
 
 
             <foundation.e.privacycentralapp.features.location.FakeLocationMapView
                 android:id="@+id/mapView"
-                android:layout_height="240dp"
-                android:layout_marginBottom="16dp"
-                android:layout_marginTop="32dp"
+                android:layout_height="220dp"
+                android:layout_marginTop="16dp"
                 android:layout_width="match_parent"
                 mapbox:mapbox_cameraZoom="8"
                 />
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:hint="@string/longitude"
-                android:id="@+id/edittext_longitude"
+                android:hint="@string/location_hint_longitude"
+                android:id="@+id/textlayout_longitude"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:paddingLeft="32dp"
-                android:paddingRight="32dp"
+                android:layout_marginTop="16dp"
+                app:endIconDrawable="@drawable/ic_valid"
+                app:endIconMode="custom"
+                app:endIconTint="@color/green_valid"
                 >
-
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edittext_longitude"
                     android:inputType="numberDecimal"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
@@ -113,16 +97,17 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:hint="@string/latitude"
-                android:id="@+id/edittext_latitude"
+                android:id="@+id/textlayout_latitude"
+                android:hint="@string/location_hint_latitude"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:layout_width="match_parent"
-                android:paddingLeft="32dp"
-                android:paddingRight="32dp"
+                android:layout_marginTop="16dp"
+                app:endIconDrawable="@drawable/ic_valid"
+                app:endIconMode="custom"
+                app:endIconTint="@color/green_valid"
                 >
-
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edittext_latitude"
                     android:inputType="numberDecimal"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
@@ -132,3 +117,4 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

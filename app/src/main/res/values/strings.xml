@@ -40,19 +40,23 @@
     <string name="ipscrambling_tor_disclaimer"><b>Note:</b> when active, this setting will slow down your Internet connectivity speed (uses Thor network).</string>
     <string name="ipscrambling_location_label">Force a country of origin:</string>
     <string name="ipscrambling_any_location">Any country</string>
-
     <string name="ipscrambling_select_app">Apply this setting to all selected apps:</string>
+
+    <!-- Location -->
+    <string name="location_title">Fake my location</string>
+    <string name="location_info">Choose if you want to use your real location when Quick Privacy is enabled.</string>
+    <string name="location_use_real_location">Use real location</string>
+    <string name="location_use_random_location">Use random plausible location</string>
+    <string name="location_use_specific_location">Use specific location</string>
+    <string name="location_hint_longitude">Longitude</string>
+    <string name="location_hint_latitude">Latitude</string>
+    <string name="location_input_error">Invalid coordinates</string>
 
     <!-- -->
     <string name="quick_protection_info">Quick protection enables these settings when turned on</string>
     <string name="quick_protection_settings_list"> - All trackers are turned off.\n- Your geolocation will be faked.\n- Your real IP address will be hidden.</string>
     <string name="learn_more">Learn more</string>
-    <string name="fake_location_info">Choose if you want to fake your real location when app asks for your geolocation tracking.</string>
-    <string name="use_real_location">Use real location</string>
-    <string name="use_random_location">Use random plausible location</string>
-    <string name="use_specific_location">Use specific location</string>
-    <string name="longitude">Longitude</string>
-    <string name="latitude">Latitude</string>
+
     <string name="add_location">Add location</string>
     <string name="i_am_exposing">I am exposing my real IP address</string>
     <string name="ipscrambling_all_apps_scrambled">All apps use hidden IP</string>

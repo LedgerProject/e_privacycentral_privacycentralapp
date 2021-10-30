@@ -26,16 +26,19 @@ import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.Toast
 import androidx.annotation.NonNull
+import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.android.material.textfield.TextInputLayout.END_ICON_CUSTOM
+import com.google.android.material.textfield.TextInputLayout.END_ICON_NONE
 import com.mapbox.android.core.location.LocationEngineCallback
 import com.mapbox.android.core.location.LocationEngineRequest
 import com.mapbox.android.core.location.LocationEngineResult
@@ -56,6 +59,7 @@ import foundation.e.privacycentralapp.DependencyContainer
 import foundation.e.privacycentralapp.PrivacyCentralApplication
 import foundation.e.privacycentralapp.R
 import foundation.e.privacycentralapp.common.NavToolbarFragment
+import foundation.e.privacycentralapp.databinding.FragmentFakeLocationBinding
 import foundation.e.privacycentralapp.domain.entities.LocationMode
 import foundation.e.privacycentralapp.extensions.viewModelProviderFactoryOf
 import kotlinx.coroutines.Job
@@ -81,13 +85,9 @@ class FakeLocationFragment :
         viewModelProviderFactoryOf { dependencyContainer.fakeLocationViewModelFactory.create() }
     }
 
-    private lateinit var mapView: FakeLocationMapView
+    private lateinit var binding: FragmentFakeLocationBinding
+
     private lateinit var mapboxMap: MapboxMap
-    private lateinit var useRealLocationRadioBtn: RadioButton
-    private lateinit var useRandomLocationRadioBtn: RadioButton
-    private lateinit var useSpecificLocationRadioBtn: RadioButton
-    private lateinit var latEditText: EditText
-    private lateinit var longEditText: EditText
 
     private var hoveringMarker: ImageView? = null
 
@@ -178,7 +178,7 @@ class FakeLocationFragment :
         Mapbox.getInstance(requireContext(), getString(R.string.mapbox_key))
     }
 
-    override fun getTitle(): String = getString(R.string.dashboard_location_title)
+    override fun getTitle(): String = getString(R.string.location_title)
 
     private fun displayToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT)
@@ -187,101 +187,112 @@ class FakeLocationFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding = FragmentFakeLocationBinding.bind(view)
 
-        setupViews(view)
-        mapView = view.findViewById<FakeLocationMapView>(R.id.mapView)
-            .setup(savedInstanceState) { mapboxMap ->
-                this.mapboxMap = mapboxMap
-                mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
-                    enableLocationPlugin(style)
-                    hoveringMarker = ImageView(requireContext())
-                        .apply {
-                            setImageResource(R.drawable.mapbox_marker_icon_default)
-                            val params = FrameLayout.LayoutParams(
-                                ViewGroup.LayoutParams.WRAP_CONTENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER
-                            )
-                            layoutParams = params
-                        }
-                    mapView.addView(hoveringMarker)
-                    hoveringMarker?.visibility = View.GONE // Keep hovering marker hidden by default
-
-                    mapboxMap.addOnCameraMoveStartedListener {
-                        // Show marker when user starts to move across the map.
-                        hoveringMarker?.visibility = if (mapView.isEnabled) {
-                            View.VISIBLE
-                        } else {
-                            View.GONE
-                        }
-                        isCameraMoved = true
+        binding.mapView.setup(savedInstanceState) { mapboxMap ->
+            this.mapboxMap = mapboxMap
+            mapboxMap.getUiSettings().isRotateGesturesEnabled = false
+            mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
+                enableLocationPlugin(style)
+                hoveringMarker = ImageView(requireContext())
+                    .apply {
+                        setImageResource(R.drawable.mapbox_marker_icon_default)
+                        val params = FrameLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER
+                        )
+                        layoutParams = params
                     }
+                binding.mapView.addView(hoveringMarker)
+                hoveringMarker?.visibility = View.GONE // Keep hovering marker hidden by default
 
-                    mapboxMap.addOnCameraMoveListener {
-                        if (mapView.isEnabled) {
-                            viewModel.submitAction(
-                                FakeLocationFeature.Action.UpdateLocationAction(
-                                    mapboxMap.cameraPosition.target
-                                )
-                            )
-                        }
+                mapboxMap.addOnCameraMoveStartedListener {
+                    // Show marker when user starts to move across the map.
+                    hoveringMarker?.visibility = if (binding.mapView.isEnabled) {
+                        View.VISIBLE
+                    } else {
+                        View.GONE
                     }
-                    // Bind click listeners once map is ready.
-                    bindClickListeners()
+                    isCameraMoved = true
                 }
+
+                mapboxMap.addOnCameraMoveListener {
+                    if (binding.mapView.isEnabled) {
+                        viewModel.submitAction(
+                            FakeLocationFeature.Action.UpdateLocationAction(
+                                mapboxMap.cameraPosition.target
+                            )
+                        )
+                    }
+                }
+                // Bind click listeners once map is ready.
+                bindClickListeners()
             }
+        }
     }
 
-    private fun setupViews(view: View) {
-        useRealLocationRadioBtn = view.findViewById(R.id.radio_use_real_location)
-        useRandomLocationRadioBtn = view.findViewById(R.id.radio_use_random_location)
-        useSpecificLocationRadioBtn = view.findViewById(R.id.radio_use_specific_location)
-        latEditText = view.findViewById<TextInputLayout>(R.id.edittext_latitude).editText!!
-        longEditText = view.findViewById<TextInputLayout>(R.id.edittext_longitude).editText!!
+    private fun getCoordinatesAfterTextChanged(inputLayout: TextInputLayout, editText: TextInputEditText, isLat: Boolean) = { editable: Editable? ->
+        inputJob?.cancel()
+        if (editable != null && editable.length > 0 && editText.isEnabled) {
+            inputJob = lifecycleScope.launch {
+                delay(DEBOUNCE_PERIOD)
+                ensureActive()
+                try {
+                    val value = editable.toString().toDouble()
+                    val maxValue = if (isLat) 90.0 else 180.0
+
+                    if (value > maxValue || value < -maxValue) {
+                        throw NumberFormatException("value $value is out of bounds")
+                    }
+                    inputLayout.error = null
+
+                    inputLayout.setEndIconDrawable(R.drawable.ic_valid)
+                    inputLayout.endIconMode = END_ICON_CUSTOM
+
+                    // Here, value is valid, try to send the values
+                    try {
+                        val lat = binding.edittextLatitude.text.toString().toDouble()
+                        val lon = binding.edittextLongitude.text.toString().toDouble()
+                        if (lat <= 90.0 && lat >= -90.0 && lon <= 180.0 && lon >= -180.0) {
+                            viewModel.submitAction(
+                                FakeLocationFeature.Action.SetCustomFakeLocationAction(lat, lon)
+                            )
+                        }
+                    } catch (e: NumberFormatException) {}
+                } catch (e: NumberFormatException) {
+                    inputLayout.endIconMode = END_ICON_NONE
+                    inputLayout.error = getString(R.string.location_input_error)
+                }
+            }
+        }
     }
 
     private fun bindClickListeners() {
-        useRealLocationRadioBtn
-            .setOnClickListener { radioButton ->
-                toggleLocationType(radioButton)
-            }
-        useRandomLocationRadioBtn
-            .setOnClickListener { radioButton ->
-                toggleLocationType(radioButton)
-            }
-        useSpecificLocationRadioBtn
-            .setOnClickListener { radioButton ->
-                toggleLocationType(radioButton)
-            }
-
-        arrayOf(latEditText, longEditText).forEach { editText ->
-            editText.addTextChangedListener(
-                afterTextChanged = {
-                    inputJob?.cancel()
-                    if (it?.length ?: 0 > 0 && editText.isEnabled) {
-                        inputJob = lifecycleScope.launch {
-                            delay(DEBOUNCE_PERIOD)
-                            ensureActive()
-                            try {
-                                val lat = latEditText.text.toString().toDouble()
-                                val long = longEditText.text.toString().toDouble()
-                                viewModel.submitAction(
-                                    FakeLocationFeature.Action.SetCustomFakeLocationAction(
-                                        lat,
-                                        long
-                                    )
-                                )
-                            } catch (e: NumberFormatException) {
-                                Toast.makeText(
-                                    requireContext(),
-                                    getString(R.string.please_enter_valid_lat_long),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-                    }
-                }
-            )
+        binding.radioUseRealLocation.setOnClickListener { radioButton ->
+            toggleLocationType(radioButton)
         }
+        binding.radioUseRandomLocation.setOnClickListener { radioButton ->
+            toggleLocationType(radioButton)
+        }
+        binding.radioUseSpecificLocation.setOnClickListener { radioButton ->
+            toggleLocationType(radioButton)
+        }
+
+        binding.edittextLatitude.addTextChangedListener(
+            afterTextChanged = getCoordinatesAfterTextChanged(
+                binding.textlayoutLatitude,
+                binding.edittextLatitude,
+                true
+            )
+        )
+
+        binding.edittextLongitude.addTextChangedListener(
+            afterTextChanged = getCoordinatesAfterTextChanged(
+                binding.textlayoutLongitude,
+                binding.edittextLongitude,
+                false
+            )
+        )
     }
 
     private fun toggleLocationType(radioButton: View?) {
@@ -313,17 +324,18 @@ class FakeLocationFragment :
     }
 
     override fun render(state: FakeLocationFeature.State) {
-        latEditText.text =
-            Editable.Factory.getInstance().newEditable(state.location.latitude.toString())
-        longEditText.text =
-            Editable.Factory.getInstance().newEditable(state.location.longitude.toString())
-        useRandomLocationRadioBtn.isChecked = (state.location.mode == LocationMode.RANDOM_LOCATION)
-        useSpecificLocationRadioBtn.isChecked =
+        binding.radioUseRandomLocation.isChecked = (state.location.mode == LocationMode.RANDOM_LOCATION)
+        binding.radioUseSpecificLocation.isChecked =
             (state.location.mode == LocationMode.CUSTOM_LOCATION)
-        useRealLocationRadioBtn.isChecked = (state.location.mode == LocationMode.REAL_LOCATION)
-        latEditText.isEnabled = (state.location.mode == LocationMode.CUSTOM_LOCATION)
-        longEditText.isEnabled = (state.location.mode == LocationMode.CUSTOM_LOCATION)
-        mapView.isEnabled = (state.location.mode == LocationMode.CUSTOM_LOCATION)
+        binding.radioUseRealLocation.isChecked = (state.location.mode == LocationMode.REAL_LOCATION)
+
+        binding.mapView.isEnabled = (state.location.mode == LocationMode.CUSTOM_LOCATION)
+
+        binding.textlayoutLatitude.isVisible = (state.location.mode == LocationMode.CUSTOM_LOCATION)
+        binding.textlayoutLongitude.isVisible = (state.location.mode == LocationMode.CUSTOM_LOCATION)
+
+        binding.edittextLatitude.setText(state.location.latitude.toString())
+        binding.edittextLongitude.setText(state.location.longitude.toString())
     }
 
     override fun actions(): Flow<FakeLocationFeature.Action> = viewModel.actions
@@ -359,32 +371,32 @@ class FakeLocationFragment :
 
     override fun onStart() {
         super.onStart()
-        mapView.onStart()
+        binding.mapView.onStart()
     }
 
     override fun onResume() {
         super.onResume()
-        mapView.onResume()
+        binding.mapView.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        mapView.onPause()
+        binding.mapView.onPause()
     }
 
     override fun onStop() {
         super.onStop()
-        mapView.onStop()
+        binding.mapView.onStop()
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        mapView.onLowMemory()
+        binding.mapView.onLowMemory()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mapView.onDestroy()
+        binding.mapView.onDestroy()
     }
 
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
