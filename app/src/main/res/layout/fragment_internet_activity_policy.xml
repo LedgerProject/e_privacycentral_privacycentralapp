@@ -91,7 +91,7 @@
                 android:id="@+id/select_location_container"
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
-                android:background="@drawable/outlined_background"
+                android:background="@drawable/bg_outlined"
                 android:layout_marginTop="16dp"
                 android:padding="1dp"
                 >

@@ -30,6 +30,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
 import foundation.e.flowmvi.MVIView
 import foundation.e.privacycentralapp.DependencyContainer
 import foundation.e.privacycentralapp.PrivacyCentralApplication
@@ -39,9 +42,7 @@ import foundation.e.privacycentralapp.databinding.FragmentDashboardBinding
 import foundation.e.privacycentralapp.domain.entities.InternetPrivacyMode
 import foundation.e.privacycentralapp.domain.entities.LocationMode
 import foundation.e.privacycentralapp.extensions.viewModelProviderFactoryOf
-import foundation.e.privacycentralapp.features.dashboard.DashboardFeature.State.DisabledState
-import foundation.e.privacycentralapp.features.dashboard.DashboardFeature.State.EnabledState
-import foundation.e.privacycentralapp.features.dashboard.DashboardFeature.State.LoadingState
+import foundation.e.privacycentralapp.features.dashboard.DashboardFeature.State
 import foundation.e.privacycentralapp.features.internetprivacy.InternetPrivacyFragment
 import foundation.e.privacycentralapp.features.location.FakeLocationFragment
 import foundation.e.privacycentralapp.features.trackers.TrackersFragment
@@ -73,13 +74,6 @@ class DashboardFragment :
                     is DashboardFeature.SingleEvent.NavigateToLocationSingleEvent -> {
                         requireActivity().supportFragmentManager.commit {
                             add<FakeLocationFragment>(R.id.container)
-                            setReorderingAllowed(true)
-                            addToBackStack("dashboard")
-                        }
-                    }
-                    is DashboardFeature.SingleEvent.NavigateToQuickProtectionSingleEvent -> {
-                        requireActivity().supportFragmentManager.commit {
-                            add<QuickProtectionFragment>(R.id.container)
                             setReorderingAllowed(true)
                             addToBackStack("dashboard")
                         }
@@ -116,6 +110,17 @@ class DashboardFragment :
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentDashboardBinding.bind(view)
 
+        binding.graph.apply {
+            description = null
+            setTouchEnabled(false)
+            setDrawGridBackground(false)
+            setDrawBorders(false)
+            axisLeft.isEnabled = false
+            axisRight.isEnabled = false
+            xAxis.isEnabled = false
+            legend.isEnabled = false
+        }
+
         binding.togglePrivacyCentral.setOnClickListener {
             viewModel.submitAction(DashboardFeature.Action.TogglePrivacyAction)
         }
@@ -149,27 +154,26 @@ class DashboardFragment :
         textView.append(clickToMore)
     }
 
-    override fun render(state: DashboardFeature.State) {
-        val enabled = state is EnabledState
+    override fun render(state: State) {
+
         binding.stateLabel.text = getString(
-            if (enabled) R.string.dashboard_state_label_on
+            if (state.isQuickPrivacyEnabled) R.string.dashboard_state_label_on
             else R.string.dashboard_state_label_off
         )
 
         binding.togglePrivacyCentral.setImageResource(
-            if (enabled) R.drawable.ic_quick_privacy_on
+            if (state.isQuickPrivacyEnabled) R.drawable.ic_quick_privacy_on
             else R.drawable.ic_quick_privacy_off
         )
         binding.stateLabel.setTextColor(
             getColor(
                 requireContext(),
-                if (enabled) R.color.green_on
+                if (state.isQuickPrivacyEnabled) R.color.green_on
                 else R.color.orange_off
             )
         )
 
-        val trackersEnabled = state is EnabledState &&
-            state.isAllTrackersBlocked
+        val trackersEnabled = state.isQuickPrivacyEnabled && state.isAllTrackersBlocked
         binding.stateTrackers.text = getString(
             if (trackersEnabled) R.string.dashboard_state_trackers_on
             else R.string.dashboard_state_trackers_off
@@ -182,7 +186,7 @@ class DashboardFragment :
             )
         )
 
-        val geolocEnabled = state is EnabledState && state.locationMode != LocationMode.REAL_LOCATION
+        val geolocEnabled = state.isQuickPrivacyEnabled && state.locationMode != LocationMode.REAL_LOCATION
         binding.stateGeolocation.text = getString(
             if (geolocEnabled) R.string.dashboard_state_geolocation_on
             else R.string.dashboard_state_geolocation_off
@@ -195,8 +199,8 @@ class DashboardFragment :
             )
         )
 
-        val ipAddressEnabled = state is EnabledState && state.internetPrivacyMode != InternetPrivacyMode.REAL_IP
-        val isLoading = state is EnabledState && state.internetPrivacyMode in listOf(
+        val ipAddressEnabled = state.isQuickPrivacyEnabled && state.internetPrivacyMode != InternetPrivacyMode.REAL_IP
+        val isLoading = state.isQuickPrivacyEnabled && state.internetPrivacyMode in listOf(
             InternetPrivacyMode.HIDE_IP_LOADING,
             InternetPrivacyMode.REAL_IP_LOADING
         )
@@ -216,6 +220,23 @@ class DashboardFragment :
             )
         )
 
+        state.dayStatistics?.let {
+            val trackersDataSet = BarDataSet(
+                it.mapIndexed { index, value -> BarEntry(index.toFloat(), value.toFloat()) },
+                getString(R.string.dashboard_graph_trackers_legend)
+            ).apply {
+                color = getColor(requireContext(), R.color.purple_chart)
+                setDrawValues(false)
+            }
+
+            binding.graph.data = BarData(trackersDataSet)
+            binding.graph.invalidate()
+        }
+
+        state.trackersCount?.let {
+            binding.graphLegend.text = getString(R.string.dashboard_graph_trackers_legend, it)
+        }
+
         // binding.graphTotal.text = if (state == DashboardFeature.State.LoadingState) {
         //     ""
         // } else {
@@ -225,16 +246,12 @@ class DashboardFragment :
         //     getString(R.string.dashboard_graph_total, value)
         // }
 
-        binding.amITracked.subtitle.text = if (state == LoadingState) ""
-        else {
-            val value = if (state is EnabledState) state.activeTrackersCount
-            else if (state is DisabledState) state.activeTrackersCount
-            else 0 // dummy
-            getString(R.string.dashboard_am_i_tracked_subtitle, 77, value)
+        state.activeTrackersCount?.let {
+            binding.amITracked.subtitle.text = getString(R.string.dashboard_am_i_tracked_subtitle, 77, it)
         }
 
         binding.myLocation.subtitle.text = getString(
-            if (state is EnabledState &&
+            if (state.isQuickPrivacyEnabled &&
                 state.locationMode != LocationMode.REAL_LOCATION
             )
                 R.string.dashboard_location_subtitle_on
@@ -242,7 +259,7 @@ class DashboardFragment :
         )
 
         binding.internetActivityPrivacy.subtitle.text = getString(
-            if (state is EnabledState &&
+            if (state.isQuickPrivacyEnabled &&
                 state.internetPrivacyMode != InternetPrivacyMode.REAL_IP
             )
                 R.string.dashboard_internet_activity_privacy_subtitle_on

@@ -17,7 +17,7 @@
     <string name="dashboard_state_ipaddress_on">Hidden</string>
     <string name="dashboard_graph_label">Personal data leakage</string>
     <string name="dashboard_graph_period">Last 24 hours</string>
-    <string name="dashboard_graph_total">%d hits</string>
+    <string name="dashboard_graph_trackers_legend">%d Trackers</string>
 
     <string name="dashboard_am_i_tracked_title">Am I tracked?</string>
     <string name="dashboard_am_i_tracked_subtitle">%1$d app trackers, %2$d active trackers</string>

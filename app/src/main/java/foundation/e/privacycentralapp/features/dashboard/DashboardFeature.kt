@@ -26,7 +26,9 @@ import foundation.e.privacycentralapp.domain.entities.InternetPrivacyMode
 import foundation.e.privacycentralapp.domain.entities.LocationMode
 import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.IpScramblingStateUseCase
+import foundation.e.privacycentralapp.domain.usecases.TrackersStatisticsUseCase
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -45,24 +47,17 @@ class DashboardFeature(
     initialState, actor, reducer, coroutineScope, { message -> Log.d("DashboardFeature", message) },
     singleEventProducer
 ) {
-    sealed class State() {
-        object LoadingState : State()
-        data class DisabledState(
-            val totalGraph: Int = 230,
-            // val graphData
-            val trackersCount: Int = 77,
-            val activeTrackersCount: Int = 22
-        ) : State()
-        data class EnabledState(
-            val isAllTrackersBlocked: Boolean = false,
-            val locationMode: LocationMode = LocationMode.CUSTOM_LOCATION,
-            val internetPrivacyMode: InternetPrivacyMode,
-            val totalGraph: Int = 150,
-            // val graphData
-            val trackersCount: Int = 80,
-            val activeTrackersCount: Int = 10
-        ) : State()
-    }
+    data class State(
+        val isQuickPrivacyEnabled: Boolean = false,
+        val isAllTrackersBlocked: Boolean = false,
+        val locationMode: LocationMode = LocationMode.REAL_LOCATION,
+        val internetPrivacyMode: InternetPrivacyMode = InternetPrivacyMode.REAL_IP,
+        val totalGraph: Int? = null,
+        // val graphData
+        val trackersCount: Int? = null,
+        val activeTrackersCount: Int? = null,
+        val dayStatistics: List<Int>? = null
+    )
 
     sealed class SingleEvent {
         object NavigateToQuickProtectionSingleEvent : SingleEvent()
@@ -89,6 +84,7 @@ class DashboardFeature(
         object NoEffect : Effect()
         data class UpdateStateEffect(val isEnabled: Boolean) : Effect()
         data class IpScramblingModeUpdatedEffect(val mode: InternetPrivacyMode) : Effect()
+        data class TrackersStatisticsUpdatedEffect(val dayStatistics: List<Int>) : Effect()
 
         object OpenQuickPrivacyProtectionEffect : Effect()
         data class OpenDashboardEffect(
@@ -118,36 +114,17 @@ class DashboardFeature(
         fun create(
             coroutineScope: CoroutineScope,
             getPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
-            ipScramblingStateUseCase: IpScramblingStateUseCase
+            ipScramblingStateUseCase: IpScramblingStateUseCase,
+            trackersStatisticsUseCase: TrackersStatisticsUseCase
         ): DashboardFeature =
             DashboardFeature(
-                initialState = State.DisabledState(),
+                initialState = State(),
                 coroutineScope,
                 reducer = { state, effect ->
-                    if (state is State.LoadingState) state
-                    else when (effect) {
-                        is Effect.UpdateStateEffect -> when {
-                            effect.isEnabled && state is State.EnabledState
-                                || !effect.isEnabled && state is State.DisabledState -> state
-                            effect.isEnabled && state is State.DisabledState -> State.EnabledState(
-                                isAllTrackersBlocked = false,
-                                locationMode = LocationMode.REAL_LOCATION,
-                                internetPrivacyMode = InternetPrivacyMode.REAL_IP,
-                                totalGraph = state.totalGraph,
-                                // val graphData
-                                trackersCount = state.trackersCount,
-                                activeTrackersCount = state.activeTrackersCount
-                            )
-                            !effect.isEnabled && state is State.EnabledState -> State.DisabledState(
-                                totalGraph = state.totalGraph,
-                                // val graphData
-                                trackersCount = state.trackersCount,
-                                activeTrackersCount = state.activeTrackersCount
-                            )
-                            else -> state
-                        }
-                        is Effect.IpScramblingModeUpdatedEffect -> if (state is State.EnabledState) state.copy(internetPrivacyMode = effect.mode)
-                        else state
+                    when (effect) {
+                        is Effect.UpdateStateEffect -> state.copy(isQuickPrivacyEnabled = effect.isEnabled)
+                        is Effect.IpScramblingModeUpdatedEffect -> state.copy(internetPrivacyMode = effect.mode)
+                        is Effect.TrackersStatisticsUpdatedEffect -> state.copy(dayStatistics = effect.dayStatistics)
 
                         /*is Effect.OpenDashboardEffect -> State.DashboardState(
                             effect.trackersCount,
@@ -196,13 +173,11 @@ class DashboardFeature(
                         else -> state
                     }
                 },
-                actor = { state: State, action: Action ->
+                actor = { _: State, action: Action ->
                     Log.d("Feature", "action: $action")
                     when (action) {
                         Action.TogglePrivacyAction -> {
-                            if (state != State.LoadingState) {
-                                getPrivacyStateUseCase.toggle()
-                            }
+                            getPrivacyStateUseCase.toggle()
                             flowOf(Effect.NoEffect)
                         }
 
@@ -213,6 +188,9 @@ class DashboardFeature(
                             },
                             ipScramblingStateUseCase.internetPrivacyMode.map {
                                 Effect.IpScramblingModeUpdatedEffect(it)
+                            },
+                            flow {
+                                emit(Effect.TrackersStatisticsUpdatedEffect(trackersStatisticsUseCase.getPast24HoursTrackersCalls()))
                             }
                         )
                         /*
