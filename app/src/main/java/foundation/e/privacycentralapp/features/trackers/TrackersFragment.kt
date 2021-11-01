@@ -19,24 +19,39 @@ package foundation.e.privacycentralapp.features.trackers
 
 import android.os.Bundle
 import android.view.View
-import androidx.core.os.bundleOf
-import androidx.fragment.app.add
-import androidx.fragment.app.commit
+import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
 import foundation.e.flowmvi.MVIView
+import foundation.e.privacycentralapp.DependencyContainer
+import foundation.e.privacycentralapp.PrivacyCentralApplication
 import foundation.e.privacycentralapp.R
+import foundation.e.privacycentralapp.common.AppsAdapter
 import foundation.e.privacycentralapp.common.NavToolbarFragment
+import foundation.e.privacycentralapp.databinding.FragmentTrackersBinding
+import foundation.e.privacycentralapp.databinding.TrackersItemGraphBinding
+import foundation.e.privacycentralapp.extensions.viewModelProviderFactoryOf
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 
 class TrackersFragment :
     NavToolbarFragment(R.layout.fragment_trackers),
     MVIView<TrackersFeature.State, TrackersFeature.Action> {
 
-    private val viewModel: TrackersViewModel by viewModels()
-    private lateinit var trackersAdapter: TrackersAdapter
+    private val dependencyContainer: DependencyContainer by lazy {
+        (this.requireActivity().application as PrivacyCentralApplication).dependencyContainer
+    }
+
+    private val viewModel: TrackersViewModel by viewModels {
+        viewModelProviderFactoryOf { dependencyContainer.trackersViewModelFactory.create() }
+    }
+
+    private lateinit var binding: FragmentTrackersBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,32 +59,99 @@ class TrackersFragment :
             viewModel.trackersFeature.takeView(this, this@TrackersFragment)
         }
         lifecycleScope.launchWhenStarted {
-            viewModel.submitAction(TrackersFeature.Action.ObserveTrackers)
+            viewModel.trackersFeature.singleEvents.collect { event ->
+                when (event) {
+                    is TrackersFeature.SingleEvent.ErrorEvent -> {
+                        displayToast(event.error)
+                    }
+                    is TrackersFeature.SingleEvent.OpenAppDetailsEvent -> {
+                        displayToast(event.packageName)
+                    }
+                }
+            }
         }
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.submitAction(TrackersFeature.Action.InitAction)
+        }
+    }
+
+    private fun displayToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT)
+            .show()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        trackersAdapter = TrackersAdapter {
-            requireActivity().supportFragmentManager.commit {
-                val bundle = bundleOf("TRACKER" to it.name)
-                add<TrackerAppsFragment>(R.id.container, args = bundle)
-                setReorderingAllowed(true)
-                addToBackStack("trackers")
+
+        binding = FragmentTrackersBinding.bind(view)
+
+        listOf(binding.graphDay, binding.graphMonth, binding.graphYear).forEach {
+            it.graph.apply {
+                description = null
+                setTouchEnabled(false)
+                setDrawGridBackground(false)
+                setDrawBorders(false)
+                axisLeft.isEnabled = false
+                axisRight.isEnabled = false
+                xAxis.isEnabled = false
+                legend.isEnabled = false
             }
-            // viewModel.submitAction(TrackersFeature.Action.SetSelectedTracker(it))
         }
-        view.findViewById<RecyclerView>(R.id.recylcer_view_trackers)?.apply {
+
+        binding.apps.apply {
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
-            adapter = trackersAdapter
+            adapter = AppsAdapter(R.layout.trackers_item_app) { packageName ->
+                viewModel.submitAction(
+                    TrackersFeature.Action.ClickAppAction(packageName)
+                )
+            }
+        }
+
+        //
+        // requireActivity().supportFragmentManager.commit {
+        //     val bundle = bundleOf("TRACKER" to it.name)
+        //     add<TrackerAppsFragment>(R.id.container, args = bundle)
+        //     setReorderingAllowed(true)
+        //     addToBackStack("trackers")
+        // }
+    }
+
+    override fun getTitle() = getString(R.string.trackers_title)
+
+    override fun render(state: TrackersFeature.State) {
+        if (state.dayStatistics != null && state.dayTrackersCount != null) {
+            renderGraph(state.dayTrackersCount, state.dayStatistics, binding.graphDay)
+        }
+
+        if (state.monthStatistics != null && state.monthTrackersCount != null) {
+            renderGraph(state.monthTrackersCount, state.monthStatistics, binding.graphMonth)
+        }
+
+        if (state.yearStatistics != null && state.yearTrackersCount != null) {
+            renderGraph(state.yearTrackersCount, state.yearStatistics, binding.graphYear)
+        }
+
+        state.apps?.let {
+            binding.apps.post {
+                (binding.apps.adapter as AppsAdapter?)?.dataSet = it
+            }
         }
     }
 
-    override fun getTitle() = getString(R.string.trackers)
+    private fun renderGraph(trackersCount: Int, data: List<Int>, graphBinding: TrackersItemGraphBinding) {
+        val trackersDataSet = BarDataSet(
+            data.mapIndexed { index, value -> BarEntry(index.toFloat(), value.toFloat()) },
+            getString(R.string.trackers_count_label)
+        ).apply {
+            color = ContextCompat.getColor(requireContext(), R.color.purple_chart)
+            setDrawValues(false)
+        }
 
-    override fun render(state: TrackersFeature.State) {
-        trackersAdapter.setData(state.trackers)
+        graphBinding.graph.data = BarData(trackersDataSet)
+        graphBinding.graph.invalidate()
+        graphBinding.trackersCountLabel.text = getString(R.string.trackers_count_label, trackersCount)
     }
 
     override fun actions(): Flow<TrackersFeature.Action> = viewModel.actions

@@ -26,4 +26,20 @@ class TrackersStatisticsUseCase(
     fun getPast24HoursTrackersCalls(): List<Int> {
         return trackTrackersPrivacyModule.getPast24HoursTrackersCalls()
     }
+
+    fun getDayMonthYearStatistics(): Triple<List<Int>, List<Int>, List<Int>> {
+        return Triple(
+            trackTrackersPrivacyModule.getPast24HoursTrackersCalls(),
+            trackTrackersPrivacyModule.getPastMonthTrackersCalls(),
+            trackTrackersPrivacyModule.getPastYearTrackersCalls()
+        )
+    }
+
+    fun getDayMonthYearCounts(): Triple<Int, Int, Int> {
+        return Triple(
+            trackTrackersPrivacyModule.getPast24HoursTrackersCount(),
+            trackTrackersPrivacyModule.getPastMonthTrackersCount(),
+            trackTrackersPrivacyModule.getPastYearTrackersCount()
+        )
+    }
 }

@@ -18,13 +18,8 @@
 package foundation.e.privacycentralapp.features.dashboard
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
 import android.view.View
-import android.widget.TextView
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.add
@@ -141,17 +136,6 @@ class DashboardFragment :
 
     override fun getTitle(): String {
         return getString(R.string.dashboard_title)
-    }
-
-    private fun addClickToMore(textView: TextView) {
-        val clickToMore = SpannableString(getString(R.string.click_to_learn_more))
-        clickToMore.setSpan(
-            ForegroundColorSpan(Color.parseColor("#007fff")),
-            0,
-            clickToMore.length,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        textView.append(clickToMore)
     }
 
     override fun render(state: State) {

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2021 E FOUNDATION
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+    <data>
+        <variable name="period" type="String" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <TextView
+            android:id="@+id/trackers_count_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="14 trackers"
+            />
+
+        <TextView
+            android:id="@+id/graph_period_label"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textColor="@color/grey_text_2"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginRight="16dp"
+            android:text="@{period}"
+            tools:text="24 hours"
+            />
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/graph"
+            android:layout_height="72dp"
+            android:layout_width="match_parent"
+            app:layout_constraintTop_toBottomOf="@+id/graph_period_label"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

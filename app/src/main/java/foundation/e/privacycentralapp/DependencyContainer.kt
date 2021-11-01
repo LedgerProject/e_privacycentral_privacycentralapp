@@ -30,6 +30,7 @@ import foundation.e.privacycentralapp.features.dashboard.DashBoardViewModelFacto
 import foundation.e.privacycentralapp.features.internetprivacy.InternetPrivacyViewModelFactory
 import foundation.e.privacycentralapp.features.location.FakeLocationViewModelFactory
 import foundation.e.privacycentralapp.features.location.LocationApiDelegate
+import foundation.e.privacycentralapp.features.trackers.TrackersViewModelFactory
 import foundation.e.privacymodules.ipscrambler.IpScramblerModule
 import foundation.e.privacymodules.ipscramblermodule.IIpScramblerModule
 import foundation.e.privacymodules.location.FakeLocation
@@ -83,6 +84,7 @@ class DependencyContainer constructor(val app: Application) {
         TrackersStatisticsUseCase(trackTrackersPrivacyModule)
     }
 
+    // ViewModelFactories
     val dashBoardViewModelFactory by lazy {
         DashBoardViewModelFactory(getQuickPrivacyStateUseCase, ipScramblingStateUseCase, trackersStatisticsUseCase)
     }
@@ -95,5 +97,9 @@ class DependencyContainer constructor(val app: Application) {
 
     val internetPrivacyViewModelFactory by lazy {
         InternetPrivacyViewModelFactory(ipScramblerModule, getQuickPrivacyStateUseCase, ipScramblingStateUseCase, appListUseCase)
+    }
+
+    val trackersViewModelFactory by lazy {
+        TrackersViewModelFactory(getQuickPrivacyStateUseCase, trackersStatisticsUseCase, appListUseCase)
     }
 }

@@ -30,6 +30,10 @@ class TrackTrackersPrivacyMock : ITrackTrackersPrivacyModule {
         )
     }
 
+    override fun getPast24HoursTrackersCount(): Int {
+        return 30
+    }
+
     override fun getPastMonthTrackersCalls(): List<Int> {
         return listOf(
             20000, 23000, 24130, 12500, 31000, 22000,
@@ -40,11 +44,19 @@ class TrackTrackersPrivacyMock : ITrackTrackersPrivacyModule {
         )
     }
 
+    override fun getPastMonthTrackersCount(): Int {
+        return 43
+    }
+
     override fun getPastYearTrackersCalls(): List<Int> {
         return listOf(
             620000, 823000, 424130, 712500, 831000, 922000,
             620000, 823000, 424130, 712500, 831000, 922000
         )
+    }
+
+    override fun getPastYearTrackersCount(): Int {
+        return 46
     }
 
     override fun getTrackersCount(): Int {

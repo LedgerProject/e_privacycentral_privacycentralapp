@@ -20,33 +20,29 @@ package foundation.e.privacycentralapp.common
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import foundation.e.privacycentralapp.R
 import foundation.e.privacymodules.permissions.data.ApplicationDescription
 
-class ToggleAppsAdapter(
+class AppsAdapter(
     private val itemsLayout: Int,
-    private val listener: (String, Boolean) -> Unit
+    private val listener: (String) -> Unit
 ) :
-    RecyclerView.Adapter<ToggleAppsAdapter.ViewHolder>() {
+    RecyclerView.Adapter<AppsAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val appName: TextView = view.findViewById(R.id.title)
 
-        val togglePermission: CheckBox = view.findViewById(R.id.toggle)
+        fun bind(item: ApplicationDescription) {
+            appName.text = item.label
 
-        fun bind(item: Pair<ApplicationDescription, Boolean>) {
-            appName.text = item.first.label
-            togglePermission.isChecked = item.second
-
-            itemView.findViewById<ImageView>(R.id.icon).setImageDrawable(item.first.icon)
+            itemView.findViewById<ImageView>(R.id.icon).setImageDrawable(item.icon)
         }
     }
 
-    var dataSet: List<Pair<ApplicationDescription, Boolean>> = emptyList()
+    var dataSet: List<ApplicationDescription> = emptyList()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -56,15 +52,15 @@ class ToggleAppsAdapter(
         val view = LayoutInflater.from(parent.context)
             .inflate(itemsLayout, parent, false)
         val holder = ViewHolder(view)
-        holder.togglePermission.setOnCheckedChangeListener { _, isChecked ->
-            listener(dataSet[holder.adapterPosition].first.packageName, isChecked)
+        holder.itemView.setOnClickListener { _ ->
+            listener(dataSet[holder.adapterPosition].packageName)
         }
         return holder
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val permission = dataSet[position]
-        holder.bind(permission)
+        val app = dataSet[position]
+        holder.bind(app)
     }
 
     override fun getItemCount(): Int = dataSet.size

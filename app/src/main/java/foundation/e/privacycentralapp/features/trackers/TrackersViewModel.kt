@@ -20,17 +20,30 @@ package foundation.e.privacycentralapp.features.trackers
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import foundation.e.privacycentralapp.common.Factory
+import foundation.e.privacycentralapp.domain.usecases.AppListUseCase
+import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
+import foundation.e.privacycentralapp.domain.usecases.TrackersStatisticsUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-class TrackersViewModel : ViewModel() {
+class TrackersViewModel(
+    private val getQuickPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
+    private val trackersStatisticsUseCase: TrackersStatisticsUseCase,
+    private val appListUseCase: AppListUseCase
+) : ViewModel() {
 
     private val _actions = MutableSharedFlow<TrackersFeature.Action>()
     val actions = _actions.asSharedFlow()
 
     val trackersFeature: TrackersFeature by lazy {
-        TrackersFeature.create(coroutineScope = viewModelScope)
+        TrackersFeature.create(
+            coroutineScope = viewModelScope,
+            getPrivacyStateUseCase = getQuickPrivacyStateUseCase,
+            trackersStatisticsUseCase = trackersStatisticsUseCase,
+            appListUseCase = appListUseCase
+        )
     }
 
     fun submitAction(action: TrackersFeature.Action) {
@@ -38,5 +51,16 @@ class TrackersViewModel : ViewModel() {
         viewModelScope.launch {
             _actions.emit(action)
         }
+    }
+}
+
+class TrackersViewModelFactory(
+    private val getQuickPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
+    private val trackersStatisticsUseCase: TrackersStatisticsUseCase,
+    private val appListUseCase: AppListUseCase
+) :
+    Factory<TrackersViewModel> {
+    override fun create(): TrackersViewModel {
+        return TrackersViewModel(getQuickPrivacyStateUseCase, trackersStatisticsUseCase, appListUseCase)
     }
 }

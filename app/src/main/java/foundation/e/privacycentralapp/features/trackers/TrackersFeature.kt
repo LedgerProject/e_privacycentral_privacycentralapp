@@ -22,11 +22,17 @@ import foundation.e.flowmvi.Actor
 import foundation.e.flowmvi.Reducer
 import foundation.e.flowmvi.SingleEventProducer
 import foundation.e.flowmvi.feature.BaseFeature
+import foundation.e.privacycentralapp.domain.usecases.AppListUseCase
+import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
+import foundation.e.privacycentralapp.domain.usecases.TrackersStatisticsUseCase
 import foundation.e.privacycentralapp.dummy.Tracker
 import foundation.e.privacycentralapp.dummy.TrackersDataSource
+import foundation.e.privacymodules.permissions.data.ApplicationDescription
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 
 // Define a state machine for Tracker feature.
 class TrackersFeature(
@@ -44,16 +50,28 @@ class TrackersFeature(
     singleEventProducer
 ) {
     data class State(
+        val dayStatistics: List<Int>? = null,
+        val dayTrackersCount: Int? = null,
+        val monthStatistics: List<Int>? = null,
+        val monthTrackersCount: Int? = null,
+        val yearStatistics: List<Int>? = null,
+        val yearTrackersCount: Int? = null,
+        val apps: List<ApplicationDescription>? = null,
+
         val trackers: List<Tracker> = emptyList(),
         val currentSelectedTracker: Tracker? = null
     )
 
     sealed class SingleEvent {
         data class ErrorEvent(val error: String) : SingleEvent()
+        data class OpenAppDetailsEvent(val packageName: String) : SingleEvent()
         object BlockerErrorEvent : SingleEvent()
     }
 
     sealed class Action {
+        object InitAction : Action()
+        data class ClickAppAction(val packageName: String) : Action()
+
         object ObserveTrackers : Action()
         data class SetSelectedTracker(val tracker: Tracker) : Action()
         data class ToggleTrackerAction(
@@ -64,6 +82,19 @@ class TrackersFeature(
     }
 
     sealed class Effect {
+        data class TrackersStatisticsLoadedEffect(
+            val dayStatistics: List<Int>? = null,
+            val dayTrackersCount: Int? = null,
+            val monthStatistics: List<Int>? = null,
+            val monthTrackersCount: Int? = null,
+            val yearStatistics: List<Int>? = null,
+            val yearTrackersCount: Int? = null
+        ) : Effect()
+        data class AvailableAppsListEffect(
+            val apps: List<ApplicationDescription>
+        ) : Effect()
+        data class OpenAppDetailsEffect(val packageName: String) : Effect()
+        object QuickPrivacyDisabledWarningEffect : Effect()
         data class TrackersLoadedEffect(val trackers: List<Tracker>) : Effect()
         data class TrackerSelectedEffect(val tracker: Tracker) : Effect()
         data class TrackerToggleEffect(val result: Boolean) : Effect()
@@ -74,12 +105,25 @@ class TrackersFeature(
     companion object {
         fun create(
             initialState: State = State(),
-            coroutineScope: CoroutineScope
+            coroutineScope: CoroutineScope,
+            getPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
+            trackersStatisticsUseCase: TrackersStatisticsUseCase,
+            appListUseCase: AppListUseCase
         ) = TrackersFeature(
             initialState, coroutineScope,
             reducer = { state, effect ->
                 when (effect) {
-                    is Effect.TrackersLoadedEffect -> State(effect.trackers)
+                    is Effect.TrackersStatisticsLoadedEffect -> state.copy(
+                        dayStatistics = effect.dayStatistics,
+                        dayTrackersCount = effect.dayTrackersCount,
+                        monthStatistics = effect.monthStatistics,
+                        monthTrackersCount = effect.monthTrackersCount,
+                        yearStatistics = effect.yearStatistics,
+                        yearTrackersCount = effect.yearTrackersCount
+                    )
+                    is Effect.AvailableAppsListEffect -> state.copy(apps = effect.apps)
+
+                    is Effect.TrackersLoadedEffect -> State()
                     is Effect.TrackerSelectedEffect -> state.copy(currentSelectedTracker = effect.tracker)
                     is Effect.ErrorEffect -> state
                     is Effect.TrackerToggleEffect -> {
@@ -88,10 +132,37 @@ class TrackersFeature(
                     is Effect.TrackerLoadedEffect -> {
                         state.copy(currentSelectedTracker = effect.tracker)
                     }
+                    else -> state
                 }
             },
             actor = { state, action ->
                 when (action) {
+                    Action.InitAction -> merge(
+                        flow {
+                            val statistics = trackersStatisticsUseCase.getDayMonthYearStatistics()
+                            val counts = trackersStatisticsUseCase.getDayMonthYearCounts()
+                            emit(
+                                Effect.TrackersStatisticsLoadedEffect(
+                                    dayStatistics = statistics.first,
+                                    dayTrackersCount = counts.first,
+                                    monthStatistics = statistics.second,
+                                    monthTrackersCount = counts.second,
+                                    yearStatistics = statistics.third,
+                                    yearTrackersCount = counts.third
+                                )
+                            )
+                        },
+                        flow {
+                            val apps = appListUseCase.getAppsUsingInternet()
+                            emit(Effect.AvailableAppsListEffect(apps))
+                        }
+                    )
+
+                    is Action.ClickAppAction -> flowOf(
+                        if (getPrivacyStateUseCase.isQuickPrivacyEnabled)
+                            Effect.OpenAppDetailsEffect(action.packageName)
+                        else Effect.QuickPrivacyDisabledWarningEffect
+                    )
                     Action.ObserveTrackers -> TrackersDataSource.trackers.map {
                         Effect.TrackersLoadedEffect(
                             it
@@ -131,9 +202,11 @@ class TrackersFeature(
             singleEventProducer = { _, _, effect ->
                 when (effect) {
                     is Effect.ErrorEffect -> SingleEvent.ErrorEvent(effect.message)
+                    is Effect.OpenAppDetailsEffect -> SingleEvent.OpenAppDetailsEvent(effect.packageName)
                     is Effect.TrackerToggleEffect -> {
                         if (!effect.result) SingleEvent.BlockerErrorEvent else null
                     }
+                    Effect.QuickPrivacyDisabledWarningEffect -> SingleEvent.ErrorEvent("Enabled Quick Privacy to use functionalities")
                     else -> null
                 }
             }

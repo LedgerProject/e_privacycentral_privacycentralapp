@@ -52,6 +52,15 @@
     <string name="location_hint_latitude">Latitude</string>
     <string name="location_input_error">Invalid coordinates</string>
 
+    <!-- Trackers -->
+    <string name="trackers_title">Manage and block</string>
+    <string name="trackers_info">See tracker usage and which trackers are present in your apps.</string>
+    <string name="trackers_count_label">%d trackers</string>
+    <string name="trackers_period_day">24 hours</string>
+    <string name="trackers_period_month">past month</string>
+    <string name="trackers_period_year">past year</string>
+    <string name="trackers_applist_title">Block trackers on each app</string>
+
     <!-- -->
     <string name="quick_protection_info">Quick protection enables these settings when turned on</string>
     <string name="quick_protection_settings_list"> - All trackers are turned off.\n- Your geolocation will be faked.\n- Your real IP address will be hidden.</string>
