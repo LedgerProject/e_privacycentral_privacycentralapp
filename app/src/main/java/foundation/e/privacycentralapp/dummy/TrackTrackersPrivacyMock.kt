@@ -17,11 +17,20 @@
 
 package foundation.e.privacycentralapp.dummy
 
+import foundation.e.privacymodules.trackers.IBlockTrackersPrivacyModule
 import foundation.e.privacymodules.trackers.ITrackTrackersPrivacyModule
 import foundation.e.privacymodules.trackers.Tracker
 
-class TrackTrackersPrivacyMock : ITrackTrackersPrivacyModule {
-    override fun getPast24HoursTrackersCalls(): List<Int> {
+class TrackTrackersPrivacyMock :
+    ITrackTrackersPrivacyModule,
+    IBlockTrackersPrivacyModule {
+
+    private val trackers = listOf(
+        Tracker(1, "Crashlytics", null),
+        Tracker(2, label = "Facebook", null)
+    )
+
+    override fun getPastDayTrackersCalls(): List<Int> {
         return listOf(
             2000, 2300, 130, 2500, 1000, 2000,
             2000, 2300, 130, 2500, 1000, 2000,
@@ -30,7 +39,7 @@ class TrackTrackersPrivacyMock : ITrackTrackersPrivacyModule {
         )
     }
 
-    override fun getPast24HoursTrackersCount(): Int {
+    override fun getPastDayTrackersCount(): Int {
         return 30
     }
 
@@ -64,9 +73,67 @@ class TrackTrackersPrivacyMock : ITrackTrackersPrivacyModule {
     }
 
     override fun getTrackersForApp(appUid: Int): List<Tracker> {
-        return listOf(
-            Tracker("Crashlytics", null),
-            Tracker(label = "Facebook", null)
-        )
+        return trackers
+    }
+
+    private var isBlockingEnabled = false
+    private val appWhitelist = mutableSetOf<Int>()
+    private val trackersWhitelist = mutableMapOf<Int, MutableSet<Tracker>>()
+
+    override fun addListener(listener: IBlockTrackersPrivacyModule.Listener) {
+        TODO("Not yet implemented")
+    }
+
+    override fun removeListener(listener: IBlockTrackersPrivacyModule.Listener) {
+        TODO("Not yet implemented")
+    }
+
+    override fun clearListeners() {
+        TODO("Not yet implemented")
+    }
+
+    override fun disableBlocking() {}
+
+    override fun enableBlocking() {}
+
+    override fun getWhiteList(appUid: Int): List<Tracker> {
+        return trackersWhitelist[appUid]?.toList() ?: emptyList()
+    }
+
+    override fun getWhiteListedApp(): List<Int> {
+        return appWhitelist.toList()
+    }
+
+    override fun isBlockingEnabled(): Boolean {
+        return isBlockingEnabled
+    }
+
+    override fun isWhiteListEmpty(): Boolean {
+        return appWhitelist.isEmpty() &&
+            (trackersWhitelist.isEmpty() || trackersWhitelist.values.all { it.isEmpty() })
+    }
+
+    override fun isWhitelisted(appUid: Int): Boolean {
+        return appUid in appWhitelist
+    }
+
+    override fun setWhiteListed(tracker: Tracker, appUid: Int, isWhiteListed: Boolean) {
+        if (appUid !in trackersWhitelist) {
+            trackersWhitelist[appUid] = mutableSetOf<Tracker>()
+        }
+
+        if (isWhiteListed) {
+            trackersWhitelist[appUid]?.add(tracker)
+        } else {
+            trackersWhitelist[appUid]?.remove(tracker)
+        }
+    }
+
+    override fun setWhiteListed(appUid: Int, isWhiteListed: Boolean) {
+        if (isWhiteListed) {
+            appWhitelist.add(appUid)
+        } else {
+            appWhitelist.remove(appUid)
+        }
     }
 }

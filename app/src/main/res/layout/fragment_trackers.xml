@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -13,60 +12,66 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_height="match_parent"
-        android:layout_marginBottom="32dp"
         android:layout_width="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         >
-
         <LinearLayout
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:orientation="vertical"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
             >
-            <TextView
-                android:id="@+id/trackers_info"
-                android:layout_height="wrap_content"
+            <LinearLayout
+                android:layout_height="match_parent"
                 android:layout_width="match_parent"
-                android:paddingTop="16dp"
-                android:lineSpacingExtra="5sp"
-                android:text="@string/manage_trackers_info"
-                />
+                android:orientation="vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                >
+                <TextView
+                    android:id="@+id/trackers_info"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:paddingTop="16dp"
+                    android:lineSpacingExtra="5sp"
+                    android:text="@string/manage_trackers_info"
+                    />
 
-            <include layout="@layout/trackers_item_graph"
-                android:id="@+id/graph_day"
-                android:layout_marginTop="32dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:period="@{@string/trackers_period_day}"
-                />
-            <include layout="@layout/trackers_item_graph"
-                android:id="@+id/graph_month"
-                android:layout_marginTop="16dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:period="@{@string/trackers_period_month}"
-                />
-            <include layout="@layout/trackers_item_graph"
-                android:id="@+id/graph_year"
-                android:layout_marginTop="16dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:period="@{@string/trackers_period_year}"
-                />
-            <TextView
-                android:layout_gravity="center_horizontal"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:paddingTop="16dp"
-                android:text="@string/trackers_applist_title"
-                />
-
+                <include layout="@layout/trackers_item_graph"
+                    android:id="@+id/graph_day"
+                    android:layout_marginTop="32dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:period="@{@string/trackers_period_day}"
+                    />
+                <include layout="@layout/trackers_item_graph"
+                    android:id="@+id/graph_month"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:period="@{@string/trackers_period_month}"
+                    />
+                <include layout="@layout/trackers_item_graph"
+                    android:id="@+id/graph_year"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:period="@{@string/trackers_period_year}"
+                    />
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="32dp"
+                    android:paddingTop="16dp"
+                    android:text="@string/trackers_applist_title"
+                    />
+            </LinearLayout>
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/apps"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
+                android:paddingTop="16dp"
+                android:paddingBottom="32dp"
+                tools:listitem="@layout/trackers_item_app"
                 />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

@@ -24,6 +24,7 @@ import foundation.e.privacycentralapp.data.repositories.LocalStateRepository
 import foundation.e.privacycentralapp.domain.usecases.AppListUseCase
 import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.IpScramblingStateUseCase
+import foundation.e.privacycentralapp.domain.usecases.TrackersStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.TrackersStatisticsUseCase
 import foundation.e.privacycentralapp.dummy.TrackTrackersPrivacyMock
 import foundation.e.privacycentralapp.features.dashboard.DashBoardViewModelFactory
@@ -31,12 +32,15 @@ import foundation.e.privacycentralapp.features.internetprivacy.InternetPrivacyVi
 import foundation.e.privacycentralapp.features.location.FakeLocationViewModelFactory
 import foundation.e.privacycentralapp.features.location.LocationApiDelegate
 import foundation.e.privacycentralapp.features.trackers.TrackersViewModelFactory
+import foundation.e.privacycentralapp.features.trackers.apptrackers.AppTrackersViewModelFactory
 import foundation.e.privacymodules.ipscrambler.IpScramblerModule
 import foundation.e.privacymodules.ipscramblermodule.IIpScramblerModule
 import foundation.e.privacymodules.location.FakeLocation
 import foundation.e.privacymodules.location.IFakeLocation
 import foundation.e.privacymodules.permissions.PermissionsPrivacyModule
 import foundation.e.privacymodules.permissions.data.ApplicationDescription
+import foundation.e.trackerfilter.api.BlockTrackersPrivacyModule
+import foundation.e.trackerfilter.api.TrackTrackersPrivacyModule
 import kotlinx.coroutines.GlobalScope
 import lineageos.blockers.BlockerInterface
 
@@ -67,9 +71,13 @@ class DependencyContainer constructor(val app: Application) {
         LocationApiDelegate(fakeLocationModule, permissionsModule, appDesc)
     }
 
+    private val blockTrackersPrivacyModule by lazy { BlockTrackersPrivacyModule.getInstance(context) }
+
     // Repositories
     private val localStateRepository by lazy { LocalStateRepository(context) }
-    private val trackTrackersPrivacyModule by lazy { TrackTrackersPrivacyMock() }
+    private val trackTrackersPrivacyModule by lazy { TrackTrackersPrivacyModule.getInstance(context) }
+
+    private val trackersPrivacyMock by lazy { TrackTrackersPrivacyMock() }
     // Usecases
     private val getQuickPrivacyStateUseCase by lazy {
         GetQuickPrivacyStateUseCase(localStateRepository)
@@ -81,7 +89,11 @@ class DependencyContainer constructor(val app: Application) {
         AppListUseCase(permissionsModule)
     }
     private val trackersStatisticsUseCase by lazy {
-        TrackersStatisticsUseCase(trackTrackersPrivacyModule)
+        TrackersStatisticsUseCase(trackersPrivacyMock)
+    }
+
+    private val trackersStateUseCase by lazy {
+        TrackersStateUseCase(trackersPrivacyMock, trackersPrivacyMock, permissionsModule)
     }
 
     // ViewModelFactories
@@ -101,5 +113,9 @@ class DependencyContainer constructor(val app: Application) {
 
     val trackersViewModelFactory by lazy {
         TrackersViewModelFactory(getQuickPrivacyStateUseCase, trackersStatisticsUseCase, appListUseCase)
+    }
+
+    val appTrackersViewModelFactory by lazy {
+        AppTrackersViewModelFactory(trackersStateUseCase)
     }
 }

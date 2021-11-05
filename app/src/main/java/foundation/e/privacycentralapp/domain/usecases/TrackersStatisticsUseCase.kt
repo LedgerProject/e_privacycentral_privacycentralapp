@@ -17,19 +17,19 @@
 
 package foundation.e.privacycentralapp.domain.usecases
 
-import foundation.e.privacycentralapp.dummy.TrackTrackersPrivacyMock
+import foundation.e.privacymodules.trackers.ITrackTrackersPrivacyModule
 
 class TrackersStatisticsUseCase(
-    private val trackTrackersPrivacyModule: TrackTrackersPrivacyMock
+    private val trackTrackersPrivacyModule: ITrackTrackersPrivacyModule
 ) {
 
-    fun getPast24HoursTrackersCalls(): List<Int> {
-        return trackTrackersPrivacyModule.getPast24HoursTrackersCalls()
+    fun getPastDayTrackersCalls(): List<Int> {
+        return trackTrackersPrivacyModule.getPastDayTrackersCalls()
     }
 
     fun getDayMonthYearStatistics(): Triple<List<Int>, List<Int>, List<Int>> {
         return Triple(
-            trackTrackersPrivacyModule.getPast24HoursTrackersCalls(),
+            trackTrackersPrivacyModule.getPastDayTrackersCalls(),
             trackTrackersPrivacyModule.getPastMonthTrackersCalls(),
             trackTrackersPrivacyModule.getPastYearTrackersCalls()
         )
@@ -37,7 +37,7 @@ class TrackersStatisticsUseCase(
 
     fun getDayMonthYearCounts(): Triple<Int, Int, Int> {
         return Triple(
-            trackTrackersPrivacyModule.getPast24HoursTrackersCount(),
+            trackTrackersPrivacyModule.getPastDayTrackersCount(),
             trackTrackersPrivacyModule.getPastMonthTrackersCount(),
             trackTrackersPrivacyModule.getPastYearTrackersCount()
         )

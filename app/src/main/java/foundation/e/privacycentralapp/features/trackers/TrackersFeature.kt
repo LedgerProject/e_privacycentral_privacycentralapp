@@ -64,7 +64,7 @@ class TrackersFeature(
 
     sealed class SingleEvent {
         data class ErrorEvent(val error: String) : SingleEvent()
-        data class OpenAppDetailsEvent(val packageName: String) : SingleEvent()
+        data class OpenAppDetailsEvent(val appDesc: ApplicationDescription) : SingleEvent()
         object BlockerErrorEvent : SingleEvent()
     }
 
@@ -93,7 +93,7 @@ class TrackersFeature(
         data class AvailableAppsListEffect(
             val apps: List<ApplicationDescription>
         ) : Effect()
-        data class OpenAppDetailsEffect(val packageName: String) : Effect()
+        data class OpenAppDetailsEffect(val appDesc: ApplicationDescription) : Effect()
         object QuickPrivacyDisabledWarningEffect : Effect()
         data class TrackersLoadedEffect(val trackers: List<Tracker>) : Effect()
         data class TrackerSelectedEffect(val tracker: Tracker) : Effect()
@@ -159,9 +159,11 @@ class TrackersFeature(
                     )
 
                     is Action.ClickAppAction -> flowOf(
-                        if (getPrivacyStateUseCase.isQuickPrivacyEnabled)
-                            Effect.OpenAppDetailsEffect(action.packageName)
-                        else Effect.QuickPrivacyDisabledWarningEffect
+                        if (getPrivacyStateUseCase.isQuickPrivacyEnabled) {
+                            state.apps?.find { it.packageName == action.packageName }?.let {
+                                Effect.OpenAppDetailsEffect(it)
+                            } ?: run { Effect.ErrorEffect("Can't find back app.") }
+                        } else Effect.QuickPrivacyDisabledWarningEffect
                     )
                     Action.ObserveTrackers -> TrackersDataSource.trackers.map {
                         Effect.TrackersLoadedEffect(
@@ -202,7 +204,7 @@ class TrackersFeature(
             singleEventProducer = { _, _, effect ->
                 when (effect) {
                     is Effect.ErrorEffect -> SingleEvent.ErrorEvent(effect.message)
-                    is Effect.OpenAppDetailsEffect -> SingleEvent.OpenAppDetailsEvent(effect.packageName)
+                    is Effect.OpenAppDetailsEffect -> SingleEvent.OpenAppDetailsEvent(effect.appDesc)
                     is Effect.TrackerToggleEffect -> {
                         if (!effect.result) SingleEvent.BlockerErrorEvent else null
                     }

@@ -21,6 +21,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.add
+import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -36,6 +38,7 @@ import foundation.e.privacycentralapp.common.NavToolbarFragment
 import foundation.e.privacycentralapp.databinding.FragmentTrackersBinding
 import foundation.e.privacycentralapp.databinding.TrackersItemGraphBinding
 import foundation.e.privacycentralapp.extensions.viewModelProviderFactoryOf
+import foundation.e.privacycentralapp.features.trackers.apptrackers.AppTrackersFragment
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 
@@ -65,7 +68,11 @@ class TrackersFragment :
                         displayToast(event.error)
                     }
                     is TrackersFeature.SingleEvent.OpenAppDetailsEvent -> {
-                        displayToast(event.packageName)
+                        requireActivity().supportFragmentManager.commit {
+                            add<AppTrackersFragment>(R.id.container, args = AppTrackersFragment.buildArgs(event.appDesc.label.toString(), event.appDesc.packageName))
+                            setReorderingAllowed(true)
+                            addToBackStack("apptrackers")
+                        }
                     }
                 }
             }
@@ -108,14 +115,6 @@ class TrackersFragment :
                 )
             }
         }
-
-        //
-        // requireActivity().supportFragmentManager.commit {
-        //     val bundle = bundleOf("TRACKER" to it.name)
-        //     add<TrackerAppsFragment>(R.id.container, args = bundle)
-        //     setReorderingAllowed(true)
-        //     addToBackStack("trackers")
-        // }
     }
 
     override fun getTitle() = getString(R.string.trackers_title)

@@ -21,6 +21,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PrivacyCentralApp"
         android:windowSoftInputMode="adjustResize"
+
+        tools:replace="android:icon,android:label,android:theme"
         >
         <activity android:name=".main.MainActivity">
             <intent-filter>

@@ -190,7 +190,7 @@ class DashboardFeature(
                                 Effect.IpScramblingModeUpdatedEffect(it)
                             },
                             flow {
-                                emit(Effect.TrackersStatisticsUpdatedEffect(trackersStatisticsUseCase.getPast24HoursTrackersCalls()))
+                                emit(Effect.TrackersStatisticsUpdatedEffect(trackersStatisticsUseCase.getPastDayTrackersCalls()))
                             }
                         )
                         /*

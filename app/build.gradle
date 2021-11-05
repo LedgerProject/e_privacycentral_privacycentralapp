@@ -94,6 +94,7 @@ android {
 dependencies {
     compileOnly files('libs/e-ui-sdk-1.0.1-q.jar')
     implementation files('libs/lineage-sdk.jar')
+    implementation files('libs/trackerfilter.aar')
     //implementation project(":privacymodulesapi")
 
     // include the google specific version of the modules, just for the google flavor

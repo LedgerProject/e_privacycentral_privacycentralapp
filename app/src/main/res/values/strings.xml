@@ -61,6 +61,10 @@
     <string name="trackers_period_year">past year</string>
     <string name="trackers_applist_title">Block trackers on each app</string>
 
+    <!-- App Trackers -->
+    <!--string name="apptrackers_block_all_toggle">Activate trackers blocking : </string-->
+    <string name="apptrackers_no_trackers_yet">Trackers will appear as they are they start tracking you.</string>
+
     <!-- -->
     <string name="quick_protection_info">Quick protection enables these settings when turned on</string>
     <string name="quick_protection_settings_list"> - All trackers are turned off.\n- Your geolocation will be faked.\n- Your real IP address will be hidden.</string>
