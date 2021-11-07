@@ -18,17 +18,17 @@
 package foundation.e.privacycentralapp.features.location
 
 import android.util.Log
-import com.mapbox.mapboxsdk.geometry.LatLng
 import foundation.e.flowmvi.Actor
 import foundation.e.flowmvi.Reducer
 import foundation.e.flowmvi.SingleEventProducer
 import foundation.e.flowmvi.feature.BaseFeature
 import foundation.e.privacycentralapp.domain.entities.LocationMode
-import foundation.e.privacycentralapp.dummy.CityDataSource
-import foundation.e.privacycentralapp.dummy.DummyDataSource
-import foundation.e.privacycentralapp.dummy.Location
+import foundation.e.privacycentralapp.domain.usecases.FakeLocationStateUseCase
+import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 
 // Define a state machine for Fake location feature
 class FakeLocationFeature(
@@ -46,7 +46,10 @@ class FakeLocationFeature(
     singleEventProducer
 ) {
     data class State(
-        val location: Location
+        val isEnabled: Boolean,
+        val mode: LocationMode,
+        val specificLatitude: Float? = null,
+        val specificLongitude: Float? = null
     )
 
     sealed class SingleEvent {
@@ -57,153 +60,97 @@ class FakeLocationFeature(
     }
 
     sealed class Action {
+        object Init : Action()
 
         // Action which is triggered everytime the location is updated.
-        data class UpdateLocationAction(val latLng: LatLng) : Action()
+        //data class UpdateLocationAction(val latLng: LatLng) : Action()
+
         object UseRealLocationAction : Action()
-        data class UseRandomLocationAction(
-            val cities: Array<String>
-        ) : Action() {
-            override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (javaClass != other?.javaClass) return false
-
-                other as UseRandomLocationAction
-
-                if (!cities.contentEquals(other.cities)) return false
-
-                return true
-            }
-
-            override fun hashCode(): Int {
-                return cities.contentHashCode()
-            }
-        }
-
-        object UseSpecificLocationAction : Action()
-        data class SetCustomFakeLocationAction(
-            val latitude: Double,
-            val longitude: Double
-        ) : Action()
+        object UseRandomLocationAction : Action()
+        data class SetSpecificLocationAction(
+            val latitude: Float,
+            val longitude: Float) : Action()
     }
 
     sealed class Effect {
-        data class LocationUpdatedEffect(val latitude: Double, val longitude: Double) : Effect()
-        object RealLocationSelectedEffect : Effect()
-        object RandomLocationSelectedEffect : Effect()
-        object SpecificLocationSelectedEffect : Effect()
-        object SpecificLocationSavedEffect : Effect()
+        data class QuickPrivacyUpdatedEffect(val isEnabled: Boolean): Effect()
+        data class LocationModeUpdatedEffect(
+            val mode: LocationMode,
+            val latitude: Float? = null,
+            val longitude: Float? = null) : Effect()
         data class ErrorEffect(val message: String) : Effect()
+        object QuickPrivacyDisabledWarningEffect : Effect()
     }
 
     companion object {
         fun create(
             initialState: State = State(
-                Location(
-                    LocationMode.REAL_LOCATION,
-                    0.0,
-                    0.0
-                )
+                isEnabled = false,
+                mode = LocationMode.REAL_LOCATION
             ),
-            coroutineScope: CoroutineScope,
-            locationApi: LocationApiDelegate
+            getQuickPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
+            fakeLocationStateUseCase: FakeLocationStateUseCase,
+            coroutineScope: CoroutineScope
         ) = FakeLocationFeature(
             initialState, coroutineScope,
             reducer = { state, effect ->
                 when (effect) {
-                    Effect.RandomLocationSelectedEffect -> state.copy(
-                        location = state.location.copy(
-                            mode = LocationMode.RANDOM_LOCATION
-                        )
-                    )
-                    Effect.RealLocationSelectedEffect -> state.copy(
-                        location = state.location.copy(
-                            mode = LocationMode.REAL_LOCATION
-                        )
-                    )
-                    is Effect.ErrorEffect, Effect.SpecificLocationSavedEffect -> state
-                    is Effect.LocationUpdatedEffect -> state.copy(
-                        location = state.location.copy(
-                            latitude = effect.latitude,
-                            longitude = effect.longitude
-                        )
-                    )
-                    is Effect.SpecificLocationSelectedEffect -> state.copy(
-                        location = state.location.copy(
-                            mode = LocationMode.CUSTOM_LOCATION
-                        )
-                    )
+                    is Effect.QuickPrivacyUpdatedEffect -> state.copy(isEnabled = effect.isEnabled)
+                    is Effect.LocationModeUpdatedEffect -> state.copy(
+                        mode = effect.mode,
+                        specificLatitude = effect.latitude,
+                        specificLongitude = effect.longitude)
+
+                    is Effect.ErrorEffect,
+                    Effect.QuickPrivacyDisabledWarningEffect -> state
                 }
             },
-            actor = { _, action ->
+            actor = { state, action ->
                 when (action) {
-                    is Action.UpdateLocationAction -> flowOf(
-                        Effect.LocationUpdatedEffect(
-                            action.latLng.latitude,
-                            action.latLng.longitude
-                        )
-                    )
-                    is Action.SetCustomFakeLocationAction -> {
-                        val location = Location(
-                            LocationMode.CUSTOM_LOCATION,
-                            action.latitude,
-                            action.longitude
-                        )
-                        locationApi.setFakeLocation(action.latitude, action.longitude)
-                        val success = DummyDataSource.setLocationMode(
-                            LocationMode.CUSTOM_LOCATION,
-                            location
-                        )
-                        if (success) {
-                            flowOf(
-                                Effect.SpecificLocationSavedEffect
+                    is Action.Init -> merge(
+                        getQuickPrivacyStateUseCase.quickPrivacyEnabledFlow.map { Effect.QuickPrivacyUpdatedEffect(it) },
+                        flowOf(Effect.LocationModeUpdatedEffect(fakeLocationStateUseCase.getLocationMode())))
+
+                    // is Action.UpdateLocationAction -> flowOf(
+                    //         Effect.LocationUpdatedEffect(
+                    //             action.latLng.latitude,
+                    //             action.latLng.longitude
+                    //         )
+                    //         )
+
+                    is Action.SetSpecificLocationAction -> {
+                        if (state.isEnabled) {
+                            fakeLocationStateUseCase.setSpecificLocation(
+                                action.latitude,
+                                action.longitude
                             )
-                        } else {
                             flowOf(
-                                Effect.ErrorEffect("Couldn't select location")
+                                Effect.LocationModeUpdatedEffect(
+                                    mode = LocationMode.SPECIFIC_LOCATION,
+                                    latitude = action.latitude,
+                                    longitude = action.longitude
+                                )
                             )
-                        }
+                        } else flowOf(Effect.QuickPrivacyDisabledWarningEffect)
                     }
                     is Action.UseRandomLocationAction -> {
-                        val randomCity = CityDataSource.getRandomCity(action.cities)
-                        locationApi.setFakeLocation(randomCity.latitude, randomCity.longitude)
-                        val success = DummyDataSource.setLocationMode(
-                            LocationMode.RANDOM_LOCATION,
-                            randomCity.toRandomLocation()
-                        )
-                        if (success) {
-                            flowOf(
-                                Effect.RandomLocationSelectedEffect
-                            )
-                        } else {
-                            flowOf(
-                                Effect.ErrorEffect("Couldn't select location")
-                            )
-                        }
+                        if (state.isEnabled) {
+                        fakeLocationStateUseCase.setRandomLocation()
+                        flowOf(Effect.LocationModeUpdatedEffect(LocationMode.RANDOM_LOCATION))
+                    } else flowOf(Effect.QuickPrivacyDisabledWarningEffect)
                     }
                     is Action.UseRealLocationAction -> {
-                        locationApi.startRealLocation()
-                        val success = DummyDataSource.setLocationMode(LocationMode.REAL_LOCATION)
-                        if (success) {
-                            flowOf(
-                                Effect.RealLocationSelectedEffect
-                            )
-                        } else {
-                            flowOf(
-                                Effect.ErrorEffect("Couldn't select location")
-                            )
-                        }
-                    }
-                    is Action.UseSpecificLocationAction -> {
-                        flowOf(Effect.SpecificLocationSelectedEffect)
+                        if (state.isEnabled) {
+                            fakeLocationStateUseCase.stopFakeLocation()
+                        flowOf(Effect.LocationModeUpdatedEffect(LocationMode.REAL_LOCATION))
+                        } else flowOf(Effect.QuickPrivacyDisabledWarningEffect)
                     }
                 }
             },
             singleEventProducer = { _, _, effect ->
                 when (effect) {
-                    Effect.RandomLocationSelectedEffect -> SingleEvent.RandomLocationSelectedEvent
-                    Effect.SpecificLocationSavedEffect -> SingleEvent.SpecificLocationSavedEvent
-                    Effect.RealLocationSelectedEffect -> SingleEvent.RealLocationSelectedEvent
+                    Effect.QuickPrivacyDisabledWarningEffect ->
+                        SingleEvent.ErrorEvent("Enabled Quick Privacy to use functionalities")
                     is Effect.ErrorEffect -> SingleEvent.ErrorEvent(effect.message)
                     else -> null
                 }

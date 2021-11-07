@@ -22,21 +22,22 @@ import android.content.Context
 import android.os.Process
 import foundation.e.privacycentralapp.data.repositories.LocalStateRepository
 import foundation.e.privacycentralapp.domain.usecases.AppListUseCase
+import foundation.e.privacycentralapp.domain.usecases.FakeLocationStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.IpScramblingStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.TrackersStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.TrackersStatisticsUseCase
+import foundation.e.privacycentralapp.dummy.CityDataSource
 import foundation.e.privacycentralapp.dummy.TrackTrackersPrivacyMock
 import foundation.e.privacycentralapp.features.dashboard.DashBoardViewModelFactory
 import foundation.e.privacycentralapp.features.internetprivacy.InternetPrivacyViewModelFactory
 import foundation.e.privacycentralapp.features.location.FakeLocationViewModelFactory
-import foundation.e.privacycentralapp.features.location.LocationApiDelegate
 import foundation.e.privacycentralapp.features.trackers.TrackersViewModelFactory
 import foundation.e.privacycentralapp.features.trackers.apptrackers.AppTrackersViewModelFactory
 import foundation.e.privacymodules.ipscrambler.IpScramblerModule
 import foundation.e.privacymodules.ipscramblermodule.IIpScramblerModule
-import foundation.e.privacymodules.location.FakeLocation
-import foundation.e.privacymodules.location.IFakeLocation
+import foundation.e.privacymodules.location.FakeLocationModule
+import foundation.e.privacymodules.location.IFakeLocationModule
 import foundation.e.privacymodules.permissions.PermissionsPrivacyModule
 import foundation.e.privacymodules.permissions.data.ApplicationDescription
 import foundation.e.trackerfilter.api.BlockTrackersPrivacyModule
@@ -54,7 +55,7 @@ class DependencyContainer constructor(val app: Application) {
     val context: Context by lazy { app.applicationContext }
 
     // Drivers
-    private val fakeLocationModule: IFakeLocation by lazy { FakeLocation(app.applicationContext) }
+    private val fakeLocationModule: IFakeLocationModule by lazy { FakeLocationModule(app.applicationContext) }
     private val permissionsModule by lazy { PermissionsPrivacyModule(app.applicationContext) }
     private val ipScramblerModule: IIpScramblerModule by lazy { IpScramblerModule(app.applicationContext) }
 
@@ -65,10 +66,6 @@ class DependencyContainer constructor(val app: Application) {
             label = context.resources.getString(R.string.app_name),
             icon = null
         )
-    }
-
-    private val locationApi by lazy {
-        LocationApiDelegate(fakeLocationModule, permissionsModule, appDesc)
     }
 
     private val blockTrackersPrivacyModule by lazy { BlockTrackersPrivacyModule.getInstance(context) }
@@ -85,9 +82,8 @@ class DependencyContainer constructor(val app: Application) {
     private val ipScramblingStateUseCase by lazy {
         IpScramblingStateUseCase(ipScramblerModule, localStateRepository, GlobalScope)
     }
-    private val appListUseCase by lazy {
-        AppListUseCase(permissionsModule, GlobalScope)
-    }
+    private val appListUseCase = AppListUseCase(permissionsModule, GlobalScope)
+
     private val trackersStatisticsUseCase by lazy {
         TrackersStatisticsUseCase(trackTrackersPrivacyModule)
     }
@@ -96,13 +92,20 @@ class DependencyContainer constructor(val app: Application) {
         TrackersStateUseCase(blockTrackersPrivacyModule, trackTrackersPrivacyModule, permissionsModule, localStateRepository, GlobalScope)
     }
 
+    private val fakeLocationStateUseCase by lazy {
+        FakeLocationStateUseCase(
+            fakeLocationModule, permissionsModule, localStateRepository, CityDataSource, appDesc, GlobalScope)
+    }
+
     // ViewModelFactories
     val dashBoardViewModelFactory by lazy {
         DashBoardViewModelFactory(getQuickPrivacyStateUseCase, ipScramblingStateUseCase, trackersStatisticsUseCase, trackersStateUseCase)
     }
 
     val fakeLocationViewModelFactory by lazy {
-        FakeLocationViewModelFactory(locationApi)
+        FakeLocationViewModelFactory(
+            getQuickPrivacyStateUseCase = getQuickPrivacyStateUseCase,
+            fakeLocationStateUseCase = fakeLocationStateUseCase)
     }
 
     val blockerService = BlockerInterface.getInstance(context)

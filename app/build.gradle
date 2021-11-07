@@ -95,14 +95,14 @@ dependencies {
     compileOnly files('libs/e-ui-sdk-1.0.1-q.jar')
     implementation files('libs/lineage-sdk.jar')
     implementation files('libs/trackerfilter.aar')
-
+    //implementation project(":privacymodulesapi")
 
     // include the google specific version of the modules, just for the google flavor
-    // TODO: google version is broken for now. googleImplementation project(":privacymodulesgoogle")
+    googleImplementation project(":privacymodulesgoogle")
     // include the e specific version of the modules, just for the e flavor
-    eImplementation 'foundation.e:privacymodule.e-29:0.3.2'
+    eImplementation project(":privacymodulese")
 
-    implementation 'foundation.e:privacymodule.api:0.3.2'
+    implementation 'foundation.e:privacymodule.api:0.4.1'
     implementation 'foundation.e:privacymodule.tor:0.1.1'
 
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'

@@ -5,7 +5,7 @@ import foundation.e.privacycentral.buildsrc.ReleaseType
 buildscript {
     ext.buildConfig = [
         'compileSdk': 30,
-        'minSdk'    : 24,
+        'minSdk'    : 26,
         'targetSdk' : 30,
         'version'   : [
             'major': 1,

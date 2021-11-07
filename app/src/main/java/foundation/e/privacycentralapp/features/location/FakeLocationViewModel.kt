@@ -20,17 +20,24 @@ package foundation.e.privacycentralapp.features.location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import foundation.e.privacycentralapp.common.Factory
+import foundation.e.privacycentralapp.domain.usecases.FakeLocationStateUseCase
+import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-class FakeLocationViewModel(private val locationApi: LocationApiDelegate) : ViewModel() {
+class FakeLocationViewModel(
+    private val getQuickPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
+    private val fakeLocationStateUseCase: FakeLocationStateUseCase) : ViewModel() {
 
     private val _actions = MutableSharedFlow<FakeLocationFeature.Action>()
     val actions = _actions.asSharedFlow()
 
     val fakeLocationFeature: FakeLocationFeature by lazy {
-        FakeLocationFeature.create(coroutineScope = viewModelScope, locationApi = locationApi)
+        FakeLocationFeature.create(
+            getQuickPrivacyStateUseCase = getQuickPrivacyStateUseCase,
+            fakeLocationStateUseCase = fakeLocationStateUseCase,
+            coroutineScope = viewModelScope)
     }
 
     fun submitAction(action: FakeLocationFeature.Action) {
@@ -40,8 +47,10 @@ class FakeLocationViewModel(private val locationApi: LocationApiDelegate) : View
     }
 }
 
-class FakeLocationViewModelFactory(private val locationApi: LocationApiDelegate) : Factory<FakeLocationViewModel> {
+class FakeLocationViewModelFactory(
+    private val getQuickPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
+    private val fakeLocationStateUseCase: FakeLocationStateUseCase) : Factory<FakeLocationViewModel> {
     override fun create(): FakeLocationViewModel {
-        return FakeLocationViewModel((locationApi))
+        return FakeLocationViewModel(getQuickPrivacyStateUseCase, fakeLocationStateUseCase)
     }
 }

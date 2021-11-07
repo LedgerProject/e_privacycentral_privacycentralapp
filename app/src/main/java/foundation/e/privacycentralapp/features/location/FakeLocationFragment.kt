@@ -28,7 +28,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.RadioButton
 import android.widget.Toast
 import androidx.annotation.NonNull
 import androidx.core.view.isVisible
@@ -62,6 +61,7 @@ import foundation.e.privacycentralapp.common.NavToolbarFragment
 import foundation.e.privacycentralapp.databinding.FragmentFakeLocationBinding
 import foundation.e.privacycentralapp.domain.entities.LocationMode
 import foundation.e.privacycentralapp.extensions.viewModelProviderFactoryOf
+import foundation.e.privacycentralapp.features.location.FakeLocationFeature.Action
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
@@ -93,11 +93,13 @@ class FakeLocationFragment :
 
     private var inputJob: Job? = null
 
+    private var displayedLocation: Pair<Float, Float>? = null
     // Callback which updates the map in realtime.
     private val locationChangeCallback: LocationEngineCallback<LocationEngineResult> =
         object : LocationEngineCallback<LocationEngineResult> {
             override fun onSuccess(result: LocationEngineResult?) {
                 result?.lastLocation?.let {
+                    displayedLocation = it.latitude.toFloat() to it.longitude.toFloat()
                     mapboxMap.locationComponent.forceLocationUpdate(
                         LocationUpdate.Builder().location(it).animationDuration(100)
                             .build()
@@ -114,16 +116,16 @@ class FakeLocationFragment :
                     }
                     // Only update location when location mode is set to real location or random location.
                     // It basically triggers a UI update.
-                    if (viewModel.fakeLocationFeature.state.value.location.mode != LocationMode.CUSTOM_LOCATION) {
-                        viewModel.submitAction(
-                            FakeLocationFeature.Action.UpdateLocationAction(
-                                LatLng(
-                                    it.latitude,
-                                    it.longitude
-                                )
-                            )
-                        )
-                    }
+                    // if (viewModel.fakeLocationFeature.state.value.location.mode != LocationMode.SPECIFIC_LOCATION) {
+                    //     viewModel.submitAction(
+                    //         FakeLocationFeature.Action.UpdateLocationAction(
+                    //             LatLng(
+                    //                 it.latitude,
+                    //                 it.longitude
+                    //             )
+                    //         )
+                    //     )
+                    // }
                 }
             }
 
@@ -148,29 +150,13 @@ class FakeLocationFragment :
         lifecycleScope.launchWhenStarted {
             viewModel.fakeLocationFeature.singleEvents.collect { event ->
                 when (event) {
-                    is FakeLocationFeature.SingleEvent.RandomLocationSelectedEvent -> {
-                        displayToast("Random location selected")
-                        hoveringMarker?.visibility = View.GONE
-                        isCameraMoved = false
-                    }
-                    is FakeLocationFeature.SingleEvent.SpecificLocationSavedEvent -> {
-                        // Hide camera hover marker when custom location is picked from map.
-                        displayToast("Specific location selected")
-                        hoveringMarker?.visibility = View.GONE
-                        isCameraMoved = false
-                    }
                     is FakeLocationFeature.SingleEvent.ErrorEvent -> {
                         displayToast(event.error)
-                        isCameraMoved = false
-                    }
-                    FakeLocationFeature.SingleEvent.RealLocationSelectedEvent -> {
-                        displayToast("Real location selected")
-                        hoveringMarker?.visibility = View.GONE
-                        isCameraMoved = false
                     }
                 }
             }
         }
+        lifecycleScope.launchWhenStarted { viewModel.submitAction(Action.Init) }
     }
 
     override fun onAttach(context: Context) {
@@ -206,25 +192,29 @@ class FakeLocationFragment :
                 binding.mapView.addView(hoveringMarker)
                 hoveringMarker?.visibility = View.GONE // Keep hovering marker hidden by default
 
-                mapboxMap.addOnCameraMoveStartedListener {
-                    // Show marker when user starts to move across the map.
-                    hoveringMarker?.visibility = if (binding.mapView.isEnabled) {
-                        View.VISIBLE
-                    } else {
-                        View.GONE
-                    }
-                    isCameraMoved = true
-                }
+                // mapboxMap.addOnCameraMoveStartedListener {
+                //     // Show marker when user starts to move across the map.
+                //     hoveringMarker?.visibility = if (binding.mapView.isEnabled) {
+                //         View.VISIBLE
+                //     } else {
+                //         View.GONE
+                //     }
+                //     isCameraMoved = true
+                // }
+                //
+                // mapboxMap.addOnCameraMoveListener {
+                //     if (binding.mapView.isEnabled) {
+                //         mapboxMap.cameraPosition.target.let {
+                //             viewModel.submitAction(
+                //                 Action.SetSpecificLocationAction(
+                //                     it.latitude.toFloat(),
+                //                     it.longitude.toFloat()
+                //                 )
+                //             )
+                //         }
+                //     }
 
-                mapboxMap.addOnCameraMoveListener {
-                    if (binding.mapView.isEnabled) {
-                        viewModel.submitAction(
-                            FakeLocationFeature.Action.UpdateLocationAction(
-                                mapboxMap.cameraPosition.target
-                            )
-                        )
-                    }
-                }
+                // }
                 // Bind click listeners once map is ready.
                 bindClickListeners()
             }
@@ -238,8 +228,8 @@ class FakeLocationFragment :
                 delay(DEBOUNCE_PERIOD)
                 ensureActive()
                 try {
-                    val value = editable.toString().toDouble()
-                    val maxValue = if (isLat) 90.0 else 180.0
+                    val value = editable.toString().toFloat()
+                    val maxValue = if (isLat) 90f else 180f
 
                     if (value > maxValue || value < -maxValue) {
                         throw NumberFormatException("value $value is out of bounds")
@@ -251,12 +241,10 @@ class FakeLocationFragment :
 
                     // Here, value is valid, try to send the values
                     try {
-                        val lat = binding.edittextLatitude.text.toString().toDouble()
-                        val lon = binding.edittextLongitude.text.toString().toDouble()
-                        if (lat <= 90.0 && lat >= -90.0 && lon <= 180.0 && lon >= -180.0) {
-                            viewModel.submitAction(
-                                FakeLocationFeature.Action.SetCustomFakeLocationAction(lat, lon)
-                            )
+                        val lat = binding.edittextLatitude.text.toString().toFloat()
+                        val lon = binding.edittextLongitude.text.toString().toFloat()
+                        if (lat <= 90f && lat >= -90f && lon <= 180f && lon >= -180f) {
+                            viewModel.submitAction(Action.SetSpecificLocationAction(lat, lon))
                         }
                     } catch (e: NumberFormatException) {}
                 } catch (e: NumberFormatException) {
@@ -268,14 +256,16 @@ class FakeLocationFragment :
     }
 
     private fun bindClickListeners() {
-        binding.radioUseRealLocation.setOnClickListener { radioButton ->
-            toggleLocationType(radioButton)
+        binding.radioUseRealLocation.setOnClickListener {
+            viewModel.submitAction(Action.UseRealLocationAction)
         }
-        binding.radioUseRandomLocation.setOnClickListener { radioButton ->
-            toggleLocationType(radioButton)
+        binding.radioUseRandomLocation.setOnClickListener {
+            viewModel.submitAction(Action.UseRandomLocationAction)
         }
-        binding.radioUseSpecificLocation.setOnClickListener { radioButton ->
-            toggleLocationType(radioButton)
+        binding.radioUseSpecificLocation.setOnClickListener {
+            viewModel.submitAction(
+Action.SetSpecificLocationAction(displayedLocation?.first?: 0f, displayedLocation?.second?: 0f)
+            )
         }
 
         binding.edittextLatitude.addTextChangedListener(
@@ -295,50 +285,25 @@ class FakeLocationFragment :
         )
     }
 
-    private fun toggleLocationType(radioButton: View?) {
-        if (radioButton is RadioButton) {
-            val checked = radioButton.isChecked
-            when (radioButton.id) {
-                R.id.radio_use_real_location ->
-                    if (checked) {
-                        viewModel.submitAction(
-                            FakeLocationFeature.Action.UseRealLocationAction
-                        )
-                    }
-                R.id.radio_use_random_location ->
-                    if (checked) {
-                        viewModel.submitAction(
-                            FakeLocationFeature.Action.UseRandomLocationAction(
-                                resources.getStringArray(R.array.cities)
-                            )
-                        )
-                    }
-                R.id.radio_use_specific_location ->
-                    if (checked) {
-                        viewModel.submitAction(
-                            FakeLocationFeature.Action.UseSpecificLocationAction
-                        )
-                    }
-            }
-        }
-    }
-
     override fun render(state: FakeLocationFeature.State) {
-        binding.radioUseRandomLocation.isChecked = (state.location.mode == LocationMode.RANDOM_LOCATION)
+        hoveringMarker?.visibility = View.GONE
+        isCameraMoved = false
+
+        binding.radioUseRandomLocation.isChecked = (state.mode == LocationMode.RANDOM_LOCATION)
         binding.radioUseSpecificLocation.isChecked =
-            (state.location.mode == LocationMode.CUSTOM_LOCATION)
-        binding.radioUseRealLocation.isChecked = (state.location.mode == LocationMode.REAL_LOCATION)
+            (state.mode == LocationMode.SPECIFIC_LOCATION)
+        binding.radioUseRealLocation.isChecked = (state.mode == LocationMode.REAL_LOCATION)
 
-        binding.mapView.isEnabled = (state.location.mode == LocationMode.CUSTOM_LOCATION)
+        binding.mapView.isEnabled = (state.mode == LocationMode.SPECIFIC_LOCATION)
 
-        binding.textlayoutLatitude.isVisible = (state.location.mode == LocationMode.CUSTOM_LOCATION)
-        binding.textlayoutLongitude.isVisible = (state.location.mode == LocationMode.CUSTOM_LOCATION)
+        binding.textlayoutLatitude.isVisible = (state.mode == LocationMode.SPECIFIC_LOCATION)
+        binding.textlayoutLongitude.isVisible = (state.mode == LocationMode.SPECIFIC_LOCATION)
 
-        binding.edittextLatitude.setText(state.location.latitude.toString())
-        binding.edittextLongitude.setText(state.location.longitude.toString())
+        binding.edittextLatitude.setText(state.specificLatitude?.toString())
+        binding.edittextLongitude.setText(state.specificLongitude?.toString())
     }
 
-    override fun actions(): Flow<FakeLocationFeature.Action> = viewModel.actions
+    override fun actions(): Flow<Action> = viewModel.actions
 
     @SuppressLint("MissingPermission")
     private fun enableLocationPlugin(@NonNull loadedMapStyle: Style) {

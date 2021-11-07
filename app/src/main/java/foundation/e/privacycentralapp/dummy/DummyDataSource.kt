@@ -183,9 +183,9 @@ object DummyDataSource {
                 requireNotNull(location) { "Custom location should be null" }
                 _location.value = location
             }
-            LocationMode.CUSTOM_LOCATION -> {
+            LocationMode.SPECIFIC_LOCATION -> {
                 requireNotNull(location) { "Custom location should be null" }
-                _location.value = location.copy(mode = LocationMode.CUSTOM_LOCATION)
+                _location.value = location.copy(mode = LocationMode.SPECIFIC_LOCATION)
             }
         }
         return true

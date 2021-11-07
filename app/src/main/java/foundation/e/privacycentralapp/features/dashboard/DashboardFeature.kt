@@ -56,7 +56,7 @@ class DashboardFeature(
         val totalGraph: Int? = null,
         // val graphData
         val trackersCount: Int? = null,
-        val dayTrackersCount: Int? = null,
+        val activeTrackersCount: Int? = null,
         val dayStatistics: List<Int>? = null
     )
 

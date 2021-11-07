@@ -17,47 +17,89 @@
 
 package foundation.e.privacycentralapp.domain.usecases
 
-/*import android.app.AppOpsManager
-import android.content.Intent
-import android.util.Log
+import android.app.AppOpsManager
 import foundation.e.privacycentralapp.data.repositories.LocalStateRepository
 import foundation.e.privacycentralapp.domain.entities.LocationMode
-import foundation.e.privacycentralapp.features.location.LocationApiDelegate
-import foundation.e.privacymodules.location.IFakeLocation
+import foundation.e.privacycentralapp.dummy.CityDataSource
+import foundation.e.privacymodules.location.IFakeLocationModule
 import foundation.e.privacymodules.permissions.PermissionsPrivacyModule
 import foundation.e.privacymodules.permissions.data.AppOpModes
 import foundation.e.privacymodules.permissions.data.ApplicationDescription
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 class FakeLocationStateUseCase(
-    private val fakeLocationModule: IFakeLocation,
+    private val fakeLocationModule: IFakeLocationModule,
+
     private val permissionsModule: PermissionsPrivacyModule,
     private val localStateRepository: LocalStateRepository,
+    private val citiesRepository: CityDataSource,
     private val appDesc: ApplicationDescription,
     private val coroutineScope: CoroutineScope
 ) {
 
+    init {
+        coroutineScope.launch {
+            localStateRepository.quickPrivacyEnabledFlow.collect {
+                applySettings(it, localStateRepository.fakeLocation)
+            }
+        }
+    }
+
+    fun getLocationMode(): LocationMode = when(localStateRepository.fakeLocation) {
+        null -> LocationMode.REAL_LOCATION
+        in citiesRepository.citiesLocationsList -> LocationMode.RANDOM_LOCATION
+        else -> LocationMode.SPECIFIC_LOCATION
+    }
+
     private fun acquireLocationPermission() {
-        try {
+        permissionsModule.toggleDangerousPermission(appDesc,
+            android.Manifest.permission.ACCESS_FINE_LOCATION, true)
 
-            permissionsModule.setAppOpMode(
-                appDesc, AppOpsManager.OPSTR_COARSE_LOCATION,
-                AppOpModes.ALLOWED
-            )
-            permissionsModule.setAppOpMode(
-                appDesc, AppOpsManager.OPSTR_FINE_LOCATION,
-                AppOpModes.ALLOWED
-            )
-        } catch (e: Exception) {
-    //        Log.e(TAG, "Can't start RealLocation", e)
+            // permissionsModule.setAppOpMode(
+            //     appDesc, AppOpsManager.OPSTR_COARSE_LOCATION,
+            //     AppOpModes.ALLOWED
+            // )
+            // permissionsModule.setAppOpMode(
+            //     appDesc, AppOpsManager.OPSTR_FINE_LOCATION,
+            //     AppOpModes.ALLOWED
+            // )
+    }
+
+    private fun applySettings(isQuickPrivacyEnabled: Boolean, fakeLocation: Pair<Float, Float>?) {
+        if (isQuickPrivacyEnabled && fakeLocation != null) {
+            if (permissionsModule.getAppOpMode(appDesc, AppOpsManager.OPSTR_MOCK_LOCATION) != AppOpModes.ALLOWED) {
+                permissionsModule.setAppOpMode(appDesc, AppOpsManager.OPSTR_MOCK_LOCATION, AppOpModes.ALLOWED)
+            }
+            fakeLocationModule.startFakeLocation()
+
+            fakeLocationModule.setFakeLocation(fakeLocation.first.toDouble(), fakeLocation.second.toDouble())
+        } else {
+            fakeLocationModule.stopFakeLocation()
         }
     }
 
-    private fun applySettings(isQuickPrivacyEnabled: Boolean, fakeLocationMode: LocationMode) {
-        when {
-          //  isQuickPrivacyEnabled ->
-        }
+    fun setSpecificLocation(latitude: Float, longitude: Float) {
+        setFakeLocation(latitude to longitude)
     }
 
+    fun setRandomLocation() {
+        val randomIndex = Random.nextInt(citiesRepository.citiesLocationsList.size)
+        val location = citiesRepository.citiesLocationsList[randomIndex]
 
-}*/
+        setFakeLocation(location)
+    }
+
+    private fun setFakeLocation(location: Pair<Float, Float>) {
+        localStateRepository.fakeLocation = location
+        applySettings(true, location)
+    }
+
+    fun stopFakeLocation() {
+        localStateRepository.fakeLocation = null
+        applySettings(true, null)
+    }
+
+}

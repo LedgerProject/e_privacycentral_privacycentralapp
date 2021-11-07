@@ -29,6 +29,7 @@ import foundation.e.privacycentralapp.features.dashboard.DashboardFragment
 import foundation.e.trackerfilter.DNSBlockerService
 import foundation.e.trackerfilter.StatsIntentService
 
+
 open class MainActivity : FragmentActivity(R.layout.activity_main) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,15 +45,15 @@ open class MainActivity : FragmentActivity(R.layout.activity_main) {
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         handleIntent(intent)
+        // TODO  move into tracker module.
+        AndroidEnvironment.initEnvironment(this)
+        startService(Intent(this, DNSBlockerService::class.java))
+        startService(Intent(this, StatsIntentService::class.java))
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleIntent(intent)
-
-        AndroidEnvironment.initEnvironment(this)
-        startService(Intent(this, DNSBlockerService::class.java))
-        startService(Intent(this, StatsIntentService::class.java))
     }
 
     open fun handleIntent(intent: Intent) {}

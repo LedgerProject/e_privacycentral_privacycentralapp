@@ -18,5 +18,5 @@
 package foundation.e.privacycentralapp.domain.entities
 
 enum class LocationMode {
-    REAL_LOCATION, RANDOM_LOCATION, CUSTOM_LOCATION
+    REAL_LOCATION, RANDOM_LOCATION, SPECIFIC_LOCATION
 }

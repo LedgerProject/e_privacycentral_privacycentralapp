@@ -26,6 +26,8 @@ class LocalStateRepository(context: Context) {
         private const val SHARED_PREFS_FILE = "localState"
         private const val KEY_QUICK_PRIVACY = "quickPrivacy"
         private const val KEY_IP_SCRAMBLING = "ipScrambling"
+        private const val KEY_FAKE_LATITUDE = "fakeLatitude"
+        private const val KEY_FAKE_LONGITUDE = "fakeLongitude"
     }
 
     private val sharedPref = context.getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
@@ -39,6 +41,27 @@ class LocalStateRepository(context: Context) {
         }
 
     var quickPrivacyEnabledFlow: Flow<Boolean> = quickPrivacyEnabledMutableFlow
+
+    var fakeLocation: Pair<Float, Float>?
+        get() = if (sharedPref.contains(KEY_FAKE_LATITUDE) && sharedPref.contains(
+                    KEY_FAKE_LONGITUDE))
+                        Pair(
+                            sharedPref.getFloat(KEY_FAKE_LATITUDE, 0f),
+                            sharedPref.getFloat(KEY_FAKE_LONGITUDE, 0f))
+                else null
+        set(value) {
+            if (value == null) {
+                sharedPref.edit()
+                    .remove(KEY_FAKE_LATITUDE)
+                    .remove(KEY_FAKE_LONGITUDE)
+                    .commit()
+            } else {
+                sharedPref.edit()
+                    .putFloat(KEY_FAKE_LATITUDE, value.first)
+                    .putFloat(KEY_FAKE_LONGITUDE, value.second)
+                    .commit()
+            }
+        }
 
     var isIpScramblingEnabled: Boolean
         get() = sharedPref.getBoolean(KEY_IP_SCRAMBLING, false)
