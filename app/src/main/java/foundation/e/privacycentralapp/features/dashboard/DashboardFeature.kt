@@ -24,6 +24,7 @@ import foundation.e.flowmvi.SingleEventProducer
 import foundation.e.flowmvi.feature.BaseFeature
 import foundation.e.privacycentralapp.domain.entities.InternetPrivacyMode
 import foundation.e.privacycentralapp.domain.entities.LocationMode
+import foundation.e.privacycentralapp.domain.usecases.FakeLocationStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.IpScramblingStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.TrackersStateUseCase
@@ -56,7 +57,7 @@ class DashboardFeature(
         val totalGraph: Int? = null,
         // val graphData
         val trackersCount: Int? = null,
-        val activeTrackersCount: Int? = null,
+        val dayTrackersCount: Int? = null,
         val dayStatistics: List<Int>? = null
     )
 
@@ -122,7 +123,8 @@ class DashboardFeature(
             getPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
             ipScramblingStateUseCase: IpScramblingStateUseCase,
             trackersStatisticsUseCase: TrackersStatisticsUseCase,
-            trackersStateUseCase: TrackersStateUseCase
+            trackersStateUseCase: TrackersStateUseCase,
+            fakeLocationStateUseCase: FakeLocationStateUseCase
         ): DashboardFeature =
             DashboardFeature(
                 initialState = State(),
@@ -140,6 +142,8 @@ class DashboardFeature(
                         is Effect.TrackersBlockedUpdatedEffect -> state.copy(
                             isAllTrackersBlocked = effect.areAllTrackersBlocked
                         )
+                        is Effect.UpdateLocationModeEffect -> state.copy(locationMode = effect.mode)
+
                         /*is Effect.OpenDashboardEffect -> State.DashboardState(
                             effect.trackersCount,
                             effect.activeTrackersCount,
@@ -214,6 +218,9 @@ class DashboardFeature(
                             },
                             trackersStateUseCase.areAllTrackersBlocked.map {
                                 Effect.TrackersBlockedUpdatedEffect(it)
+                            },
+                            fakeLocationStateUseCase.locationMode.map {
+                                Effect.UpdateLocationModeEffect(it)
                             }
                         )
                         /*

@@ -20,6 +20,7 @@ package foundation.e.privacycentralapp.features.dashboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import foundation.e.privacycentralapp.common.Factory
+import foundation.e.privacycentralapp.domain.usecases.FakeLocationStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.IpScramblingStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.TrackersStateUseCase
@@ -32,7 +33,8 @@ class DashboardViewModel(
     private val getPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
     private val ipScramblingStateUseCase: IpScramblingStateUseCase,
     private val trackersStatisticsUseCase: TrackersStatisticsUseCase,
-    private val trackersStateUseCase: TrackersStateUseCase
+    private val trackersStateUseCase: TrackersStateUseCase,
+    private val fakeLocationStateUseCase: FakeLocationStateUseCase
 ) : ViewModel() {
 
     private val _actions = MutableSharedFlow<DashboardFeature.Action>()
@@ -44,7 +46,8 @@ class DashboardViewModel(
             getPrivacyStateUseCase = getPrivacyStateUseCase,
             ipScramblingStateUseCase = ipScramblingStateUseCase,
             trackersStatisticsUseCase = trackersStatisticsUseCase,
-            trackersStateUseCase = trackersStateUseCase
+            trackersStateUseCase = trackersStateUseCase,
+            fakeLocationStateUseCase = fakeLocationStateUseCase
         )
     }
 
@@ -59,9 +62,10 @@ class DashBoardViewModelFactory(
     private val getPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
     private val ipScramblingStateUseCase: IpScramblingStateUseCase,
     private val trackersStatisticsUseCase: TrackersStatisticsUseCase,
-    private val trackersStateUseCase: TrackersStateUseCase
+    private val trackersStateUseCase: TrackersStateUseCase,
+    private val fakeLocationStateUseCase: FakeLocationStateUseCase
 ) : Factory<DashboardViewModel> {
     override fun create(): DashboardViewModel {
-        return DashboardViewModel(getPrivacyStateUseCase, ipScramblingStateUseCase, trackersStatisticsUseCase, trackersStateUseCase)
+        return DashboardViewModel(getPrivacyStateUseCase, ipScramblingStateUseCase, trackersStatisticsUseCase, trackersStateUseCase, fakeLocationStateUseCase)
     }
 }

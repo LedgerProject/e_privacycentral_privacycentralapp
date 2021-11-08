@@ -29,7 +29,6 @@ import foundation.e.privacycentralapp.features.dashboard.DashboardFragment
 import foundation.e.trackerfilter.DNSBlockerService
 import foundation.e.trackerfilter.StatsIntentService
 
-
 open class MainActivity : FragmentActivity(R.layout.activity_main) {
 
     override fun onCreate(savedInstanceState: Bundle?) {

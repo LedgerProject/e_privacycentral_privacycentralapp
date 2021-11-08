@@ -44,11 +44,14 @@ class LocalStateRepository(context: Context) {
 
     var fakeLocation: Pair<Float, Float>?
         get() = if (sharedPref.contains(KEY_FAKE_LATITUDE) && sharedPref.contains(
-                    KEY_FAKE_LONGITUDE))
-                        Pair(
-                            sharedPref.getFloat(KEY_FAKE_LATITUDE, 0f),
-                            sharedPref.getFloat(KEY_FAKE_LONGITUDE, 0f))
-                else null
+                KEY_FAKE_LONGITUDE
+            )
+        )
+            Pair(
+                sharedPref.getFloat(KEY_FAKE_LATITUDE, 0f),
+                sharedPref.getFloat(KEY_FAKE_LONGITUDE, 0f)
+            )
+        else null
         set(value) {
             if (value == null) {
                 sharedPref.edit()

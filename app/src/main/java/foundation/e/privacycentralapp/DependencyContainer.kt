@@ -94,18 +94,20 @@ class DependencyContainer constructor(val app: Application) {
 
     private val fakeLocationStateUseCase by lazy {
         FakeLocationStateUseCase(
-            fakeLocationModule, permissionsModule, localStateRepository, CityDataSource, appDesc, GlobalScope)
+            fakeLocationModule, permissionsModule, localStateRepository, CityDataSource, appDesc, context, GlobalScope
+        )
     }
 
     // ViewModelFactories
     val dashBoardViewModelFactory by lazy {
-        DashBoardViewModelFactory(getQuickPrivacyStateUseCase, ipScramblingStateUseCase, trackersStatisticsUseCase, trackersStateUseCase)
+        DashBoardViewModelFactory(getQuickPrivacyStateUseCase, ipScramblingStateUseCase, trackersStatisticsUseCase, trackersStateUseCase, fakeLocationStateUseCase)
     }
 
     val fakeLocationViewModelFactory by lazy {
         FakeLocationViewModelFactory(
             getQuickPrivacyStateUseCase = getQuickPrivacyStateUseCase,
-            fakeLocationStateUseCase = fakeLocationStateUseCase)
+            fakeLocationStateUseCase = fakeLocationStateUseCase
+        )
     }
 
     val blockerService = BlockerInterface.getInstance(context)

@@ -68,13 +68,41 @@
             </RadioGroup>
 
 
-            <foundation.e.privacycentralapp.features.location.FakeLocationMapView
-                android:id="@+id/mapView"
-                android:layout_height="220dp"
+            <FrameLayout
                 android:layout_marginTop="16dp"
+                android:layout_height="220dp"
                 android:layout_width="match_parent"
-                mapbox:mapbox_cameraZoom="8"
-                />
+                >
+                <foundation.e.privacycentralapp.features.location.FakeLocationMapView
+                    android:id="@+id/mapView"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    mapbox:mapbox_cameraZoom="8"
+                    />
+                <ImageView
+                    android:id="@+id/centered_marker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/mapbox_marker_icon_default"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    />
+                <View
+                    android:id="@+id/map_overlay"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/grey_overlay"
+                    android:visibility="visible"
+                    />
+                <ProgressBar
+                    android:id="@+id/map_loader"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_margin="24dp"
+                    android:layout_gravity="center"
+                    android:visibility="visible"
+                    />
+            </FrameLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"

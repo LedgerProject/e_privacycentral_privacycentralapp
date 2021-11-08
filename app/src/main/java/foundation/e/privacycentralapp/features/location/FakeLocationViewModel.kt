@@ -28,7 +28,8 @@ import kotlinx.coroutines.launch
 
 class FakeLocationViewModel(
     private val getQuickPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
-    private val fakeLocationStateUseCase: FakeLocationStateUseCase) : ViewModel() {
+    private val fakeLocationStateUseCase: FakeLocationStateUseCase
+) : ViewModel() {
 
     private val _actions = MutableSharedFlow<FakeLocationFeature.Action>()
     val actions = _actions.asSharedFlow()
@@ -37,7 +38,8 @@ class FakeLocationViewModel(
         FakeLocationFeature.create(
             getQuickPrivacyStateUseCase = getQuickPrivacyStateUseCase,
             fakeLocationStateUseCase = fakeLocationStateUseCase,
-            coroutineScope = viewModelScope)
+            coroutineScope = viewModelScope
+        )
     }
 
     fun submitAction(action: FakeLocationFeature.Action) {
@@ -49,7 +51,8 @@ class FakeLocationViewModel(
 
 class FakeLocationViewModelFactory(
     private val getQuickPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
-    private val fakeLocationStateUseCase: FakeLocationStateUseCase) : Factory<FakeLocationViewModel> {
+    private val fakeLocationStateUseCase: FakeLocationStateUseCase
+) : Factory<FakeLocationViewModel> {
     override fun create(): FakeLocationViewModel {
         return FakeLocationViewModel(getQuickPrivacyStateUseCase, fakeLocationStateUseCase)
     }

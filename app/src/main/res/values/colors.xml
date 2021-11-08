@@ -16,6 +16,7 @@
     <color name="grey_text">#99000000</color>
     <color name="grey_text_2">#61000000</color>
     <color name="grey_divider">#14212121</color>
+    <color name="grey_overlay">#66FFFFFF</color>
 
     <color name="orange_off">#FC7222</color>
     <color name="green_on">#169659</color>

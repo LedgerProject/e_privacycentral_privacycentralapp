@@ -217,7 +217,7 @@ class DashboardFragment :
             binding.graph.invalidate()
         }
 
-        binding.graphLegend.text = getString(R.string.dashboard_graph_trackers_legend, state.trackersCount?.toString() ?: "No")
+        binding.graphLegend.text = getString(R.string.dashboard_graph_trackers_legend, state.dayTrackersCount?.toString() ?: "No")
 
         if (state.dayTrackersCount != null && state.trackersCount != null) {
             binding.amITracked.subTitle = getString(R.string.dashboard_am_i_tracked_subtitle, state.trackersCount, state.dayTrackersCount)

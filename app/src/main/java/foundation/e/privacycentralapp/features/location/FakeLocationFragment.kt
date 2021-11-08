@@ -19,14 +19,11 @@ package foundation.e.privacycentralapp.features.location
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.location.Location
 import android.os.Bundle
-import android.os.Looper
 import android.text.Editable
 import android.util.Log
-import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.NonNull
@@ -39,7 +36,6 @@ import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textfield.TextInputLayout.END_ICON_CUSTOM
 import com.google.android.material.textfield.TextInputLayout.END_ICON_NONE
 import com.mapbox.android.core.location.LocationEngineCallback
-import com.mapbox.android.core.location.LocationEngineRequest
 import com.mapbox.android.core.location.LocationEngineResult
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
@@ -87,25 +83,26 @@ class FakeLocationFragment :
 
     private lateinit var binding: FragmentFakeLocationBinding
 
-    private lateinit var mapboxMap: MapboxMap
-
+    private var mapboxMap: MapboxMap? = null
+    private var locationComponent: LocationComponent? = null
     private var hoveringMarker: ImageView? = null
 
     private var inputJob: Job? = null
 
     private var displayedLocation: Pair<Float, Float>? = null
+
     // Callback which updates the map in realtime.
     private val locationChangeCallback: LocationEngineCallback<LocationEngineResult> =
         object : LocationEngineCallback<LocationEngineResult> {
             override fun onSuccess(result: LocationEngineResult?) {
                 result?.lastLocation?.let {
                     displayedLocation = it.latitude.toFloat() to it.longitude.toFloat()
-                    mapboxMap.locationComponent.forceLocationUpdate(
+                    mapboxMap?.locationComponent?.forceLocationUpdate(
                         LocationUpdate.Builder().location(it).animationDuration(100)
                             .build()
                     )
                     if (!isCameraMoved) {
-                        mapboxMap.animateCamera(
+                        mapboxMap?.animateCamera(
                             CameraUpdateFactory.newLatLng(
                                 LatLng(
                                     it.latitude,
@@ -153,10 +150,11 @@ class FakeLocationFragment :
                     is FakeLocationFeature.SingleEvent.ErrorEvent -> {
                         displayToast(event.error)
                     }
+                    is FakeLocationFeature.SingleEvent.LocationUpdatedEvent ->
+                        updateLocation(event.location)
                 }
             }
         }
-        lifecycleScope.launchWhenStarted { viewModel.submitAction(Action.Init) }
     }
 
     override fun onAttach(context: Context) {
@@ -180,48 +178,30 @@ class FakeLocationFragment :
             mapboxMap.getUiSettings().isRotateGesturesEnabled = false
             mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
                 enableLocationPlugin(style)
-                hoveringMarker = ImageView(requireContext())
-                    .apply {
-                        setImageResource(R.drawable.mapbox_marker_icon_default)
-                        val params = FrameLayout.LayoutParams(
-                            ViewGroup.LayoutParams.WRAP_CONTENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER
-                        )
-                        layoutParams = params
+
+                mapboxMap.addOnCameraMoveListener {
+                    if (binding.mapView.isEnabled) {
+                        mapboxMap.cameraPosition.target.let {
+                            viewModel.submitAction(
+                                Action.SetSpecificLocationAction(
+                                    it.latitude.toFloat(),
+                                    it.longitude.toFloat()
+                                )
+                            )
+                        }
                     }
-                binding.mapView.addView(hoveringMarker)
-                hoveringMarker?.visibility = View.GONE // Keep hovering marker hidden by default
-
-                // mapboxMap.addOnCameraMoveStartedListener {
-                //     // Show marker when user starts to move across the map.
-                //     hoveringMarker?.visibility = if (binding.mapView.isEnabled) {
-                //         View.VISIBLE
-                //     } else {
-                //         View.GONE
-                //     }
-                //     isCameraMoved = true
-                // }
-                //
-                // mapboxMap.addOnCameraMoveListener {
-                //     if (binding.mapView.isEnabled) {
-                //         mapboxMap.cameraPosition.target.let {
-                //             viewModel.submitAction(
-                //                 Action.SetSpecificLocationAction(
-                //                     it.latitude.toFloat(),
-                //                     it.longitude.toFloat()
-                //                 )
-                //             )
-                //         }
-                //     }
-
-                // }
+                }
                 // Bind click listeners once map is ready.
                 bindClickListeners()
             }
         }
     }
 
-    private fun getCoordinatesAfterTextChanged(inputLayout: TextInputLayout, editText: TextInputEditText, isLat: Boolean) = { editable: Editable? ->
+    private fun getCoordinatesAfterTextChanged(
+        inputLayout: TextInputLayout,
+        editText: TextInputEditText,
+        isLat: Boolean
+    ) = { editable: Editable? ->
         inputJob?.cancel()
         if (editable != null && editable.length > 0 && editText.isEnabled) {
             inputJob = lifecycleScope.launch {
@@ -244,9 +224,16 @@ class FakeLocationFragment :
                         val lat = binding.edittextLatitude.text.toString().toFloat()
                         val lon = binding.edittextLongitude.text.toString().toFloat()
                         if (lat <= 90f && lat >= -90f && lon <= 180f && lon >= -180f) {
-                            viewModel.submitAction(Action.SetSpecificLocationAction(lat, lon))
+                            Log.e("UpdateText", "")
+                            mapboxMap?.moveCamera(
+                                CameraUpdateFactory.newLatLng(
+                                    LatLng(lat.toDouble(), lon.toDouble())
+                                )
+                            )
+                            // viewModel.submitAction(Action.SetSpecificLocationAction(lat, lon))
                         }
-                    } catch (e: NumberFormatException) {}
+                    } catch (e: NumberFormatException) {
+                    }
                 } catch (e: NumberFormatException) {
                     inputLayout.endIconMode = END_ICON_NONE
                     inputLayout.error = getString(R.string.location_input_error)
@@ -255,6 +242,7 @@ class FakeLocationFragment :
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun bindClickListeners() {
         binding.radioUseRealLocation.setOnClickListener {
             viewModel.submitAction(Action.UseRealLocationAction)
@@ -263,10 +251,22 @@ class FakeLocationFragment :
             viewModel.submitAction(Action.UseRandomLocationAction)
         }
         binding.radioUseSpecificLocation.setOnClickListener {
-            viewModel.submitAction(
-Action.SetSpecificLocationAction(displayedLocation?.first?: 0f, displayedLocation?.second?: 0f)
-            )
+            mapboxMap?.cameraPosition?.target?.let {
+                viewModel.submitAction(
+                    Action.SetSpecificLocationAction(it.latitude.toFloat(), it.longitude.toFloat())
+                )
+            }
         }
+
+        // binding.mapView.addOnTouchListener { _, event ->
+        //     //mapboxMap.addOnCameraMoveStartedListener {
+        //         // Show marker when user starts to move across the map.
+        //     if (event.action == ACTION_DOWN && binding.mapView.isEnabled) {
+        //         hoveringMarker?.visibility = View.VISIBLE
+        //         isCameraMoved = true
+        //     }
+        //     binding.mapView.onTouchEvent(event)
+        // }
 
         binding.edittextLatitude.addTextChangedListener(
             afterTextChanged = getCoordinatesAfterTextChanged(
@@ -285,16 +285,29 @@ Action.SetSpecificLocationAction(displayedLocation?.first?: 0f, displayedLocatio
         )
     }
 
+    @SuppressLint("MissingPermission")
     override fun render(state: FakeLocationFeature.State) {
-        hoveringMarker?.visibility = View.GONE
-        isCameraMoved = false
-
         binding.radioUseRandomLocation.isChecked = (state.mode == LocationMode.RANDOM_LOCATION)
         binding.radioUseSpecificLocation.isChecked =
             (state.mode == LocationMode.SPECIFIC_LOCATION)
         binding.radioUseRealLocation.isChecked = (state.mode == LocationMode.REAL_LOCATION)
 
         binding.mapView.isEnabled = (state.mode == LocationMode.SPECIFIC_LOCATION)
+
+        if (state.mode != LocationMode.SPECIFIC_LOCATION) {
+            isCameraMoved = false
+            binding.centeredMarker.isVisible = false
+        } else {
+            binding.mapLoader.isVisible = false
+            binding.mapOverlay.isVisible = false
+            binding.centeredMarker.isVisible = true
+
+            mapboxMap?.moveCamera(
+                CameraUpdateFactory.newLatLng(
+                    LatLng(state.specificLatitude?.toDouble() ?: 0.0, state.specificLongitude?.toDouble() ?: 0.0)
+                )
+            )
+        }
 
         binding.textlayoutLatitude.isVisible = (state.mode == LocationMode.SPECIFIC_LOCATION)
         binding.textlayoutLongitude.isVisible = (state.mode == LocationMode.SPECIFIC_LOCATION)
@@ -306,32 +319,72 @@ Action.SetSpecificLocationAction(displayedLocation?.first?: 0f, displayedLocatio
     override fun actions(): Flow<Action> = viewModel.actions
 
     @SuppressLint("MissingPermission")
+    private fun updateLocation(lastLocation: Location?) {
+        lastLocation?.let { location ->
+            locationComponent?.isLocationComponentEnabled = true
+            val locationUpdate = LocationUpdate.Builder()
+                .location(location)
+                .animationDuration(100)
+                .build()
+            locationComponent?.forceLocationUpdate(locationUpdate)
+
+            // if (binding.mapView.isEnabled && !isCameraMoved) {
+            //     binding.mapView.isEnabled = false
+            //     mapboxMap?.moveCamera(
+            //         CameraUpdateFactory.newLatLng(
+            //             LatLng(
+            //                 location.latitude,
+            //                 location.longitude
+            //             )
+            //         )
+            //     )
+            //     isCameraMoved = false
+            //     binding.mapView.isEnabled = true
+            if (!binding.mapView.isEnabled) {
+                binding.mapLoader.isVisible = false
+                binding.mapOverlay.isVisible = false
+                mapboxMap?.animateCamera(
+                    CameraUpdateFactory.newLatLng(
+                        LatLng(location.latitude, location.longitude)
+                    )
+                )
+            }
+        } ?: run {
+            locationComponent?.isLocationComponentEnabled = false
+            if (!binding.mapView.isEnabled) {
+                binding.mapLoader.isVisible = true
+                binding.mapOverlay.isVisible = true
+            }
+        }
+    }
+
+    @SuppressLint("MissingPermission")
     private fun enableLocationPlugin(@NonNull loadedMapStyle: Style) {
         // Check if permissions are enabled and if not request
-        if (PermissionsManager.areLocationPermissionsGranted(requireContext())) {
-            val locationComponent: LocationComponent = mapboxMap.locationComponent
-            locationComponent.activateLocationComponent(
-                LocationComponentActivationOptions.builder(
-                    requireContext(), loadedMapStyle
-                ).useDefaultLocationEngine(true).build()
-            )
-            locationComponent.isLocationComponentEnabled = true
-            locationComponent.cameraMode = CameraMode.TRACKING
-            locationComponent.renderMode = RenderMode.NORMAL
-            locationComponent.locationEngine?.let {
-                it.requestLocationUpdates(
-                    LocationEngineRequest.Builder(DEFAULT_INTERVAL_IN_MILLISECONDS)
-                        .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
-                        .setMaxWaitTime(DEFAULT_MAX_WAIT_TIME).build(),
-                    locationChangeCallback,
-                    Looper.getMainLooper()
-                )
-                it.getLastLocation(locationChangeCallback)
-            }
-        } else {
-            permissionsManager = PermissionsManager(this)
-            permissionsManager.requestLocationPermissions(requireActivity())
-        }
+        // if (PermissionsManager.areLocationPermissionsGranted(requireContext())) {
+        locationComponent = mapboxMap?.locationComponent
+        locationComponent?.activateLocationComponent(
+            LocationComponentActivationOptions.builder(
+                requireContext(), loadedMapStyle
+            ).useDefaultLocationEngine(false).build()
+        )
+        locationComponent?.isLocationComponentEnabled = true
+        locationComponent?.cameraMode = CameraMode.NONE
+        locationComponent?.renderMode = RenderMode.NORMAL
+        //     //locationComponent.locationEngine?.let {
+        //         it.requestLocationUpdates(
+        //             LocationEngineRequest.Builder(DEFAULT_INTERVAL_IN_MILLISECONDS)
+        //                 .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+        //                 .setMaxWaitTime(DEFAULT_MAX_WAIT_TIME).build(),
+        //             locationChangeCallback,
+        //             Looper.getMainLooper()
+        //         )
+        //         it.getLastLocation(locationChangeCallback)
+        //     }
+        // } else {
+        //     permissionsManager = PermissionsManager(this)
+        //     permissionsManager.requestLocationPermissions(requireActivity())
+        // }
     }
 
     override fun onStart() {
@@ -341,11 +394,13 @@ Action.SetSpecificLocationAction(displayedLocation?.first?: 0f, displayedLocatio
 
     override fun onResume() {
         super.onResume()
+        viewModel.submitAction(Action.Init)
         binding.mapView.onResume()
     }
 
     override fun onPause() {
         super.onPause()
+        viewModel.submitAction(Action.LeaveScreen)
         binding.mapView.onPause()
     }
 
@@ -374,7 +429,7 @@ Action.SetSpecificLocationAction(displayedLocation?.first?: 0f, displayedLocatio
 
     override fun onPermissionResult(granted: Boolean) {
         if (granted) {
-            val style = mapboxMap.style
+            val style = mapboxMap?.style
             if (style != null) {
                 enableLocationPlugin(style)
             }
