@@ -56,7 +56,6 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        //mavenLocal()
         maven {
             url 'https://api.mapbox.com/downloads/v2/releases/maven'
             authentication {
@@ -72,18 +71,35 @@ allprojects {
         }
         maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
         maven { url 'https://jitpack.io' }
-        maven {
-            url "https://gitlab.e.foundation/api/v4/groups/13662/-/packages/maven"
-            name "GitLab"
-            credentials(HttpHeaderCredentials) {
-                name = 'Private-Token'
-                value = gitLabPrivateToken
+
+        def ciJobToken = System.getenv("CI_JOB_TOKEN")
+        def ciApiV4Url = System.getenv("CI_API_V4_URL")
+        if (ciJobToken != null) {
+            maven {
+                url "${ciApiV4Url}/groups/13662/-/packages/maven"
+                name "GitLab"
+                credentials(HttpHeaderCredentials) {
+                    name = 'Job-Token'
+                    value = ciJobToken
+                }
+                authentication {
+                    header(HttpHeaderAuthentication)
+                }
             }
-            authentication {
-                header(HttpHeaderAuthentication)
+        } else {
+            mavenLocal()
+            maven {
+                url "https://gitlab.e.foundation/api/v4/groups/13662/-/packages/maven"
+                name "GitLab"
+                credentials(HttpHeaderCredentials) {
+                    name = 'Private-Token'
+                    value = gitLabPrivateToken
+                }
+                authentication {
+                    header(HttpHeaderAuthentication)
+                }
             }
         }
-        maven { url '../embeddedmavenrepository/'}
     }
 }
 

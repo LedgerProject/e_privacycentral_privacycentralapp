@@ -1,3 +1,0 @@
-configurations.maybeCreate("default")
-//artifacts.add("default", file('privacymodulese-release.aar'))
-artifacts.add("default", file('privacymodulese-debug.aar'))

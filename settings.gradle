@@ -1,5 +1,3 @@
 include ':flow-mvi'
 include ':app'
-include ':privacymodulesgoogle'
-include ':privacymodulese'
 rootProject.name = "PrivacyCentralApp"
