@@ -209,7 +209,7 @@ class DashboardFragment :
                 it.mapIndexed { index, value -> BarEntry(index.toFloat(), value.toFloat()) },
                 getString(R.string.dashboard_graph_trackers_legend)
             ).apply {
-                color = getColor(requireContext(), R.color.purple_chart)
+                color = getColor(requireContext(), R.color.e_blue2)
                 setDrawValues(false)
             }
 
@@ -217,24 +217,15 @@ class DashboardFragment :
             binding.graph.invalidate()
         }
 
-        state.trackersCount?.let {
-            binding.graphLegend.text = getString(R.string.dashboard_graph_trackers_legend, it)
+        binding.graphLegend.text = getString(R.string.dashboard_graph_trackers_legend, state.trackersCount?.toString() ?: "No")
+
+        if (state.dayTrackersCount != null && state.trackersCount != null) {
+            binding.amITracked.subTitle = getString(R.string.dashboard_am_i_tracked_subtitle, state.trackersCount, state.dayTrackersCount)
+        } else {
+            binding.amITracked.subTitle = getString(R.string.trackers_title)
         }
 
-        // binding.graphTotal.text = if (state == DashboardFeature.State.LoadingState) {
-        //     ""
-        // } else {
-        //     val value = if (state is DashboardFeature.State.EnabledState) state.totalGraph
-        //     else if (state is DashboardFeature.State.DisabledState) state.totalGraph
-        //     else 0 // dummy
-        //     getString(R.string.dashboard_graph_total, value)
-        // }
-
-        state.activeTrackersCount?.let {
-            binding.amITracked.subtitle.text = getString(R.string.dashboard_am_i_tracked_subtitle, 77, it)
-        }
-
-        binding.myLocation.subtitle.text = getString(
+        binding.myLocation.subTitle = getString(
             if (state.isQuickPrivacyEnabled &&
                 state.locationMode != LocationMode.REAL_LOCATION
             )
@@ -242,13 +233,15 @@ class DashboardFragment :
             else R.string.dashboard_location_subtitle_off
         )
 
-        binding.internetActivityPrivacy.subtitle.text = getString(
+        binding.internetActivityPrivacy.subTitle = getString(
             if (state.isQuickPrivacyEnabled &&
                 state.internetPrivacyMode != InternetPrivacyMode.REAL_IP
             )
                 R.string.dashboard_internet_activity_privacy_subtitle_on
             else R.string.dashboard_internet_activity_privacy_subtitle_off
         )
+
+        binding.executePendingBindings()
     }
 
     override fun actions(): Flow<DashboardFeature.Action> = viewModel.actions

@@ -20,8 +20,8 @@ package foundation.e.privacycentralapp.features.trackers.apptrackers
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Switch
 import android.widget.TextView
-import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.RecyclerView
 import foundation.e.privacycentralapp.R
 import foundation.e.privacymodules.trackers.Tracker
@@ -32,22 +32,27 @@ class ToggleTrackersAdapter(
 ) :
     RecyclerView.Adapter<ToggleTrackersAdapter.ViewHolder>() {
 
+    var isEnabled = true
+
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val title: TextView = view.findViewById(R.id.title)
 
-        val toggle: SwitchCompat = view.findViewById(R.id.toggle)
+        val toggle: Switch = view.findViewById(R.id.toggle)
 
-        fun bind(item: Pair<Tracker, Boolean>) {
+        fun bind(item: Pair<Tracker, Boolean>, isEnabled: Boolean) {
             title.text = item.first.label
             toggle.isChecked = item.second
+            toggle.isEnabled = isEnabled
         }
     }
 
-    var dataSet: List<Pair<Tracker, Boolean>> = emptyList()
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
+    private var dataSet: List<Pair<Tracker, Boolean>> = emptyList()
+
+    fun updateDataSet(new: List<Pair<Tracker, Boolean>>, isEnabled: Boolean) {
+        this.isEnabled = isEnabled
+        dataSet = new
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -61,7 +66,7 @@ class ToggleTrackersAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val permission = dataSet[position]
-        holder.bind(permission)
+        holder.bind(permission, isEnabled)
     }
 
     override fun getItemCount(): Int = dataSet.size

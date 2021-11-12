@@ -17,16 +17,14 @@
         android:layout_weight="1"
         android:maxLines="1"
         android:ellipsize="end"
-        android:layout_marginStart="16dp"
         android:textSize="14sp"
         tools:text="Body sensor"
         />
 
-    <androidx.appcompat.widget.SwitchCompat
+    <Switch
         android:id="@+id/toggle"
         android:layout_width="wrap_content"
         android:layout_height="24dp"
-        android:layoutDirection="rtl"
         android:checked="true"
         />
 </androidx.appcompat.widget.LinearLayoutCompat>

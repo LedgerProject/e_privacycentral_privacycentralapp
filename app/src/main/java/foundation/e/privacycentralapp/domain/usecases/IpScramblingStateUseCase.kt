@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 class IpScramblingStateUseCase(
     private val ipScramblerModule: IIpScramblerModule,
     private val localStateRepository: LocalStateRepository,
-    private val coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope
 ) {
 
     // private val internetPrivacyModeMutableFlow = MutableStateFlow(InternetPrivacyMode.REAL_IP)

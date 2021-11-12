@@ -110,15 +110,24 @@ class AppTrackersFragment :
         }
     }
 
-    override fun render(state: AppTrackersFeature.State) {
-        // binding.blockAllToggle.isChecked = state.isBlockingActivated
+    override fun render(state: State) {
+        binding.blockAllToggle.isChecked = state.isBlockingActivated
 
-        state.getTrackersStatus()?.let {
+        val trackersStatus = state.getTrackersStatus()
+        if (!trackersStatus.isNullOrEmpty()) {
             binding.trackers.isVisible = true
             binding.trackers.post {
-                (binding.trackers.adapter as ToggleTrackersAdapter?)?.dataSet = it
+                (binding.trackers.adapter as ToggleTrackersAdapter?)?.updateDataSet(trackersStatus, state.isBlockingActivated)
             }
             binding.noTrackersYet.isVisible = false
+        } else {
+            binding.trackers.isVisible = false
+            binding.noTrackersYet.isVisible = true
+            binding.noTrackersYet.text = getString(
+                if (state.isBlockingActivated)
+                    R.string.apptrackers_no_trackers_yet_block_on
+                else R.string.apptrackers_no_trackers_yet_block_off
+            )
         }
     }
 

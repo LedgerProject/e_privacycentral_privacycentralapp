@@ -86,19 +86,19 @@ class DependencyContainer constructor(val app: Application) {
         IpScramblingStateUseCase(ipScramblerModule, localStateRepository, GlobalScope)
     }
     private val appListUseCase by lazy {
-        AppListUseCase(permissionsModule)
+        AppListUseCase(permissionsModule, GlobalScope)
     }
     private val trackersStatisticsUseCase by lazy {
-        TrackersStatisticsUseCase(trackersPrivacyMock)
+        TrackersStatisticsUseCase(trackTrackersPrivacyModule)
     }
 
     private val trackersStateUseCase by lazy {
-        TrackersStateUseCase(trackersPrivacyMock, trackersPrivacyMock, permissionsModule)
+        TrackersStateUseCase(blockTrackersPrivacyModule, trackTrackersPrivacyModule, permissionsModule, localStateRepository, GlobalScope)
     }
 
     // ViewModelFactories
     val dashBoardViewModelFactory by lazy {
-        DashBoardViewModelFactory(getQuickPrivacyStateUseCase, ipScramblingStateUseCase, trackersStatisticsUseCase)
+        DashBoardViewModelFactory(getQuickPrivacyStateUseCase, ipScramblingStateUseCase, trackersStatisticsUseCase, trackersStateUseCase)
     }
 
     val fakeLocationViewModelFactory by lazy {

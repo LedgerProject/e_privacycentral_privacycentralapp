@@ -144,7 +144,7 @@ class TrackersFragment :
             data.mapIndexed { index, value -> BarEntry(index.toFloat(), value.toFloat()) },
             getString(R.string.trackers_count_label)
         ).apply {
-            color = ContextCompat.getColor(requireContext(), R.color.purple_chart)
+            color = ContextCompat.getColor(requireContext(), R.color.e_blue2)
             setDrawValues(false)
         }
 

@@ -152,9 +152,8 @@ class TrackersFeature(
                                 )
                             )
                         },
-                        flow {
-                            val apps = appListUseCase.getAppsUsingInternet()
-                            emit(Effect.AvailableAppsListEffect(apps))
+                        appListUseCase.getAppsUsingInternet().map { apps ->
+                            Effect.AvailableAppsListEffect(apps)
                         }
                     )
 

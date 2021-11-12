@@ -32,6 +32,7 @@
     <androidx.core.widget.NestedScrollView
         android:layout_height="match_parent"
         android:layout_width="match_parent"
+        android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         >
 
@@ -40,10 +41,11 @@
         android:layout_width="match_parent"
         android:orientation="vertical"
         >
-        <!--LinearLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:padding="16dp"
             android:gravity="center_vertical">
             <TextView
                 android:layout_width="0dp"
@@ -51,14 +53,19 @@
                 android:layout_weight="1"
                 android:text="@string/apptrackers_block_all_toggle"
                 />
-            <androidx.appcompat.widget.SwitchCompat
+            <Switch
                 android:id="@+id/block_all_toggle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
-        </LinearLayout-->
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/grey_divider"
+            />
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/trackers"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:layout_marginBottom="32dp"
             tools:listitem="@layout/apptrackers_item_tracker_toggle"
@@ -66,9 +73,11 @@
             />
         <TextView
             android:id="@+id/no_trackers_yet"
+            android:padding="32dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="@string/apptrackers_no_trackers_yet"
+            android:gravity="center"
+            tools:text="@string/apptrackers_no_trackers_yet_block_off"
             />
     </LinearLayout>
     </androidx.core.widget.NestedScrollView>

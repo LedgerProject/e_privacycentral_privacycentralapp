@@ -17,7 +17,7 @@
     <string name="dashboard_state_ipaddress_on">Hidden</string>
     <string name="dashboard_graph_label">Personal data leakage</string>
     <string name="dashboard_graph_period">Last 24 hours</string>
-    <string name="dashboard_graph_trackers_legend">%d Trackers</string>
+    <string name="dashboard_graph_trackers_legend">%s Trackers</string>
 
     <string name="dashboard_am_i_tracked_title">Am I tracked?</string>
     <string name="dashboard_am_i_tracked_subtitle">%1$d app trackers, %2$d active trackers</string>
@@ -53,17 +53,18 @@
     <string name="location_input_error">Invalid coordinates</string>
 
     <!-- Trackers -->
-    <string name="trackers_title">Manage and block</string>
+    <string name="trackers_title">Manage trackers</string>
     <string name="trackers_info">See tracker usage and which trackers are present in your apps.</string>
     <string name="trackers_count_label">%d trackers</string>
     <string name="trackers_period_day">24 hours</string>
     <string name="trackers_period_month">past month</string>
     <string name="trackers_period_year">past year</string>
-    <string name="trackers_applist_title">Block trackers on each app</string>
+    <string name="trackers_applist_title">Allow or deny trackers in apps</string>
 
     <!-- App Trackers -->
-    <!--string name="apptrackers_block_all_toggle">Activate trackers blocking : </string-->
-    <string name="apptrackers_no_trackers_yet">Trackers will appear as they are they start tracking you.</string>
+    <string name="apptrackers_block_all_toggle">Block trackers</string>
+    <string name="apptrackers_no_trackers_yet_block_off">No trackers were detected yet. If new trackers are detected they will be updated here.</string>
+    <string name="apptrackers_no_trackers_yet_block_on">No trackers were detected yet. All future trackers will be blocked.</string>
 
     <!-- -->
     <string name="quick_protection_info">Quick protection enables these settings when turned on</string>

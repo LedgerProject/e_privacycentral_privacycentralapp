@@ -23,8 +23,11 @@ import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
+import dnsfilter.android.AndroidEnvironment
 import foundation.e.privacycentralapp.R
 import foundation.e.privacycentralapp.features.dashboard.DashboardFragment
+import foundation.e.trackerfilter.DNSBlockerService
+import foundation.e.trackerfilter.StatsIntentService
 
 open class MainActivity : FragmentActivity(R.layout.activity_main) {
 
@@ -46,6 +49,10 @@ open class MainActivity : FragmentActivity(R.layout.activity_main) {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleIntent(intent)
+
+        AndroidEnvironment.initEnvironment(this)
+        startService(Intent(this, DNSBlockerService::class.java))
+        startService(Intent(this, StatsIntentService::class.java))
     }
 
     open fun handleIntent(intent: Intent) {}

@@ -17,17 +17,50 @@
 
 package foundation.e.privacycentralapp.domain.usecases
 
+import foundation.e.privacycentralapp.data.repositories.LocalStateRepository
 import foundation.e.privacymodules.permissions.PermissionsPrivacyModule
 import foundation.e.privacymodules.permissions.data.ApplicationDescription
 import foundation.e.privacymodules.trackers.IBlockTrackersPrivacyModule
 import foundation.e.privacymodules.trackers.ITrackTrackersPrivacyModule
 import foundation.e.privacymodules.trackers.Tracker
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class TrackersStateUseCase(
     private val blockTrackersPrivacyModule: IBlockTrackersPrivacyModule,
     private val trackersPrivacyModule: ITrackTrackersPrivacyModule,
-    private val permissionsPrivacyModule: PermissionsPrivacyModule
+    private val permissionsPrivacyModule: PermissionsPrivacyModule,
+    private val localStateRepository: LocalStateRepository,
+    coroutineScope: CoroutineScope
 ) {
+
+    private val _areAllTrackersBlocked = MutableStateFlow(
+        blockTrackersPrivacyModule.isBlockingEnabled() &&
+            blockTrackersPrivacyModule.isWhiteListEmpty()
+    )
+    val areAllTrackersBlocked: StateFlow<Boolean> = _areAllTrackersBlocked
+
+    init {
+        coroutineScope.launch {
+            localStateRepository.quickPrivacyEnabledFlow.collect { enabled ->
+                if (enabled) {
+                    blockTrackersPrivacyModule.enableBlocking()
+                } else {
+                    blockTrackersPrivacyModule.disableBlocking()
+                }
+                updateAllTrackersBlockedState()
+            }
+        }
+    }
+
+    private fun updateAllTrackersBlockedState() {
+        _areAllTrackersBlocked.value = blockTrackersPrivacyModule.isBlockingEnabled() &&
+            blockTrackersPrivacyModule.isWhiteListEmpty()
+    }
+
     fun getApplicationPermission(packageName: String): ApplicationDescription {
         return permissionsPrivacyModule.getApplicationDescription(packageName)
     }
@@ -46,9 +79,11 @@ class TrackersStateUseCase(
 
     fun toggleAppWhitelist(appUid: Int, isWhitelisted: Boolean) {
         blockTrackersPrivacyModule.setWhiteListed(appUid, isWhitelisted)
+        updateAllTrackersBlockedState()
     }
 
     fun blockTracker(appUid: Int, tracker: Tracker, isBlocked: Boolean) {
         blockTrackersPrivacyModule.setWhiteListed(tracker, appUid, !isBlocked)
+        updateAllTrackersBlockedState()
     }
 }

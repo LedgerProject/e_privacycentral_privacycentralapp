@@ -42,4 +42,12 @@ class TrackersStatisticsUseCase(
             trackTrackersPrivacyModule.getPastYearTrackersCount()
         )
     }
+
+    fun getPastDayTrackersCount(): Int {
+        return trackTrackersPrivacyModule.getPastDayTrackersCount()
+    }
+
+    fun getTrackersCount(): Int {
+        return trackTrackersPrivacyModule.getTrackersCount()
+    }
 }

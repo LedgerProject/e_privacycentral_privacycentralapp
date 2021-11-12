@@ -213,7 +213,7 @@ android:text="@string/dashboard_state_ipaddress_off"
                 android:layout_height="88dp"
                 app:icon="@{@drawable/ic_tracked}"
                 app:title="@{@string/dashboard_am_i_tracked_title}"
-                app:subTitle='@{""}'
+                app:subTitle='@{@string/trackers_title}'
                 />
             <View
                 android:layout_width="match_parent"

@@ -136,19 +136,16 @@ class InternetPrivacyFeature(
                 when {
                     action is Action.LoadInternetModeAction -> merge(
                         getQuickPrivacyStateUseCase.quickPrivacyEnabledFlow.map { Effect.QuickPrivacyUpdatedEffect(it) },
-                        flowOf(Effect.QuickPrivacyUpdatedEffect(true)),
                         ipScramblingStateUseCase.internetPrivacyMode.map { Effect.ModeUpdatedEffect(it) }.shareIn(scope = coroutineScope, started = SharingStarted.Lazily, replay = 0),
                         flowOf(Effect.ModeUpdatedEffect(InternetPrivacyMode.REAL_IP)),
-                        flow {
-                            val apps = appListUseCase.getAppsUsingInternet()
+                        appListUseCase.getAppsUsingInternet().map { apps ->
                             if (ipScramblerModule.appList.isEmpty()) {
-                                ipScramblerModule.appList = apps.map { it.packageName }.toMutableSet()
+                                ipScramblerModule.appList =
+                                    apps.map { it.packageName }.toMutableSet()
                             }
-                            emit(
-                                Effect.AvailableAppsListEffect(
-                                    apps,
-                                    ipScramblerModule.appList
-                                )
+                            Effect.AvailableAppsListEffect(
+                                apps,
+                                ipScramblerModule.appList
                             )
                         },
                         flow {

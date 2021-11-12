@@ -20,12 +20,31 @@ package foundation.e.privacycentralapp.domain.usecases
 import android.Manifest
 import foundation.e.privacymodules.permissions.PermissionsPrivacyModule
 import foundation.e.privacymodules.permissions.data.ApplicationDescription
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 
 class AppListUseCase(
-    private val permissionsModule: PermissionsPrivacyModule
+    private val permissionsModule: PermissionsPrivacyModule,
+    private val corouteineScope: CoroutineScope
 ) {
 
-    fun getAppsUsingInternet(): List<ApplicationDescription> {
+    private val _appsUsingInternet = MutableStateFlow<List<ApplicationDescription>>(emptyList())
+    init {
+        corouteineScope.launch {
+            _appsUsingInternet.value = getAppsUsingInternetList()
+        }
+    }
+
+    fun getAppsUsingInternet(): Flow<List<ApplicationDescription>> {
+        corouteineScope.launch {
+            _appsUsingInternet.value = getAppsUsingInternetList()
+        }
+        return _appsUsingInternet
+    }
+
+    private fun getAppsUsingInternetList(): List<ApplicationDescription> {
         return permissionsModule.getInstalledApplications()
             .filter {
                 permissionsModule.getPermissions(it.packageName)

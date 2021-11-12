@@ -26,6 +26,7 @@ import foundation.e.privacycentralapp.domain.entities.InternetPrivacyMode
 import foundation.e.privacycentralapp.domain.entities.LocationMode
 import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.IpScramblingStateUseCase
+import foundation.e.privacycentralapp.domain.usecases.TrackersStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.TrackersStatisticsUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flow
@@ -55,7 +56,7 @@ class DashboardFeature(
         val totalGraph: Int? = null,
         // val graphData
         val trackersCount: Int? = null,
-        val activeTrackersCount: Int? = null,
+        val dayTrackersCount: Int? = null,
         val dayStatistics: List<Int>? = null
     )
 
@@ -84,7 +85,12 @@ class DashboardFeature(
         object NoEffect : Effect()
         data class UpdateStateEffect(val isEnabled: Boolean) : Effect()
         data class IpScramblingModeUpdatedEffect(val mode: InternetPrivacyMode) : Effect()
-        data class TrackersStatisticsUpdatedEffect(val dayStatistics: List<Int>) : Effect()
+        data class TrackersStatisticsUpdatedEffect(
+            val dayStatistics: List<Int>,
+            val dayTrackersCount: Int,
+            val trackersCount: Int
+        ) : Effect()
+        data class TrackersBlockedUpdatedEffect(val areAllTrackersBlocked: Boolean) : Effect()
 
         object OpenQuickPrivacyProtectionEffect : Effect()
         data class OpenDashboardEffect(
@@ -115,7 +121,8 @@ class DashboardFeature(
             coroutineScope: CoroutineScope,
             getPrivacyStateUseCase: GetQuickPrivacyStateUseCase,
             ipScramblingStateUseCase: IpScramblingStateUseCase,
-            trackersStatisticsUseCase: TrackersStatisticsUseCase
+            trackersStatisticsUseCase: TrackersStatisticsUseCase,
+            trackersStateUseCase: TrackersStateUseCase
         ): DashboardFeature =
             DashboardFeature(
                 initialState = State(),
@@ -124,8 +131,15 @@ class DashboardFeature(
                     when (effect) {
                         is Effect.UpdateStateEffect -> state.copy(isQuickPrivacyEnabled = effect.isEnabled)
                         is Effect.IpScramblingModeUpdatedEffect -> state.copy(internetPrivacyMode = effect.mode)
-                        is Effect.TrackersStatisticsUpdatedEffect -> state.copy(dayStatistics = effect.dayStatistics)
+                        is Effect.TrackersStatisticsUpdatedEffect -> state.copy(
+                            dayStatistics = effect.dayStatistics,
+                            dayTrackersCount = effect.dayTrackersCount,
+                            trackersCount = effect.trackersCount
+                        )
 
+                        is Effect.TrackersBlockedUpdatedEffect -> state.copy(
+                            isAllTrackersBlocked = effect.areAllTrackersBlocked
+                        )
                         /*is Effect.OpenDashboardEffect -> State.DashboardState(
                             effect.trackersCount,
                             effect.activeTrackersCount,
@@ -190,7 +204,16 @@ class DashboardFeature(
                                 Effect.IpScramblingModeUpdatedEffect(it)
                             },
                             flow {
-                                emit(Effect.TrackersStatisticsUpdatedEffect(trackersStatisticsUseCase.getPastDayTrackersCalls()))
+                                emit(
+                                    Effect.TrackersStatisticsUpdatedEffect(
+                                        dayStatistics = trackersStatisticsUseCase.getPastDayTrackersCalls(),
+                                        dayTrackersCount = trackersStatisticsUseCase.getPastDayTrackersCount(),
+                                        trackersCount = trackersStatisticsUseCase.getTrackersCount()
+                                    )
+                                )
+                            },
+                            trackersStateUseCase.areAllTrackersBlocked.map {
+                                Effect.TrackersBlockedUpdatedEffect(it)
                             }
                         )
                         /*
