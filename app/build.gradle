@@ -45,10 +45,10 @@ android {
             applicationIdSuffix '.e'
             dimension 'os'
         }
-        google {
-            applicationIdSuffix '.google'
-            dimension 'os'
-        }
+//        google {
+//            applicationIdSuffix '.google'
+//            dimension 'os'
+//        }
     }
 
     buildTypes {
@@ -102,7 +102,7 @@ dependencies {
 
 
     implementation 'foundation.e:privacymodule.api:0.4.1'
-    implementation 'foundation.e:privacymodule.e-29:0.3.2'
+    implementation 'foundation.e:privacymodule.e-29:0.4.1'
     implementation 'foundation.e:privacymodule.tor:0.1.1'
 
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'

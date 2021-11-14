@@ -17,11 +17,12 @@
 
 package foundation.e.privacycentralapp.domain.usecases
 
-import android.content.Intent
 import android.util.Log
 import foundation.e.privacycentralapp.data.repositories.LocalStateRepository
 import foundation.e.privacycentralapp.domain.entities.InternetPrivacyMode
 import foundation.e.privacymodules.ipscramblermodule.IIpScramblerModule
+import foundation.e.privacymodules.permissions.IPermissionsPrivacyModule
+import foundation.e.privacymodules.permissions.data.ApplicationDescription
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.SharingStarted
@@ -33,6 +34,8 @@ import kotlinx.coroutines.launch
 
 class IpScramblingStateUseCase(
     private val ipScramblerModule: IIpScramblerModule,
+    private val permissionsPrivacyModule: IPermissionsPrivacyModule,
+    private val appDesc: ApplicationDescription,
     private val localStateRepository: LocalStateRepository,
     coroutineScope: CoroutineScope
 ) {
@@ -70,23 +73,22 @@ class IpScramblingStateUseCase(
         }
     }
 
-    fun toggle(hideIp: Boolean): Intent? {
-        if (!localStateRepository.isQuickPrivacyEnabled) return null
+    fun toggle(hideIp: Boolean) {
+        if (!localStateRepository.isQuickPrivacyEnabled) return
 
         localStateRepository.isIpScramblingEnabled = hideIp
-        return applySettings(true, hideIp)
+        applySettings(true, hideIp)
     }
 
-    private fun applySettings(isQuickPrivacyEnabled: Boolean, isIpScramblingEnabled: Boolean): Intent? {
+    private fun applySettings(isQuickPrivacyEnabled: Boolean, isIpScramblingEnabled: Boolean) {
         when {
             isQuickPrivacyEnabled && isIpScramblingEnabled -> when (internetPrivacyMode.value) {
                 InternetPrivacyMode.REAL_IP, InternetPrivacyMode.REAL_IP_LOADING -> {
                     val intent = ipScramblerModule.prepareAndroidVpn()
                     if (intent != null) {
-                        return intent
-                    } else {
-                        ipScramblerModule.start()
+                        permissionsPrivacyModule.setVpnPackageAuthorization(appDesc.packageName)
                     }
+                    ipScramblerModule.start()
                 }
                 else -> {
                     Log.d("testQPFlow", "Not starting tor, already in started state")
@@ -100,7 +102,6 @@ class IpScramblingStateUseCase(
                 }
             }
         }
-        return null
     }
 
     private fun map(status: IIpScramblerModule.Status): InternetPrivacyMode {

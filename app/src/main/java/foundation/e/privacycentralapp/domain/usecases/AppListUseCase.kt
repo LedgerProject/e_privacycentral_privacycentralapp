@@ -31,10 +31,42 @@ class AppListUseCase(
 ) {
 
     private val _appsUsingInternet = MutableStateFlow<List<ApplicationDescription>>(emptyList())
+    private val _installedAppsUsingInternet = MutableStateFlow<List<ApplicationDescription>>(emptyList())
     init {
         corouteineScope.launch {
             _appsUsingInternet.value = getAppsUsingInternetList()
         }
+    }
+
+    fun getInstalledAppsUsingInternet(): Flow<List<ApplicationDescription>> {
+        corouteineScope.launch {
+            _installedAppsUsingInternet.value = getInstalledAppsUsingInternetList()
+        }
+        return _installedAppsUsingInternet
+    }
+
+    private fun getInstalledAppsUsingInternetList(): List<ApplicationDescription> {
+        return permissionsModule.getInstalledApplications()
+            .filter {
+                permissionsModule.getPermissions(it.packageName)
+                    .contains(Manifest.permission.INTERNET)
+            }.map {
+                it.icon = permissionsModule.getApplicationIcon(it.packageName)
+                it
+            }.sortedWith(object : Comparator<ApplicationDescription> {
+                override fun compare(
+                    p0: ApplicationDescription?,
+                    p1: ApplicationDescription?
+                ): Int {
+                    return if (p0?.icon != null && p1?.icon != null) {
+                        p0.label.toString().compareTo(p1.label.toString())
+                    } else if (p0?.icon == null) {
+                        1
+                    } else {
+                        -1
+                    }
+                }
+            })
     }
 
     fun getAppsUsingInternet(): Flow<List<ApplicationDescription>> {
@@ -45,7 +77,7 @@ class AppListUseCase(
     }
 
     private fun getAppsUsingInternetList(): List<ApplicationDescription> {
-        return permissionsModule.getInstalledApplications()
+        return permissionsModule.getAllApplications()
             .filter {
                 permissionsModule.getPermissions(it.packageName)
                     .contains(Manifest.permission.INTERNET)

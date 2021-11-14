@@ -137,7 +137,7 @@ class InternetPrivacyFeature(
                     action is Action.LoadInternetModeAction -> merge(
                         getQuickPrivacyStateUseCase.quickPrivacyEnabledFlow.map { Effect.QuickPrivacyUpdatedEffect(it) },
                         ipScramblingStateUseCase.internetPrivacyMode.map { Effect.ModeUpdatedEffect(it) }.shareIn(scope = coroutineScope, started = SharingStarted.Lazily, replay = 0),
-                        flowOf(Effect.ModeUpdatedEffect(InternetPrivacyMode.REAL_IP)),
+                        // flowOf(Effect.ModeUpdatedEffect(InternetPrivacyMode.REAL_IP)),
                         appListUseCase.getAppsUsingInternet().map { apps ->
                             if (ipScramblerModule.appList.isEmpty()) {
                                 ipScramblerModule.appList =
@@ -189,11 +189,8 @@ class InternetPrivacyFeature(
                             InternetPrivacyMode.REAL_IP_LOADING
                         ) -> {
                         if (getQuickPrivacyStateUseCase.isQuickPrivacyEnabled) {
-                            ipScramblingStateUseCase.toggle(hideIp = true)?.let {
-                                flowOf(Effect.ShowAndroidVpnDisclaimerEffect(it))
-                            } ?: run {
-                                flowOf(Effect.ModeUpdatedEffect(InternetPrivacyMode.HIDE_IP_LOADING))
-                            }
+                            ipScramblingStateUseCase.toggle(hideIp = true)
+                            flowOf(Effect.ModeUpdatedEffect(InternetPrivacyMode.HIDE_IP_LOADING))
                         } else {
                             flowOf(Effect.QuickPrivacyDisabledWarningEffect)
                         }

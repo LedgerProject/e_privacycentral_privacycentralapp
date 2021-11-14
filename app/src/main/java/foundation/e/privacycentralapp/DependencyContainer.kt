@@ -80,7 +80,7 @@ class DependencyContainer constructor(val app: Application) {
         GetQuickPrivacyStateUseCase(localStateRepository)
     }
     private val ipScramblingStateUseCase by lazy {
-        IpScramblingStateUseCase(ipScramblerModule, localStateRepository, GlobalScope)
+        IpScramblingStateUseCase(ipScramblerModule, permissionsModule, appDesc, localStateRepository, GlobalScope)
     }
     private val appListUseCase = AppListUseCase(permissionsModule, GlobalScope)
 

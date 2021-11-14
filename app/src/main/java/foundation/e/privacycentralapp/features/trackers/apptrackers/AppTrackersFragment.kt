@@ -75,9 +75,9 @@ class AppTrackersFragment :
             }
         }
         lifecycleScope.launchWhenStarted {
-            viewModel.submitAction(
-                Action.InitAction(requireArguments().getString(PARAM_PACKAGE_NAME))
-            )
+            requireArguments().getString(PARAM_PACKAGE_NAME)?.let {
+                viewModel.submitAction(Action.InitAction(it))
+            }
         }
     }
 
@@ -86,7 +86,7 @@ class AppTrackersFragment :
             .show()
     }
 
-    override fun getTitle(): String = requireArguments().getString(PARAM_LABEL)
+    override fun getTitle(): String = requireArguments().getString(PARAM_LABEL) ?: ""
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

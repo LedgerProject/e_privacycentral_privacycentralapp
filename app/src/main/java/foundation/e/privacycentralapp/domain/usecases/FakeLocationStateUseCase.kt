@@ -22,6 +22,7 @@ import android.content.Context
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Bundle
 import android.util.Log
 import foundation.e.privacycentralapp.data.repositories.LocalStateRepository
 import foundation.e.privacycentralapp.domain.entities.LocationMode
@@ -125,8 +126,6 @@ class FakeLocationStateUseCase(
         applySettings(true, null)
     }
 
-    private var listener: LocationListener? = null
-
     val currentLocation = MutableStateFlow<Location?>(null)
 
     private var localListener = object : LocationListener {
@@ -136,6 +135,9 @@ class FakeLocationStateUseCase(
             Log.e("DebugLoc", "onLocationChanged $location")
             currentLocation.value = location
         }
+
+        // Deprecated since API 29, never called.
+        override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
 
         override fun onProviderEnabled(provider: String?) {
             Log.e("DebugLoc", "ProvuderEnabled: $provider")

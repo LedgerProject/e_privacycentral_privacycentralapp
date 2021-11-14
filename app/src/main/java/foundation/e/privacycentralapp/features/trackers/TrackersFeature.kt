@@ -152,7 +152,7 @@ class TrackersFeature(
                                 )
                             )
                         },
-                        appListUseCase.getAppsUsingInternet().map { apps ->
+                        appListUseCase.getInstalledAppsUsingInternet().map { apps ->
                             Effect.AvailableAppsListEffect(apps)
                         }
                     )

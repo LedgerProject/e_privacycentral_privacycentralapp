@@ -101,13 +101,15 @@ class InternetPrivacyFragment :
             }
         }
 
-        binding.radioUseRealIp.container.setOnClickListener {
+        binding.radioUseRealIp.radiobutton.setOnClickListener {
             viewModel.submitAction(InternetPrivacyFeature.Action.UseRealIPAction)
         }
 
-        binding.radioUseHiddenIp.container.setOnClickListener {
+        binding.radioUseHiddenIp.radiobutton.setOnClickListener {
             viewModel.submitAction(InternetPrivacyFeature.Action.UseHiddenIPAction)
         }
+
+        binding.executePendingBindings()
     }
 
     override fun getTitle(): String = getString(R.string.ipscrambling_title)
@@ -144,7 +146,7 @@ class InternetPrivacyFragment :
             }
 
             setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
+                override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View?, position: Int, id: Long) {
                     viewModel.submitAction(InternetPrivacyFeature.Action.SelectLocationAction(position))
                 }
 
