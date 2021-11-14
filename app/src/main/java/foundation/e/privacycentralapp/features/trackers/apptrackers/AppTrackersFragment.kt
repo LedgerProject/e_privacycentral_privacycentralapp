@@ -92,6 +92,7 @@ class AppTrackersFragment :
         super.onViewCreated(view, savedInstanceState)
         binding = ApptrackersFragmentBinding.bind(view)
 
+        // TODO: crash sqlite ?
         // binding.blockAllToggle.setOnCheckedChangeListener { _, isChecked ->
         //     viewModel.submitAction(Action.BlockAllToggleAction(isChecked))
         // }

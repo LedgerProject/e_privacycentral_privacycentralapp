@@ -62,7 +62,6 @@ class DashboardFeature(
     )
 
     sealed class SingleEvent {
-        object NavigateToQuickProtectionSingleEvent : SingleEvent()
         object NavigateToTrackersSingleEvent : SingleEvent()
         object NavigateToInternetActivityPrivacySingleEvent : SingleEvent()
         object NavigateToLocationSingleEvent : SingleEvent()
@@ -71,11 +70,7 @@ class DashboardFeature(
 
     sealed class Action {
         object InitAction : Action()
-
         object TogglePrivacyAction : Action()
-        // object ShowQuickPrivacyProtectionInfoAction : Action()
-        // object ObserveDashboardAction : Action()
-        // object ShowDashboardAction : Action()
         object ShowFakeMyLocationAction : Action()
         object ShowInternetActivityPrivacyAction : Action()
         object ShowAppsPermissions : Action()
@@ -92,25 +87,7 @@ class DashboardFeature(
             val trackersCount: Int
         ) : Effect()
         data class TrackersBlockedUpdatedEffect(val areAllTrackersBlocked: Boolean) : Effect()
-
-        object OpenQuickPrivacyProtectionEffect : Effect()
-        data class OpenDashboardEffect(
-            val trackersCount: Int,
-            val activeTrackersCount: Int,
-            val totalApps: Int,
-            val permissionCount: Int,
-            val appsUsingLocationPerm: Int,
-            val locationMode: LocationMode,
-            val internetPrivacyMode: InternetPrivacyMode
-        ) : Effect()
-
-        object LoadingDashboardEffect : Effect()
-        data class UpdateActiveTrackersCountEffect(val count: Int) : Effect()
-        data class UpdateTotalTrackersCountEffect(val count: Int) : Effect()
         data class UpdateLocationModeEffect(val mode: LocationMode) : Effect()
-        data class UpdateInternetActivityModeEffect(val mode: InternetPrivacyMode) : Effect()
-        data class UpdateAppsUsingLocationPermEffect(val apps: Int) : Effect()
-
         object OpenFakeMyLocationEffect : Effect()
         object OpenInternetActivityPrivacyEffect : Effect()
         object OpenAppsPermissionsEffect : Effect()
@@ -143,50 +120,6 @@ class DashboardFeature(
                             isAllTrackersBlocked = effect.areAllTrackersBlocked
                         )
                         is Effect.UpdateLocationModeEffect -> state.copy(locationMode = effect.mode)
-
-                        /*is Effect.OpenDashboardEffect -> State.DashboardState(
-                            effect.trackersCount,
-                            effect.activeTrackersCount,
-                            effect.totalApps,
-                            effect.permissionCount,
-                            effect.appsUsingLocationPerm,
-                            effect.locationMode,
-                            effect.internetPrivacyMode
-                            )
-                            Effect.LoadingDashboardEffect -> {
-                                if (state is State.InitialState) {
-                                    State.LoadingDashboardState
-                                } else state
-                            }
-                            is Effect.UpdateActiveTrackersCountEffect -> {
-                                if (state is State.DashboardState) {
-                                    state.copy(activeTrackersCount = effect.count)
-                                } else state
-                            }
-                            is Effect.UpdateTotalTrackersCountEffect -> {
-                                if (state is State.DashboardState) {
-                                    state.copy(trackersCount = effect.count)
-                                } else state
-                            }
-                            is Effect.UpdateInternetActivityModeEffect -> {
-                                if (state is State.DashboardState) {
-                                    state.copy(internetPrivacyMode = effect.mode)
-                                } else state
-                            }
-                            is Effect.UpdateLocationModeEffect -> {
-                                if (state is State.DashboardState) {
-                                    state.copy(locationMode = effect.mode)
-                                } else state
-                            }
-                            is Effect.UpdateAppsUsingLocationPermEffect -> if (state is State.DashboardState) {
-                                state.copy(appsUsingLocationPerm = effect.apps)
-                            } else state
-
-                            Effect.OpenFakeMyLocationEffect -> state
-                            Effect.OpenAppsPermissionsEffect -> state
-                            Effect.OpenInternetActivityPrivacyEffect -> state
-                            Effect.OpenTrackersEffect -> state
-                            */
 
                         else -> state
                     }
@@ -223,51 +156,6 @@ class DashboardFeature(
                                 Effect.UpdateLocationModeEffect(it)
                             }
                         )
-                        /*
-                            Action.ObserveDashboardAction -> {
-                            merge(
-                            TrackersDataSource.trackers.map {
-                                var activeTrackersCount: Int = 0
-                                outer@ for (tracker in it) {
-                                    for (app in tracker.trackedApps) {
-                                        if (!app.isEnabled) {
-                                            continue@outer
-                                        }
-                                    }
-                                    activeTrackersCount++
-                                }
-                                Effect.UpdateActiveTrackersCountEffect(activeTrackersCount)
-                            },
-                            TrackersDataSource.trackers.map {
-                                Effect.UpdateTotalTrackersCountEffect(it.size)
-                            },
-                            DummyDataSource.appsUsingLocationPerm.map {
-                                Effect.UpdateAppsUsingLocationPermEffect(it.size)
-                            },
-                            DummyDataSource.location.map {
-                                Effect.UpdateLocationModeEffect(it.mode)
-                            },
-                            DummyDataSource.internetActivityMode.map {
-                                Effect.UpdateInternetActivityModeEffect(it)
-                            }
-                        )
-                        Action.ShowQuickPrivacyProtectionInfoAction -> flowOf(
-                            Effect.OpenQuickPrivacyProtectionEffect
-                        )
-                        Action.ShowDashboardAction -> flow {
-                            emit(Effect.LoadingDashboardEffect)
-                            emit(
-                                Effect.OpenDashboardEffect(
-                                    DummyDataSource.trackersCount,
-                                    DummyDataSource.activeTrackersCount.value,
-                                    DummyDataSource.packages.size,
-                                    DummyDataSource.permissions.size,
-                                    DummyDataSource.appsUsingLocationPerm.value.size,
-                                    DummyDataSource.location.value.mode,
-                                    DummyDataSource.internetActivityMode.value
-                                )
-                            )
-                        }*/
                         Action.ShowFakeMyLocationAction -> flowOf(Effect.OpenFakeMyLocationEffect)
                         Action.ShowAppsPermissions -> flowOf(Effect.OpenAppsPermissionsEffect)
                         Action.ShowInternetActivityPrivacyAction -> flowOf(

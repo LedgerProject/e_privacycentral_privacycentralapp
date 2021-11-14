@@ -28,7 +28,6 @@ import foundation.e.privacycentralapp.domain.usecases.IpScramblingStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.TrackersStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.TrackersStatisticsUseCase
 import foundation.e.privacycentralapp.dummy.CityDataSource
-import foundation.e.privacycentralapp.dummy.TrackTrackersPrivacyMock
 import foundation.e.privacycentralapp.features.dashboard.DashBoardViewModelFactory
 import foundation.e.privacycentralapp.features.internetprivacy.InternetPrivacyViewModelFactory
 import foundation.e.privacycentralapp.features.location.FakeLocationViewModelFactory
@@ -74,7 +73,6 @@ class DependencyContainer constructor(val app: Application) {
     private val localStateRepository by lazy { LocalStateRepository(context) }
     private val trackTrackersPrivacyModule by lazy { TrackTrackersPrivacyModule.getInstance(context) }
 
-    private val trackersPrivacyMock by lazy { TrackTrackersPrivacyMock() }
     // Usecases
     private val getQuickPrivacyStateUseCase by lazy {
         GetQuickPrivacyStateUseCase(localStateRepository)

@@ -57,9 +57,6 @@ class FakeLocationFeature(
     )
 
     sealed class SingleEvent {
-        object RandomLocationSelectedEvent : SingleEvent()
-        object RealLocationSelectedEvent : SingleEvent()
-        object SpecificLocationSavedEvent : SingleEvent()
         data class LocationUpdatedEvent(val location: Location?) : SingleEvent()
         data class ErrorEvent(val error: String) : SingleEvent()
     }
@@ -67,10 +64,6 @@ class FakeLocationFeature(
     sealed class Action {
         object Init : Action()
         object LeaveScreen : Action()
-
-        // Action which is triggered everytime the location is updated.
-        // data class UpdateLocationAction(val latLng: LatLng) : Action()
-
         object UseRealLocationAction : Action()
         object UseRandomLocationAction : Action()
         data class SetSpecificLocationAction(
@@ -112,7 +105,6 @@ class FakeLocationFeature(
                         specificLatitude = effect.latitude,
                         specificLongitude = effect.longitude
                     )
-                    // is Effect.LocationUpdatedEffect -> state.copy(currentLocation = effect.location)
                     Effect.QuickPrivacyDisabledWarningEffect -> state.copy(forceRefresh = !state.forceRefresh)
                     else -> state
                 }
@@ -127,37 +119,7 @@ class FakeLocationFeature(
                             emit(Effect.LocationModeUpdatedEffect(mode = mode, latitude = lat, longitude = lon))
                         },
                         fakeLocationStateUseCase.currentLocation.map { Effect.LocationUpdatedEffect(it) }
-
-                        // callbackFlow {
-                        //     val listener = object : LocationListener {
-                        //         override fun onLocationChanged(location: Location) {
-                        //             Log.e("DebugLoc", "onLocationChanged $location")
-                        //             offer(Effect.LocationUpdatedEffect(location))
-                        //         }
-                        //
-                        //         override fun onProviderEnabled(provider: String?) {
-                        //             Log.e("DebugLoc", "ProvuderEnabled: $provider")
-                        //         }
-                        //
-                        //         override fun onProviderDisabled(provider: String?) {
-                        //             Log.e("DebugLoc", "ProvuderDisabled: $provider")
-                        //         }
-                        //     }
-                        //
-                        //     fakeLocationStateUseCase.requestLocationUpdates(listener)
-                        //     // TODO: when is awaitClose called ?
-                        //     awaitClose { fakeLocationStateUseCase.removeUpdates(listener) }
-                        // }
-
                     )
-
-                    // is Action.UpdateLocationAction -> flowOf(
-                    //         Effect.LocationUpdatedEffect(
-                    //             action.latLng.latitude,
-                    //             action.latLng.longitude
-                    //         )
-                    //         )
-
                     is Action.LeaveScreen -> {
                         fakeLocationStateUseCase.stopListeningLocation()
                         flowOf(Effect.NoEffect)

@@ -71,8 +71,6 @@ class InternetPrivacyFeature(
     }
 
     sealed class SingleEvent {
-        object RealIPSelectedEvent : SingleEvent()
-        object HiddenIPSelectedEvent : SingleEvent()
         data class StartAndroidVpnActivityEvent(val intent: Intent) : SingleEvent()
         data class ErrorEvent(val error: String) : SingleEvent()
     }
@@ -137,7 +135,6 @@ class InternetPrivacyFeature(
                     action is Action.LoadInternetModeAction -> merge(
                         getQuickPrivacyStateUseCase.quickPrivacyEnabledFlow.map { Effect.QuickPrivacyUpdatedEffect(it) },
                         ipScramblingStateUseCase.internetPrivacyMode.map { Effect.ModeUpdatedEffect(it) }.shareIn(scope = coroutineScope, started = SharingStarted.Lazily, replay = 0),
-                        // flowOf(Effect.ModeUpdatedEffect(InternetPrivacyMode.REAL_IP)),
                         appListUseCase.getAppsUsingInternet().map { apps ->
                             if (ipScramblerModule.appList.isEmpty()) {
                                 ipScramblerModule.appList =

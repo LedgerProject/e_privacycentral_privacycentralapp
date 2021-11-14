@@ -28,7 +28,6 @@ import foundation.e.privacymodules.trackers.Tracker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 
 // Define a state machine for Tracker feature.

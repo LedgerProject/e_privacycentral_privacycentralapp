@@ -18,17 +18,9 @@
 package foundation.e.privacycentralapp
 
 import android.app.Application
-import foundation.e.privacycentralapp.dummy.TrackersDataSource
 
 class PrivacyCentralApplication : Application() {
 
     // Initialize the dependency container.
     val dependencyContainer: DependencyContainer by lazy { DependencyContainer(this) }
-
-    override fun onCreate() {
-        super.onCreate()
-
-        // Inject blocker service in trackers source.
-        TrackersDataSource.injectBlockerService(dependencyContainer.blockerService)
-    }
 }

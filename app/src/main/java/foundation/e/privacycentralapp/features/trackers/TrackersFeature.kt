@@ -25,9 +25,8 @@ import foundation.e.flowmvi.feature.BaseFeature
 import foundation.e.privacycentralapp.domain.usecases.AppListUseCase
 import foundation.e.privacycentralapp.domain.usecases.GetQuickPrivacyStateUseCase
 import foundation.e.privacycentralapp.domain.usecases.TrackersStatisticsUseCase
-import foundation.e.privacycentralapp.dummy.Tracker
-import foundation.e.privacycentralapp.dummy.TrackersDataSource
 import foundation.e.privacymodules.permissions.data.ApplicationDescription
+import foundation.e.privacymodules.trackers.Tracker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -65,20 +64,11 @@ class TrackersFeature(
     sealed class SingleEvent {
         data class ErrorEvent(val error: String) : SingleEvent()
         data class OpenAppDetailsEvent(val appDesc: ApplicationDescription) : SingleEvent()
-        object BlockerErrorEvent : SingleEvent()
     }
 
     sealed class Action {
         object InitAction : Action()
         data class ClickAppAction(val packageName: String) : Action()
-
-        object ObserveTrackers : Action()
-        data class SetSelectedTracker(val tracker: Tracker) : Action()
-        data class ToggleTrackerAction(
-            val tracker: Tracker,
-            val grant: Boolean
-        ) : Action()
-        data class ObserveTracker(val tracker: String?) : Action()
     }
 
     sealed class Effect {
@@ -95,11 +85,7 @@ class TrackersFeature(
         ) : Effect()
         data class OpenAppDetailsEffect(val appDesc: ApplicationDescription) : Effect()
         object QuickPrivacyDisabledWarningEffect : Effect()
-        data class TrackersLoadedEffect(val trackers: List<Tracker>) : Effect()
-        data class TrackerSelectedEffect(val tracker: Tracker) : Effect()
-        data class TrackerToggleEffect(val result: Boolean) : Effect()
         data class ErrorEffect(val message: String) : Effect()
-        data class TrackerLoadedEffect(val tracker: Tracker) : Effect()
     }
 
     companion object {
@@ -123,15 +109,7 @@ class TrackersFeature(
                     )
                     is Effect.AvailableAppsListEffect -> state.copy(apps = effect.apps)
 
-                    is Effect.TrackersLoadedEffect -> State()
-                    is Effect.TrackerSelectedEffect -> state.copy(currentSelectedTracker = effect.tracker)
                     is Effect.ErrorEffect -> state
-                    is Effect.TrackerToggleEffect -> {
-                        state
-                    }
-                    is Effect.TrackerLoadedEffect -> {
-                        state.copy(currentSelectedTracker = effect.tracker)
-                    }
                     else -> state
                 }
             },
@@ -164,49 +142,12 @@ class TrackersFeature(
                             } ?: run { Effect.ErrorEffect("Can't find back app.") }
                         } else Effect.QuickPrivacyDisabledWarningEffect
                     )
-                    Action.ObserveTrackers -> TrackersDataSource.trackers.map {
-                        Effect.TrackersLoadedEffect(
-                            it
-                        )
-                    }
-                    is Action.SetSelectedTracker -> flowOf(
-                        Effect.TrackerSelectedEffect(
-                            action.tracker
-                        )
-                    )
-
-                    is Action.ToggleTrackerAction -> {
-                        if (state.currentSelectedTracker != null) {
-                            val result = TrackersDataSource.toggleTracker(
-                                action.tracker,
-                                action.grant
-                            )
-                            flowOf(Effect.TrackerToggleEffect(result))
-                        } else {
-                            flowOf(Effect.ErrorEffect("Can't toggle tracker"))
-                        }
-                    }
-                    is Action.ObserveTracker -> {
-                        if (action.tracker == null) {
-                            flowOf(Effect.ErrorEffect("Null tracker id passed"))
-                        } else {
-                            val tracker = TrackersDataSource.getTracker(action.tracker)
-                            if (tracker != null) {
-                                flowOf(Effect.TrackerLoadedEffect(tracker))
-                            } else {
-                                flowOf(Effect.ErrorEffect("Can't find tracker with name ${action.tracker}"))
-                            }
-                        }
-                    }
                 }
             },
             singleEventProducer = { _, _, effect ->
                 when (effect) {
                     is Effect.ErrorEffect -> SingleEvent.ErrorEvent(effect.message)
                     is Effect.OpenAppDetailsEffect -> SingleEvent.OpenAppDetailsEvent(effect.appDesc)
-                    is Effect.TrackerToggleEffect -> {
-                        if (!effect.result) SingleEvent.BlockerErrorEvent else null
-                    }
                     Effect.QuickPrivacyDisabledWarningEffect -> SingleEvent.ErrorEvent("Enabled Quick Privacy to use functionalities")
                     else -> null
                 }

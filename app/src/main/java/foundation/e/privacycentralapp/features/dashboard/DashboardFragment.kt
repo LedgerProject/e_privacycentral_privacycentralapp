@@ -96,8 +96,6 @@ class DashboardFragment :
         }
         lifecycleScope.launchWhenStarted {
             viewModel.submitAction(DashboardFeature.Action.InitAction)
-            // viewModel.submitAction(DashboardFeature.Action.ShowDashboardAction)
-            // viewModel.submitAction(DashboardFeature.Action.ObserveDashboardAction)
         }
     }
 
