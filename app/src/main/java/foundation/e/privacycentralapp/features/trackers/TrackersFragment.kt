@@ -26,15 +26,14 @@ import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
 import foundation.e.flowmvi.MVIView
 import foundation.e.privacycentralapp.DependencyContainer
 import foundation.e.privacycentralapp.PrivacyCentralApplication
 import foundation.e.privacycentralapp.R
 import foundation.e.privacycentralapp.common.AppsAdapter
 import foundation.e.privacycentralapp.common.NavToolbarFragment
+import foundation.e.privacycentralapp.common.customizeBarChart
+import foundation.e.privacycentralapp.common.updateGraphData
 import foundation.e.privacycentralapp.databinding.FragmentTrackersBinding
 import foundation.e.privacycentralapp.databinding.TrackersItemGraphBinding
 import foundation.e.privacycentralapp.extensions.viewModelProviderFactoryOf
@@ -94,16 +93,7 @@ class TrackersFragment :
         binding = FragmentTrackersBinding.bind(view)
 
         listOf(binding.graphDay, binding.graphMonth, binding.graphYear).forEach {
-            it.graph.apply {
-                description = null
-                setTouchEnabled(false)
-                setDrawGridBackground(false)
-                setDrawBorders(false)
-                axisLeft.isEnabled = false
-                axisRight.isEnabled = false
-                xAxis.isEnabled = false
-                legend.isEnabled = false
-            }
+            customizeBarChart(it.graph)
         }
 
         binding.apps.apply {
@@ -140,16 +130,7 @@ class TrackersFragment :
     }
 
     private fun renderGraph(trackersCount: Int, data: List<Int>, graphBinding: TrackersItemGraphBinding) {
-        val trackersDataSet = BarDataSet(
-            data.mapIndexed { index, value -> BarEntry(index.toFloat(), value.toFloat()) },
-            getString(R.string.trackers_count_label)
-        ).apply {
-            color = ContextCompat.getColor(requireContext(), R.color.e_blue2)
-            setDrawValues(false)
-        }
-
-        graphBinding.graph.data = BarData(trackersDataSet)
-        graphBinding.graph.invalidate()
+        updateGraphData(data, graphBinding.graph, ContextCompat.getColor(requireContext(), R.color.e_blue2))
         graphBinding.trackersCountLabel.text = getString(R.string.trackers_count_label, trackersCount)
     }
 

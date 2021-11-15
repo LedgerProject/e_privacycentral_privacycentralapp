@@ -23,5 +23,5 @@
     <color name="green_valid">#2CC766</color>
 
 
-    <color name="e_blue2">@lineageos.platform:color/color_default_blue2</color>
+    <color name="e_blue2">@lineageos.platform:color/color_default_blue1</color>
 </resources>

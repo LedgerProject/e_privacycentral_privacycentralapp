@@ -25,14 +25,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
 import foundation.e.flowmvi.MVIView
 import foundation.e.privacycentralapp.DependencyContainer
 import foundation.e.privacycentralapp.PrivacyCentralApplication
 import foundation.e.privacycentralapp.R
 import foundation.e.privacycentralapp.common.NavToolbarFragment
+import foundation.e.privacycentralapp.common.customizeBarChart
+import foundation.e.privacycentralapp.common.updateGraphData
 import foundation.e.privacycentralapp.databinding.FragmentDashboardBinding
 import foundation.e.privacycentralapp.domain.entities.InternetPrivacyMode
 import foundation.e.privacycentralapp.domain.entities.LocationMode
@@ -103,16 +102,7 @@ class DashboardFragment :
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentDashboardBinding.bind(view)
 
-        binding.graph.apply {
-            description = null
-            setTouchEnabled(false)
-            setDrawGridBackground(false)
-            setDrawBorders(false)
-            axisLeft.isEnabled = false
-            axisRight.isEnabled = false
-            xAxis.isEnabled = false
-            legend.isEnabled = false
-        }
+        customizeBarChart(binding.graph)
 
         binding.togglePrivacyCentral.setOnClickListener {
             viewModel.submitAction(DashboardFeature.Action.TogglePrivacyAction)
@@ -203,16 +193,7 @@ class DashboardFragment :
         )
 
         state.dayStatistics?.let {
-            val trackersDataSet = BarDataSet(
-                it.mapIndexed { index, value -> BarEntry(index.toFloat(), value.toFloat()) },
-                getString(R.string.dashboard_graph_trackers_legend)
-            ).apply {
-                color = getColor(requireContext(), R.color.e_blue2)
-                setDrawValues(false)
-            }
-
-            binding.graph.data = BarData(trackersDataSet)
-            binding.graph.invalidate()
+            updateGraphData(it, binding.graph, getColor(requireContext(), R.color.e_blue2))
         }
 
         binding.graphLegend.text = getString(R.string.dashboard_graph_trackers_legend, state.dayTrackersCount?.toString() ?: "No")

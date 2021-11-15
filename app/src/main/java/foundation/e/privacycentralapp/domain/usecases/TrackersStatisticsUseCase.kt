@@ -24,14 +24,14 @@ class TrackersStatisticsUseCase(
 ) {
 
     fun getPastDayTrackersCalls(): List<Int> {
-        return trackTrackersPrivacyModule.getPastDayTrackersCalls()
+        return trackTrackersPrivacyModule.getPastDayTrackersCalls().pruneEmptyHistoric()
     }
 
     fun getDayMonthYearStatistics(): Triple<List<Int>, List<Int>, List<Int>> {
         return Triple(
-            trackTrackersPrivacyModule.getPastDayTrackersCalls(),
-            trackTrackersPrivacyModule.getPastMonthTrackersCalls(),
-            trackTrackersPrivacyModule.getPastYearTrackersCalls()
+            trackTrackersPrivacyModule.getPastDayTrackersCalls().pruneEmptyHistoric(),
+            trackTrackersPrivacyModule.getPastMonthTrackersCalls().pruneEmptyHistoric(),
+            trackTrackersPrivacyModule.getPastYearTrackersCalls().pruneEmptyHistoric()
         )
     }
 
@@ -49,5 +49,18 @@ class TrackersStatisticsUseCase(
 
     fun getTrackersCount(): Int {
         return trackTrackersPrivacyModule.getTrackersCount()
+    }
+
+    private fun List<Int>.pruneEmptyHistoric(): List<Int> {
+        val result = mutableListOf<Int>()
+        reversed().forEach {
+            if (result.isNotEmpty() || it != 0) {
+                result.add(it)
+            }
+        }
+        if (result.isEmpty() && !isEmpty()) {
+            result.add(last())
+        }
+        return result
     }
 }
