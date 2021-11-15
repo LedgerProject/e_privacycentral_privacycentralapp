@@ -93,8 +93,8 @@ class AppTrackersFragment :
         binding = ApptrackersFragmentBinding.bind(view)
 
         // TODO: crash sqlite ?
-        // binding.blockAllToggle.setOnCheckedChangeListener { _, isChecked ->
-        //     viewModel.submitAction(Action.BlockAllToggleAction(isChecked))
+        // binding.blockAllToggle.setOnClickListener {
+        //    viewModel.submitAction(Action.BlockAllToggleAction(binding.blockAllToggle.isChecked))
         // }
 
         binding.trackers.apply {

@@ -58,8 +58,8 @@ class ToggleTrackersAdapter(
         val view = LayoutInflater.from(parent.context)
             .inflate(itemsLayout, parent, false)
         val holder = ViewHolder(view)
-        holder.toggle.setOnCheckedChangeListener { _, isChecked ->
-            listener(dataSet[holder.adapterPosition].first, isChecked)
+        holder.toggle.setOnClickListener {
+            listener(dataSet[holder.adapterPosition].first, holder.toggle.isChecked)
         }
         return holder
     }
