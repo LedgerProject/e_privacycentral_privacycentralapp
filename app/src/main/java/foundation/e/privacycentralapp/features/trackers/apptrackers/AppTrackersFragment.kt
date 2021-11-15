@@ -93,9 +93,9 @@ class AppTrackersFragment :
         binding = ApptrackersFragmentBinding.bind(view)
 
         // TODO: crash sqlite ?
-        // binding.blockAllToggle.setOnClickListener {
-        //    viewModel.submitAction(Action.BlockAllToggleAction(binding.blockAllToggle.isChecked))
-        // }
+        binding.blockAllToggle.setOnClickListener {
+            viewModel.submitAction(Action.BlockAllToggleAction(binding.blockAllToggle.isChecked))
+        }
 
         binding.trackers.apply {
             layoutManager = LinearLayoutManager(requireContext())
