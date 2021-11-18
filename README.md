@@ -70,6 +70,17 @@ To strictly enforce the code quality, this project has a pre-commit hook which i
 hooks/pre-commit
 ```
 
+## Build dependencies
+
+This app requires different modules that must be built indivually and pushed to a local maven repository or our gitlab
+
+modules must be build and deployed in the following order:
+
+- privacymodulesapi
+- privacymodulese
+- privacymoduletor
+- privacymoduletrackerfilter
+
 ## Build
 If you'd like to build PrivacyCentral locally, you should be able to just clone and build with no issues.
 
