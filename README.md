@@ -76,14 +76,14 @@ This app requires different modules that must be built indivually and pushed to 
 
 modules must be build and deployed in the following order:
 
-- [privacymodulesapi](../e_privacycentral_privacymodulesapi)
-- [privacymodulese](../e_privacycentral_privacymodulese)
-- [privacymoduletor](../e_privacycentral_privacymoduletor)
-- [privacymoduletrackerfilter](../e_privacycentral_privacymoduletrackerfilter)
+- [privacymodulesapi](../../../e_privacycentral_privacymodulesapi)
+- [privacymodulese](../../../e_privacycentral_privacymodulese)
+- [privacymoduletor](../../../e_privacycentral_privacymoduletor)
+- [privacymoduletrackerfilter](../../../e_privacycentral_privacymoduletrackerfilter)
 
 TrackerFilter won't work unless your rom was build with this specific netd project:
 
-[android_system_netd](../e_privacycentral_android_system_netd)
+[android_system_netd](../../../e_privacycentral_android_system_netd)
 
 
 ## Build
