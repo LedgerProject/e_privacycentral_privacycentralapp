@@ -80,7 +80,7 @@ class DependencyContainer constructor(val app: Application) {
     private val ipScramblingStateUseCase by lazy {
         IpScramblingStateUseCase(ipScramblerModule, permissionsModule, appDesc, localStateRepository, GlobalScope)
     }
-    private val appListUseCase = AppListUseCase(permissionsModule, GlobalScope)
+    private val appListUseCase = AppListUseCase(permissionsModule, blockTrackersPrivacyModule, GlobalScope)
 
     private val trackersStatisticsUseCase by lazy {
         TrackersStatisticsUseCase(trackTrackersPrivacyModule)

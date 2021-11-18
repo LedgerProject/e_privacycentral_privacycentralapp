@@ -130,7 +130,7 @@ class TrackersFeature(
                                 )
                             )
                         },
-                        appListUseCase.getInstalledAppsUsingInternet().map { apps ->
+                        appListUseCase.getBlockableApps().map { apps ->
                             Effect.AvailableAppsListEffect(apps)
                         }
                     )

@@ -20,6 +20,7 @@ package foundation.e.privacycentralapp.domain.usecases
 import android.Manifest
 import foundation.e.privacymodules.permissions.PermissionsPrivacyModule
 import foundation.e.privacymodules.permissions.data.ApplicationDescription
+import foundation.e.trackerfilter.api.BlockTrackersPrivacyModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +28,7 @@ import kotlinx.coroutines.launch
 
 class AppListUseCase(
     private val permissionsModule: PermissionsPrivacyModule,
+    private val blockTrackersPrivacyModule: BlockTrackersPrivacyModule,
     private val corouteineScope: CoroutineScope
 ) {
 
@@ -43,6 +45,37 @@ class AppListUseCase(
             _installedAppsUsingInternet.value = getInstalledAppsUsingInternetList()
         }
         return _installedAppsUsingInternet
+    }
+
+    fun getBlockableApps(): Flow<List<ApplicationDescription>> {
+        corouteineScope.launch {
+            _installedAppsUsingInternet.value = getBlockableAppsList()
+        }
+        return _installedAppsUsingInternet
+    }
+
+    private fun getBlockableAppsList(): List<ApplicationDescription> {
+        return blockTrackersPrivacyModule.getBlockableApps()
+            .filter {
+                permissionsModule.getPermissions(it.packageName)
+                    .contains(Manifest.permission.INTERNET)
+            }.map {
+                it.icon = permissionsModule.getApplicationIcon(it.packageName)
+                it
+            }.sortedWith(object : Comparator<ApplicationDescription> {
+                override fun compare(
+                    p0: ApplicationDescription?,
+                    p1: ApplicationDescription?
+                ): Int {
+                    return if (p0?.icon != null && p1?.icon != null) {
+                        p0.label.toString().compareTo(p1.label.toString())
+                    } else if (p0?.icon == null) {
+                        1
+                    } else {
+                        -1
+                    }
+                }
+            })
     }
 
     private fun getInstalledAppsUsingInternetList(): List<ApplicationDescription> {

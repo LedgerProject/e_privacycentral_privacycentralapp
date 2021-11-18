@@ -98,8 +98,8 @@ dependencies {
     //googleImplementation project(":privacymodulesgoogle")
     // include the e specific version of the modules, just for the e flavor
 
-    implementation 'foundation.e:privacymodule.trackerfilter:0.1.2'
-    implementation 'foundation.e:privacymodule.api:0.4.1'
+    implementation 'foundation.e:privacymodule.trackerfilter:0.1.3'
+    implementation 'foundation.e:privacymodule.api:0.4.3'
     implementation 'foundation.e:privacymodule.e-29:0.4.1'
     implementation 'foundation.e:privacymodule.tor:0.1.1'
 
