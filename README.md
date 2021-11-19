@@ -72,6 +72,25 @@ hooks/pre-commit
 
 ## Build dependencies
 
+TrackerFilter won't work unless your rom was build with this specific netd project:
+
+[android_system_netd](../../../e_privacycentral_android_system_netd)
+
+To create an /e/ build with this specific project, follow the documentation to create an usual /e/ build for your device https://doc.e.foundation/devices until `repo sync`
+
+After `repo sync` all the sources, replace
+```
+system/netd
+```
+
+with this repo [android_system_netd](../../../e_privacycentral_android_system_netd)
+
+then run the build as usual
+
+This won't include privacy central, you still need to build the app.
+
+
+
 This app requires different modules that must be built indivually and pushed to a local maven repository or our gitlab
 
 modules must be build and deployed in the following order:
@@ -80,10 +99,6 @@ modules must be build and deployed in the following order:
 - [privacymodulese](../../../e_privacycentral_privacymodulese)
 - [privacymoduletor](../../../e_privacycentral_privacymoduletor)
 - [privacymoduletrackerfilter](../../../e_privacycentral_privacymoduletrackerfilter)
-
-TrackerFilter won't work unless your rom was build with this specific netd project:
-
-[android_system_netd](../../../e_privacycentral_android_system_netd)
 
 
 ## Build
