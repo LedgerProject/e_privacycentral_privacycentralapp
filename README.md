@@ -1,4 +1,7 @@
-# PrivacyCentralApp
+# PrivacyCentralApp Alpha
+
+⚠️ Final version will be published on /e/ foundation gitlab https://gitlab.e.foundation/e
+
 An app to let you control and protect your privacy.
 
 Forked to https://github.com/LedgerProject/e_privacycentralapp, embending all /e/ submodules.
